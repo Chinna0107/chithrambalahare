@@ -1,0 +1,137 @@
+import { createBrowserRouter } from 'react-router-dom';
+import MainLayout from '../layouts/MainLayout';
+
+// Lazy load pages for better performance
+import { lazy, Suspense } from 'react';
+import LoadingSkeleton from '../components/LoadingSkeleton';
+
+const Home = lazy(() => import('../pages/Home'));
+const About = lazy(() => import('../pages/About'));
+const MovieNews = lazy(() => import('../pages/MovieNews'));
+const SingleArticle = lazy(() => import('../pages/MovieNews/SingleArticle'));
+const Archive = lazy(() => import('../pages/MovieNews/Archive'));
+const Reviews = lazy(() => import('../pages/Reviews'));
+const SingleReview = lazy(() => import('../pages/Reviews/SingleReview'));
+const BoxOffice = lazy(() => import('../pages/BoxOffice'));
+const SingleBoxOffice = lazy(() => import('../pages/BoxOffice/SingleBoxOffice'));
+const Search = lazy(() => import('../pages/Search'));
+const Admin = lazy(() => import('../pages/Admin'));
+const AdminOverview = lazy(() => import('../pages/Admin/Overview'));
+const AdminPopupAd = lazy(() => import('../pages/Admin/PopupAd'));
+const AdminNorthAmerica = lazy(() => import('../pages/Admin/NorthAmerica'));
+const AdminSchedules = lazy(() => import('../pages/Admin/Schedules'));
+const AdminTop5 = lazy(() => import('../pages/Admin/Top5'));
+const AdminGalleries = lazy(() => import('../pages/Admin/Galleries'));
+const AdminArticles = lazy(() => import('../pages/Admin/Articles'));
+const AdminReviews = lazy(() => import('../pages/Admin/Reviews'));
+const AdminBoxOffice = lazy(() => import('../pages/Admin/BoxOffice'));
+const Gallery = lazy(() => import('../pages/Gallery'));
+const NotFound = lazy(() => import('../pages/NotFound'));
+
+// Wrapper to provide suspense fallback
+const SuspenseWrapper = ({ children }) => (
+  <Suspense fallback={<LoadingSkeleton type="page" />}>
+    {children}
+  </Suspense>
+);
+
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <MainLayout />,
+    children: [
+      {
+        index: true,
+        element: <SuspenseWrapper><Home /></SuspenseWrapper>,
+      },
+      {
+        path: 'about',
+        element: <SuspenseWrapper><About /></SuspenseWrapper>,
+      },
+      {
+        path: 'movie-news',
+        children: [
+          {
+            index: true,
+            element: <SuspenseWrapper><MovieNews /></SuspenseWrapper>,
+          },
+          {
+            path: 'archive',
+            element: <SuspenseWrapper><Archive /></SuspenseWrapper>,
+          },
+          {
+            path: ':slug',
+            element: <SuspenseWrapper><SingleArticle /></SuspenseWrapper>,
+          },
+        ]
+      },
+      {
+        path: 'reviews',
+        children: [
+          {
+            index: true,
+            element: <SuspenseWrapper><Reviews /></SuspenseWrapper>,
+          },
+          {
+            path: ':slug',
+            element: <SuspenseWrapper><SingleReview /></SuspenseWrapper>,
+          },
+        ]
+      },
+      {
+        path: 'box-office',
+        children: [
+          {
+            index: true,
+            element: <SuspenseWrapper><BoxOffice /></SuspenseWrapper>,
+          },
+          {
+            path: ':slug',
+            element: <SuspenseWrapper><SingleBoxOffice /></SuspenseWrapper>,
+          },
+        ]
+      },
+      {
+        path: 'search',
+        element: <SuspenseWrapper><Search /></SuspenseWrapper>,
+      },
+      {
+        path: 'galleries',
+        children: [
+          {
+            index: true,
+            element: <SuspenseWrapper><Gallery /></SuspenseWrapper>,
+          },
+          {
+            path: ':id',
+            element: <SuspenseWrapper><Gallery /></SuspenseWrapper>,
+          },
+        ]
+      },
+      {
+        path: 'admin',
+        element: <SuspenseWrapper><Admin /></SuspenseWrapper>,
+        children: [
+          { index: true, element: <SuspenseWrapper><AdminOverview /></SuspenseWrapper> },
+          { path: 'overview', element: <SuspenseWrapper><AdminOverview /></SuspenseWrapper> },
+          { path: 'popup', element: <SuspenseWrapper><AdminPopupAd /></SuspenseWrapper> },
+          { path: 'north-america', element: <SuspenseWrapper><AdminNorthAmerica /></SuspenseWrapper> },
+          { path: 'schedules', element: <SuspenseWrapper><AdminSchedules /></SuspenseWrapper> },
+          { path: 'top5', element: <SuspenseWrapper><AdminTop5 /></SuspenseWrapper> },
+          { path: 'galleries', element: <SuspenseWrapper><AdminGalleries /></SuspenseWrapper> },
+          { path: 'articles', element: <SuspenseWrapper><AdminArticles /></SuspenseWrapper> },
+          { path: 'reviews', element: <SuspenseWrapper><AdminReviews /></SuspenseWrapper> },
+          { path: 'box-office', element: <SuspenseWrapper><AdminBoxOffice /></SuspenseWrapper> }
+        ]
+      },
+      {
+        path: '*',
+        element: <SuspenseWrapper><NotFound /></SuspenseWrapper>,
+      },
+    ],
+  },
+]);
+
+export default router;
+
+
