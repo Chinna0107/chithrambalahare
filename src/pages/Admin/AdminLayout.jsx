@@ -214,7 +214,8 @@ const AdminLayout = () => {
             ))}
           </nav>
 
-          {/* <div className="p-4 mt-auto border-t border-gray-800">
+          {/* <div className="p-4 mt-auto border-t bo
+          rder-gray-800">
             <div className="bg-red-500/10 rounded-xl p-4 border border-red-500/20">
               <h4 className="text-red-500 font-bold text-xs uppercase tracking-wider mb-2 flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4" /> Danger Zone
