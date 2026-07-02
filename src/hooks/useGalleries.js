@@ -15,3 +15,5 @@ export const useGallery = (id) =>
     enabled: !!id,
     staleTime: 1000 * 60 * 5,
   });
+
+

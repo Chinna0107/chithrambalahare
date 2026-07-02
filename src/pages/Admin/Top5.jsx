@@ -101,9 +101,60 @@ const Top5 = () => {
                   onChange={e => handleChange(item.rank, 'trend', e.target.value)}
                   className="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand-red transition-all"
                 >
-                  {trendOptions.map(t => <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>)}
+                  {['up', 'down', 'stable'].map(v => <option key={v} value={v}>{v.charAt(0).toUpperCase() + v.slice(1)}</option>)}
                 </select>
               </div>
+              <div>
+                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Opening Collection</label>
+                <input
+                  type="text"
+                  value={item.openingCollection ?? ''}
+                  onChange={e => handleChange(item.rank, 'openingCollection', e.target.value)}
+                  placeholder="e.g. ₹5 Cr"
+                  className="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand-red transition-all"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Weekend Collection</label>
+                <input
+                  type="text"
+                  value={item.weekendCollection ?? ''}
+                  onChange={e => handleChange(item.rank, 'weekendCollection', e.target.value)}
+                  placeholder="e.g. ₹15 Cr"
+                  className="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand-red transition-all"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Total Collection</label>
+                <input
+                  type="text"
+                  value={item.totalCollection ?? ''}
+                  onChange={e => handleChange(item.rank, 'totalCollection', e.target.value)}
+                  placeholder="e.g. ₹25 Cr"
+                  className="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand-red transition-all"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Territory</label>
+                <input
+                  type="text"
+                  value={item.territory ?? ''}
+                  onChange={e => handleChange(item.rank, 'territory', e.target.value)}
+                  placeholder="e.g. Worldwide"
+                  className="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand-red transition-all"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Last Updated</label>
+                <input
+                  type="text"
+                  value={item.lastUpdated ?? ''}
+                  onChange={e => handleChange(item.rank, 'lastUpdated', e.target.value)}
+                  placeholder="e.g. 10 Mins ago"
+                  className="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand-red transition-all"
+                />
+              </div>
+
             </div>
           </div>
         ))}

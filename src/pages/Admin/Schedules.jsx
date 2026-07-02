@@ -2,11 +2,66 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useOutletContext } from 'react-router-dom';
 import { Plus, Trash2, Edit, Check, X, Loader2 } from 'lucide-react';
+import ImageUpload from '../../components/ImageUpload';
 
-const emptyForm = { movieName: '', releaseDate: '', language: '', status: 'Upcoming' };
+const emptyForm = { movieName: '', slug: '', releaseDate: '', language: '', status: 'Upcoming', banner: '', director: '', castList: '', genre: '', trailerLink: '', notes: '' };
 const sanitize = (obj) => Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, v === null || v === undefined ? '' : v]));
 
 const statusOptions = ['Upcoming', 'Released', 'Postponed', 'Cancelled'];
+
+const fields = [
+  { field: 'slug', label: 'Slug (URL)', type: 'text' },
+  { field: 'movieName', label: 'Movie Name', type: 'text' },
+  { field: 'releaseDate', label: 'Release Date', type: 'text' },
+  { field: 'language', label: 'Language', type: 'text' },
+  { field: 'director', label: 'Director', type: 'text' },
+  { field: 'genre', label: 'Genre', type: 'text' },
+  { field: 'castList', label: 'Cast', type: 'text' },
+  { field: 'trailerLink', label: 'Trailer Link', type: 'text' },
+  { field: 'notes', label: 'Notes', type: 'text' },
+];
+
+const FormRow = ({ formState, setFormState }) => (
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="lg:col-span-4">
+      <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Banner Image URL</label>
+      <ImageUpload
+        value={formState.banner}
+        onChange={(url) => setFormState(f => ({ ...f, banner: url }))}
+      />
+    </div>
+    {fields.map(({ field, label, type }) => (
+      <div key={field} className={type === 'textarea' ? "lg:col-span-4" : ""}>
+        <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">{label}</label>
+        {type === 'textarea' ? (
+          <textarea
+            value={formState[field] ?? ''}
+            onChange={e => setFormState(f => ({ ...f, [field]: e.target.value }))}
+            className="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-brand-red transition-all"
+            rows={3}
+          />
+        ) : (
+          <input
+            type={type}
+            value={formState[field] ?? ''}
+            onChange={e => setFormState(f => ({ ...f, [field]: e.target.value }))}
+            className="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-brand-red transition-all"
+          />
+        )}
+      </div>
+    ))}
+    <div>
+      <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Status</label>
+      <select
+        value={formState.status ?? 'Upcoming'}
+        onChange={e => setFormState(f => ({ ...f, status: e.target.value }))}
+        className="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand-red transition-all"
+      >
+        {statusOptions.map(s => <option key={s} value={s}>{s}</option>)}
+      </select>
+    </div>
+  </div>
+);
 
 const Schedules = () => {
   const { dbData, setDbData, triggerNotification } = useOutletContext();
@@ -47,38 +102,6 @@ const Schedules = () => {
     await save(list.map(item => item.id === editingId ? { ...item, ...editForm } : item));
     setEditingId(null);
   };
-
-  const fields = [
-    { field: 'movieName', label: 'Movie Name', type: 'text' },
-    { field: 'releaseDate', label: 'Release Date', type: 'date' },
-    { field: 'language', label: 'Language', type: 'text' },
-  ];
-
-  const FormRow = ({ formState, setFormState }) => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      {fields.map(({ field, label, type }) => (
-        <div key={field}>
-          <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">{label}</label>
-          <input
-            type={type}
-            value={formState[field] ?? ''}
-            onChange={e => setFormState(f => ({ ...f, [field]: e.target.value }))}
-            className="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-brand-red transition-all"
-          />
-        </div>
-      ))}
-      <div>
-        <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Status</label>
-        <select
-          value={formState.status ?? 'Upcoming'}
-          onChange={e => setFormState(f => ({ ...f, status: e.target.value }))}
-          className="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand-red transition-all"
-        >
-          {statusOptions.map(s => <option key={s} value={s}>{s}</option>)}
-        </select>
-      </div>
-    </div>
-  );
 
   const statusColor = { Upcoming: 'bg-blue-500/20 text-blue-400', Released: 'bg-green-500/20 text-green-400', Postponed: 'bg-yellow-500/20 text-yellow-400', Cancelled: 'bg-red-500/20 text-red-400' };
 

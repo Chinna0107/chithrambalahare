@@ -14,6 +14,8 @@ const Reviews = lazy(() => import('../pages/Reviews'));
 const SingleReview = lazy(() => import('../pages/Reviews/SingleReview'));
 const BoxOffice = lazy(() => import('../pages/BoxOffice'));
 const SingleBoxOffice = lazy(() => import('../pages/BoxOffice/SingleBoxOffice'));
+const SingleNorthAmerica = lazy(() => import('../pages/NorthAmerica/SingleNorthAmerica'));
+const SingleSchedule = lazy(() => import('../pages/Schedules/SingleSchedule'));
 const Search = lazy(() => import('../pages/Search'));
 const Admin = lazy(() => import('../pages/Admin'));
 const AdminOverview = lazy(() => import('../pages/Admin/Overview'));
@@ -25,6 +27,12 @@ const AdminGalleries = lazy(() => import('../pages/Admin/Galleries'));
 const AdminArticles = lazy(() => import('../pages/Admin/Articles'));
 const AdminReviews = lazy(() => import('../pages/Admin/Reviews'));
 const AdminBoxOffice = lazy(() => import('../pages/Admin/BoxOffice'));
+const AdminTaxonomy = lazy(() => import('../pages/Admin/Taxonomy'));
+const AdminLandingPage = lazy(() => import('../pages/Admin/LandingPage'));
+const AdminMonetization = lazy(() => import('../pages/Admin/Monetization'));
+const AdminComments = lazy(() => import('../pages/Admin/Comments'));
+const AdminSettings = lazy(() => import('../pages/Admin/Settings'));
+const AdminMedia = lazy(() => import('../pages/Admin/Media'));
 const Gallery = lazy(() => import('../pages/Gallery'));
 const NotFound = lazy(() => import('../pages/NotFound'));
 
@@ -92,6 +100,24 @@ const router = createBrowserRouter([
         ]
       },
       {
+        path: 'north-america',
+        children: [
+          {
+            path: ':slug',
+            element: <SuspenseWrapper><SingleNorthAmerica /></SuspenseWrapper>,
+          },
+        ]
+      },
+      {
+        path: 'upcoming',
+        children: [
+          {
+            path: ':slug',
+            element: <SuspenseWrapper><SingleSchedule /></SuspenseWrapper>,
+          },
+        ]
+      },
+      {
         path: 'search',
         element: <SuspenseWrapper><Search /></SuspenseWrapper>,
       },
@@ -121,7 +147,13 @@ const router = createBrowserRouter([
           { path: 'galleries', element: <SuspenseWrapper><AdminGalleries /></SuspenseWrapper> },
           { path: 'articles', element: <SuspenseWrapper><AdminArticles /></SuspenseWrapper> },
           { path: 'reviews', element: <SuspenseWrapper><AdminReviews /></SuspenseWrapper> },
-          { path: 'box-office', element: <SuspenseWrapper><AdminBoxOffice /></SuspenseWrapper> }
+          { path: 'box-office', element: <SuspenseWrapper><AdminBoxOffice /></SuspenseWrapper> },
+          { path: 'taxonomy', element: <SuspenseWrapper><AdminTaxonomy /></SuspenseWrapper> },
+          { path: 'landing-page', element: <SuspenseWrapper><AdminLandingPage /></SuspenseWrapper> },
+          { path: 'monetization', element: <SuspenseWrapper><AdminMonetization /></SuspenseWrapper> },
+          { path: 'comments', element: <SuspenseWrapper><AdminComments /></SuspenseWrapper> },
+          { path: 'settings', element: <SuspenseWrapper><AdminSettings /></SuspenseWrapper> },
+          { path: 'media', element: <SuspenseWrapper><AdminMedia /></SuspenseWrapper> }
         ]
       },
       {

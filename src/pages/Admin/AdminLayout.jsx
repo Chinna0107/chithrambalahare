@@ -3,7 +3,8 @@ import { Helmet } from 'react-helmet-async';
 import axios from 'axios';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { 
-  Settings, Tv, Globe, Calendar, TrendingUp, RotateCcw, AlertTriangle, Loader2, X, Check, Image as ImageIcon
+  Settings, Tv, Globe, Calendar, TrendingUp, RotateCcw, AlertTriangle, Loader2, X, Check, Image as ImageIcon,
+  Tags, LayoutTemplate, DollarSign, MessageSquare
 } from 'lucide-react';
 
 const AdminLayout = () => {
@@ -160,14 +161,20 @@ const AdminLayout = () => {
 
   const tabs = [
     { id: 'overview', icon: <TrendingUp className="w-5 h-5" />, label: 'Dashboard Overview' },
-    { id: 'popup', icon: <Globe className="w-5 h-5" />, label: 'Popup Ad Settings' },
     { id: 'north-america', icon: <Globe className="w-5 h-5" />, label: 'North America' },
     { id: 'schedules', icon: <Calendar className="w-5 h-5" />, label: 'Schedules' },
     { id: 'top5', icon: <TrendingUp className="w-5 h-5" />, label: 'Box Office Top 5' },
-    { id: 'galleries', icon: <ImageIcon className="w-5 h-5" />, label: 'Galleries' },
+    { id: 'box-office', icon: <Globe className="w-5 h-5" />, label: 'Box Office Detail' },
     { id: 'articles', icon: <Tv className="w-5 h-5" />, label: 'Articles' },
     { id: 'reviews', icon: <Settings className="w-5 h-5" />, label: 'Reviews' },
-    { id: 'box-office', icon: <Globe className="w-5 h-5" />, label: 'Box Office Detail' }
+    { id: 'galleries', icon: <ImageIcon className="w-5 h-5" />, label: 'Galleries' },
+    // { id: 'media', icon: <ImageIcon className="w-5 h-5" />, label: 'Media Library' },
+    // { id: 'taxonomy', icon: <Tags className="w-5 h-5" />, label: 'Categories & Tags' },
+    // { id: 'landing-page', icon: <LayoutTemplate className="w-5 h-5" />, label: 'Landing Page' },
+    { id: 'monetization', icon: <DollarSign className="w-5 h-5" />, label: 'Ad & Monetization' },
+    { id: 'popup', icon: <Globe className="w-5 h-5" />, label: 'Popup Ad Settings' },
+    // { id: 'comments', icon: <MessageSquare className="w-5 h-5" />, label: 'Comments' },
+    // { id: 'settings', icon: <Settings className="w-5 h-5" />, label: 'Global Settings' }
   ];
 
   return (

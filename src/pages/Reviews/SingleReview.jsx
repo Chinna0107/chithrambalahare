@@ -6,6 +6,14 @@ import LoadingSkeleton from '../../components/LoadingSkeleton';
 import ShareWidget from '../../components/ShareWidget';
 import { getReviewBySlug } from '../../services/api';
 
+const getYouTubeEmbedUrl = (url) => {
+  if (!url) return '';
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+  const videoId = (match && match[2].length === 11) ? match[2] : null;
+  return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
+};
+
 const SingleReview = () => {
   const { slug } = useParams();
 
@@ -75,17 +83,63 @@ const SingleReview = () => {
           </div>
         </div>
 
+        {/* Movie Info Grid */}
+        <div className="bg-[#151515] p-6 md:p-8 border-b border-brand-red/10 grid grid-cols-2 md:grid-cols-4 gap-6">
+          {review.director && (
+            <div><span className="block text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1">Director</span><span className="text-gray-200 font-medium">{review.director}</span></div>
+          )}
+          {review.producer && (
+            <div><span className="block text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1">Producer</span><span className="text-gray-200 font-medium">{review.producer}</span></div>
+          )}
+          {review.productionHouse && (
+            <div><span className="block text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1">Production</span><span className="text-gray-200 font-medium">{review.productionHouse}</span></div>
+          )}
+          {review.language && (
+            <div><span className="block text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1">Language</span><span className="text-gray-200 font-medium">{review.language}</span></div>
+          )}
+          {review.genre && (
+            <div><span className="block text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1">Genre</span><span className="text-gray-200 font-medium">{review.genre}</span></div>
+          )}
+          {review.releaseDate && (
+            <div><span className="block text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1">Release Date</span><span className="text-gray-200 font-medium">{review.releaseDate}</span></div>
+          )}
+          {review.runtime && (
+            <div><span className="block text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1">Runtime</span><span className="text-gray-200 font-medium">{review.runtime}</span></div>
+          )}
+        </div>
+
         {/* Content Section */}
         <div className="p-8 md:p-12 space-y-10">
+          
+          {review.trailer && (
+            <div className="mb-4">
+              <h2 className="text-2xl font-poppins font-bold text-gray-100 mb-4 flex items-center">
+                <span className="w-1.5 h-6 bg-brand-red mr-3 rounded-full"></span>
+                Trailer
+              </h2>
+              <div className="aspect-video w-full rounded-xl overflow-hidden border border-gray-800 shadow-xl">
+                <iframe 
+                  width="100%" 
+                  height="100%" 
+                  src={getYouTubeEmbedUrl(review.trailer)} 
+                  title="Trailer" 
+                  frameBorder="0" 
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                  allowFullScreen
+                ></iframe>
+              </div>
+            </div>
+          )}
           
           <section>
             <h2 className="text-2xl font-poppins font-bold text-gray-100 mb-4 flex items-center">
               <span className="w-1.5 h-6 bg-brand-red mr-3 rounded-full"></span>
               Story
             </h2>
-            <p className="text-gray-300 leading-relaxed font-inter text-lg">
-              {review.story}
-            </p>
+            <div 
+              className="text-gray-300 leading-relaxed font-inter text-lg prose prose-invert max-w-none" 
+              dangerouslySetInnerHTML={{ __html: review.story }} 
+            />
           </section>
 
           <section>
@@ -93,9 +147,10 @@ const SingleReview = () => {
               <span className="w-1.5 h-6 bg-brand-red mr-3 rounded-full"></span>
               Performances
             </h2>
-            <p className="text-gray-300 leading-relaxed font-inter text-lg">
-              {review.performances}
-            </p>
+            <div 
+              className="text-gray-300 leading-relaxed font-inter text-lg prose prose-invert max-w-none" 
+              dangerouslySetInnerHTML={{ __html: review.performances }} 
+            />
           </section>
 
           <section>
@@ -103,9 +158,10 @@ const SingleReview = () => {
               <span className="w-1.5 h-6 bg-brand-red mr-3 rounded-full"></span>
               Technical Aspects
             </h2>
-            <p className="text-gray-300 leading-relaxed font-inter text-lg">
-              {review.technicalAspects}
-            </p>
+            <div 
+              className="text-gray-300 leading-relaxed font-inter text-lg prose prose-invert max-w-none" 
+              dangerouslySetInnerHTML={{ __html: review.technicalAspects }} 
+            />
           </section>
 
           <div className="bg-[#18181B] border border-brand-red/20 rounded-xl p-8 mt-12 text-center shadow-[0_0_20px_rgba(255,0,0,0.1)]">
@@ -113,6 +169,12 @@ const SingleReview = () => {
             <p className="text-2xl font-bold text-gray-100 drop-shadow-[0_0_10px_rgba(255,0,0,0.5)]">
               {review.verdict}
             </p>
+            {review.verdictText && (
+              <div 
+                className="text-gray-300 leading-relaxed font-inter text-lg mt-4 text-left prose prose-invert max-w-none" 
+                dangerouslySetInnerHTML={{ __html: review.verdictText }} 
+              />
+            )}
           </div>
           
           <ShareWidget title={`${review.movieName} Review`} />

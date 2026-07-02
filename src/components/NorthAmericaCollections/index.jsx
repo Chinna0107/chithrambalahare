@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
 import { Globe, RefreshCw, Star, TrendingUp } from 'lucide-react';
 import { getNorthAmericaCollections } from '../../services/api';
 
@@ -56,12 +57,10 @@ const NorthAmericaCollections = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {collections.map((movie) => (
-          <div 
-            key={movie.id} 
-            className="glass-card group relative rounded-xl border border-brand-red/10 overflow-hidden hover:border-brand-red/30 transition-all duration-300 hover:shadow-[0_10px_30px_rgba(212,43,43,0.15)] flex flex-col justify-between"
-          >
-            {/* Upper Info Section */}
+        {collections.map((movie) => {
+          const CardContent = (
+            <>
+              {/* Upper Info Section */}
             <div className="p-5 flex gap-4">
               {/* Poster Thumbnail */}
               <div className="w-20 h-28 shrink-0 rounded-lg overflow-hidden border border-gray-800 bg-brand-dark shadow-md group-hover:border-brand-red/40 transition-colors">
@@ -99,17 +98,40 @@ const NorthAmericaCollections = () => {
               </div>
             </div>
 
+            {/* Detailed Info Grid */}
+            <div className="bg-[#151515] p-4 text-xs border-t border-brand-red/10 grid grid-cols-2 gap-y-2 gap-x-4 text-gray-300">
+              {movie.distributor && <div><span className="text-gray-500 font-medium">Distributor:</span> {movie.distributor}</div>}
+              {movie.releaseDate && <div><span className="text-gray-500 font-medium">Release:</span> {movie.releaseDate}</div>}
+              {movie.language && <div><span className="text-gray-500 font-medium">Language:</span> {movie.language}</div>}
+              {movie.budget && <div><span className="text-gray-500 font-medium">Budget:</span> {movie.budget}</div>}
+            </div>
+
             {/* Bottom Collections Grid */}
             <div className="bg-[#18181B]/80 border-t border-brand-red/10 p-4 grid grid-cols-2 gap-4 text-center">
               <div>
                 <div className="text-[9px] text-gray-400 font-semibold uppercase tracking-wider">Premiere</div>
-                <div className="font-poppins font-bold text-gray-200 text-sm">{movie.premierGross || '—'}</div>
+                <div className="font-poppins font-bold text-gray-200 text-sm">{movie.premierGross || movie.premiereCollections || '—'}</div>
               </div>
               <div className="border-l border-gray-800">
                 <div className="text-[9px] text-gray-400 font-semibold uppercase tracking-wider">Total Gross</div>
                 <div className="font-poppins font-bold text-brand-red text-sm">{movie.totalGross || '—'}</div>
               </div>
             </div>
+
+            {/* Daily Breakdown */}
+            {movie.dailyBreakdown && Array.isArray(movie.dailyBreakdown) && movie.dailyBreakdown.length > 0 && (
+              <div className="border-t border-brand-red/10 p-4 bg-[#111113]">
+                <div className="text-[10px] text-brand-red font-bold uppercase tracking-wider mb-2">Daily Breakdown</div>
+                <div className="space-y-1.5 max-h-32 overflow-y-auto pr-1">
+                  {movie.dailyBreakdown.map((d, i) => (
+                    <div key={i} className="flex justify-between items-center text-xs bg-black/40 rounded px-2 py-1 border border-gray-800/50">
+                      <span className="text-gray-400 font-medium">{d.day}</span>
+                      <span className="font-poppins font-bold text-green-400">{d.collection}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Last Updated Footer Banner */}
             <div className="bg-brand-red/5 px-4 py-1.5 border-t border-brand-red/5 flex justify-between items-center text-[10px] text-gray-400">
@@ -118,8 +140,21 @@ const NorthAmericaCollections = () => {
               </span>
               <span>Updated: {movie.lastUpdated || 'Just now'}</span>
             </div>
-          </div>
-        ))}
+          </>
+        );
+
+        const identifier = movie.slug || movie.id;
+        
+        return (
+          <Link 
+            to={`/north-america/${identifier}`} 
+            key={movie.id}
+            className="glass-card group relative rounded-xl border border-brand-red/10 overflow-hidden hover:border-brand-red/30 transition-all duration-300 hover:shadow-[0_10px_30px_rgba(212,43,43,0.15)] flex flex-col justify-between block"
+          >
+            {CardContent}
+          </Link>
+        );
+      })}
       </div>
 
       <style>{`

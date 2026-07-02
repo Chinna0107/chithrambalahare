@@ -214,13 +214,18 @@ const SingleArticle = () => {
 
   const isPeddiArticle = slug.includes('peddi');
 
-  // Collect all images from content blocks for the strip
-  const contentImages = (article.content || [])
-    .filter(b => b.type === 'image' && b.value)
-    .map(b => b.value);
+  const heroImage = article.featuredImage || article.thumbnail || FALLBACK;
+  
+  // Extract image URLs from HTML content string for the lightbox strip
+  const contentStr = typeof article.content === 'string' ? article.content : '';
+  const imgRegex = /<img[^>]+src="([^">]+)"/g;
+  const contentImages = [];
+  let match;
+  while ((match = imgRegex.exec(contentStr)) !== null) {
+    contentImages.push(match[1]);
+  }
 
   // Deduplicate featured image + content images
-  const heroImage = article.featuredImage || article.thumbnail || FALLBACK;
   const allImages = [heroImage, ...contentImages.filter(u => u !== heroImage)];
 
   return (
@@ -309,46 +314,8 @@ const SingleArticle = () => {
               </div>
             </div>
 
-            {/* BODY CONTENT — paragraphs only, images already shown in strip */}
-            <div className="art-body" id="artBody">
-              {(article.content || []).map((block, idx) => {
-                if (block.type === 'paragraph') {
-                  return (
-                    <React.Fragment key={idx}>
-                      <p>{block.value}</p>
-
-                      {isPeddiArticle && idx === 0 && (
-                        <div className="pullquote">
-                          <p>The second week alone contributed over ₹68 Cr to the worldwide tally — a remarkable hold that points to exceptional word of mouth and repeat viewing.</p>
-                          <cite>— CHITRAMBHALARE Box Office Desk</cite>
-                        </div>
-                      )}
-
-                      {isPeddiArticle && idx === 1 && (
-                        <div className="bo-table-wrap">
-                          <div className="bo-table-hdr"><div className="bo-table-hdr-title">Peddi — Worldwide Gross Collections</div></div>
-                          <div className="table-scroll">
-                            <table className="bo-table">
-                              <thead>
-                                <tr><th>#</th><th>Period</th><th>WW Gross</th><th>Telugu Share</th><th>Trend</th></tr>
-                              </thead>
-                              <tbody>
-                                <tr><td className="rank">1</td><td>Day 1 Opening</td><td className="amt">₹73 Cr</td><td>₹42 Cr</td><td className="trend-up">▲ Record</td></tr>
-                                <tr><td className="rank">2</td><td>First Weekend</td><td className="amt">₹190 Cr</td><td>₹108 Cr</td><td className="trend-up">▲ Strong</td></tr>
-                                <tr><td className="rank">3</td><td>First Week</td><td className="amt">₹252 Cr</td><td>₹164 Cr</td><td className="trend-up">▲ Solid</td></tr>
-                                <tr><td className="rank">4</td><td>Second Weekend</td><td className="amt">₹290 Cr</td><td>₹180 Cr</td><td className="trend-up">▲ Holding</td></tr>
-                                <tr><td className="rank">5</td><td>Two Weeks</td><td className="amt">₹320 Cr+</td><td>₹195 Cr+</td><td className="trend-up">▲ Running</td></tr>
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-                      )}
-                    </React.Fragment>
-                  );
-                }
-                return null;
-              })}
-            </div>
+            {/* BODY CONTENT */}
+            <div className="art-body prose prose-invert max-w-none" id="artBody" dangerouslySetInnerHTML={{ __html: typeof article.content === 'string' ? article.content : '' }} />
 
             {/* TAGS */}
             <div className="art-tags">

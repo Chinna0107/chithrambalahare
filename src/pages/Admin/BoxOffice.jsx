@@ -2,6 +2,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useOutletContext } from 'react-router-dom';
 import { Plus, Trash2, Edit, Check, X, Loader2, Eye } from 'lucide-react';
+import ImageUpload from '../../components/ImageUpload';
 
 const emptyForm = {
   slug: '', movieName: '', director: '', cast: '', poster: '',
@@ -111,19 +112,27 @@ const BoxOffice = () => {
     { field: 'date', label: 'Date', placeholder: '', type: 'date' },
   ];
 
-  const FormFields = ({ formState, setFormState }) => (
+  const renderFormFields = (formState, setFormState) => (
     <div className="space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {shortFields.map(({ field, label, placeholder, type }) => (
           <div key={field}>
             <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">{label}</label>
-            <input
-              type={type || 'text'}
-              value={formState[field] ?? ''}
-              onChange={e => setFormState(f => ({ ...f, [field]: e.target.value }))}
-              placeholder={placeholder}
-              className="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand-red transition-all"
-            />
+            {field === 'poster' ? (
+              <ImageUpload 
+                value={formState[field] ?? ''} 
+                onChange={url => setFormState(f => ({ ...f, [field]: url }))} 
+                placeholder={`Upload ${label.replace(' URL', '').toLowerCase()}...`} 
+              />
+            ) : (
+              <input
+                type={type || 'text'}
+                value={formState[field] ?? ''}
+                onChange={e => setFormState(f => ({ ...f, [field]: e.target.value }))}
+                placeholder={placeholder}
+                className="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand-red transition-all"
+              />
+            )}
           </div>
         ))}
       </div>
@@ -164,7 +173,7 @@ const BoxOffice = () => {
       {showAdd && (
         <div className="bg-[#18181B] border border-brand-red/30 rounded-2xl p-6 space-y-4">
           <h3 className="text-white font-bold text-sm">New Box Office Entry</h3>
-          <FormFields formState={addForm} setFormState={setAddForm} />
+          {renderFormFields(addForm, setAddForm)}
           <div className="flex gap-3">
             <button onClick={handleAdd} disabled={isSaving} className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold px-4 py-2 rounded-xl text-sm disabled:opacity-50">
               {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />} Save
@@ -182,7 +191,7 @@ const BoxOffice = () => {
           <div key={item.id} className="bg-[#18181B] border border-gray-800 rounded-2xl p-5 hover:border-gray-700 transition-colors">
             {editingId === item.id ? (
               <div className="space-y-4">
-                <FormFields formState={editForm} setFormState={setEditForm} />
+                {renderFormFields(editForm, setEditForm)}
                 <div className="flex gap-3">
                   <button onClick={handleEditSave} disabled={isSaving} className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold px-4 py-2 rounded-xl text-sm disabled:opacity-50">
                     {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />} Save

@@ -10,18 +10,60 @@ const PopupAdModal = ({ forceShow = false }) => {
   });
 
   const [isOpen, setIsOpen] = useState(false);
+  const [canClose, setCanClose] = useState(false);
+  const [timerCount, setTimerCount] = useState(0);
 
   useEffect(() => {
-    // Check session storage to see if ad was already dismissed
-    const dismissed = sessionStorage.getItem('tolly_ad_dismissed');
-    
-    if (adData && adData.active && (dismissed !== 'true' || forceShow)) {
-      // Small delay before showing the popup for premium entrance feel
-      const timer = setTimeout(() => {
-        setIsOpen(true);
-      }, 800);
-      return () => clearTimeout(timer);
+    if (!adData) return;
+
+    if (!adData.active && !forceShow) return;
+
+    // Check Scheduling
+    if (!forceShow) {
+      const now = new Date().getTime();
+      if (adData.scheduleStart && now < new Date(adData.scheduleStart).getTime()) return;
+      if (adData.scheduleEnd && now > new Date(adData.scheduleEnd).getTime()) return;
     }
+
+    // Check Display Rules
+    if (!forceShow && adData.displayRule === 'once_per_user') {
+      const dismissed = localStorage.getItem('tolly_ad_dismissed');
+      if (dismissed === 'true') return;
+    }
+
+    // Process Delay
+    const delayMs = forceShow ? 0 : (adData.displayDelay || 0) * 1000;
+    
+    const delayTimer = setTimeout(() => {
+      setIsOpen(true);
+      
+      // Setup Close Timer Logic
+      const closeSecs = adData.closeTimer || 0;
+      setTimerCount(closeSecs);
+
+      if (closeSecs > 0) {
+        let currentCount = closeSecs;
+        const interval = setInterval(() => {
+          currentCount--;
+          setTimerCount(currentCount);
+          if (currentCount <= 0) {
+            clearInterval(interval);
+            setCanClose(true);
+            if (adData.autoClose && !forceShow) {
+               setIsOpen(false);
+               if (adData.displayRule === 'once_per_user') {
+                 localStorage.setItem('tolly_ad_dismissed', 'true');
+               }
+            }
+          }
+        }, 1000);
+      } else {
+        setCanClose(true);
+      }
+
+    }, delayMs);
+
+    return () => clearTimeout(delayTimer);
   }, [adData, forceShow]);
 
   // Listen to custom admin preview trigger
@@ -37,8 +79,8 @@ const PopupAdModal = ({ forceShow = false }) => {
 
   const handleClose = () => {
     setIsOpen(false);
-    if (!forceShow) {
-      sessionStorage.setItem('tolly_ad_dismissed', 'true');
+    if (!forceShow && adData?.displayRule === 'once_per_user') {
+      localStorage.setItem('tolly_ad_dismissed', 'true');
     }
   };
 
@@ -48,70 +90,83 @@ const PopupAdModal = ({ forceShow = false }) => {
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-brand-dark/80 backdrop-blur-md transition-opacity duration-300"
-        onClick={handleClose}
+        className="absolute inset-0 bg-brand-dark/90 backdrop-blur-sm transition-opacity duration-300"
+        onClick={() => canClose && handleClose()}
       />
 
       {/* Modal Container */}
-      <div className="relative w-full max-w-lg bg-[#131a2b] border border-brand-red/30 rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(212,43,43,0.3)] transform transition-all duration-300 animate-scale-up z-50">
+      <div className="relative w-full max-w-lg bg-[#131a2b] border border-gray-800 rounded-2xl overflow-hidden shadow-2xl transform transition-all duration-300 animate-scale-up z-50">
         
         {/* Banner Image */}
-        {adData.imageUrl && (
-          <div className="relative h-64 w-full overflow-hidden">
-            <img 
-              src={adData.imageUrl || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80'} 
-              alt={adData.title || "Advertisement"} 
-              onError={(e) => {
-                e.target.src = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80';
-              }}
-              className="w-full h-full object-cover"
-            />
-            {/* Top vignette overlay */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-transparent" />
-          </div>
+        {(adData.imageDesktop || adData.imageMobile || adData.imageUrl) && (
+          <a href={adData.redirectUrl || '#'} target={adData.redirectUrl ? '_blank' : '_self'} rel="noopener noreferrer" className="block relative w-full overflow-hidden min-h-[150px]">
+             {/* Unified ImageUrl fallback */}
+             {adData.imageUrl && !adData.imageDesktop && !adData.imageMobile && (
+                <img 
+                  src={adData.imageUrl} 
+                  alt={adData.title || "Advertisement"} 
+                  className="w-full h-auto object-cover block"
+                />
+             )}
+             {/* Desktop Image */}
+             {adData.imageDesktop && (
+                <img 
+                  src={adData.imageDesktop} 
+                  alt={adData.title || "Advertisement"} 
+                  className={`w-full h-auto object-cover ${adData.imageMobile ? 'hidden sm:block' : 'block'}`}
+                />
+             )}
+             {/* Mobile Image */}
+             {adData.imageMobile && (
+                <img 
+                  src={adData.imageMobile} 
+                  alt={adData.title || "Advertisement"} 
+                  className={`w-full h-auto object-cover ${adData.imageDesktop ? 'block sm:hidden' : 'block'}`}
+                />
+             )}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-transparent pointer-events-none" />
+          </a>
         )}
 
         {/* Content Box */}
         <div className="p-6 md:p-8 space-y-6">
-          <div className="space-y-2">
-            <span className="text-[10px] font-bold text-brand-red uppercase tracking-widest bg-brand-red/10 px-2.5 py-1 rounded-full border border-brand-red/20 inline-block">
-              🔥 SPECIAL ANNOUNCEMENT
-            </span>
-            <h3 className="text-xl md:text-2xl font-poppins font-bold text-gray-100 leading-snug">
-              {adData.title}
-            </h3>
+          <div className="space-y-2 text-center">
+            {adData.title && (
+              <h3 className="text-xl md:text-2xl font-poppins font-bold text-gray-100 leading-snug">
+                {adData.title}
+              </h3>
+            )}
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 pt-2">
-            {adData.linkUrl && (
+          <div className="flex flex-col sm:flex-row gap-3 pt-2 justify-center">
+            {adData.redirectUrl && (
               <a
-                href={adData.linkUrl}
-                target={adData.linkUrl.startsWith('http') ? '_blank' : '_self'}
+                href={adData.redirectUrl}
+                target="_blank"
                 rel="noopener noreferrer"
                 onClick={handleClose}
-                className="flex-1 inline-flex items-center justify-center bg-brand-red text-white text-sm font-bold px-6 py-3.5 rounded-xl hover:bg-brand-red/95 transition-all shadow-[0_0_20px_rgba(212,43,43,0.4)] hover:shadow-[0_0_30px_rgba(212,43,43,0.6)] hover:-translate-y-0.5 text-center"
+                className="flex-1 max-w-[200px] inline-flex items-center justify-center bg-brand-red text-white text-sm font-bold px-6 py-3.5 rounded-xl hover:bg-brand-red/95 transition-all text-center"
               >
-                {adData.buttonText || "Check It Out"} 
+                {adData.buttonText || "Learn More"}
                 <ExternalLink className="w-4 h-4 ml-2" />
               </a>
             )}
-            <button
-              onClick={handleClose}
-              className="px-6 py-3.5 bg-gray-800/80 text-gray-300 hover:text-white border border-gray-700/50 hover:bg-gray-700/60 rounded-xl text-sm font-bold transition-all text-center"
-            >
-              Dismiss
-            </button>
           </div>
         </div>
 
-        {/* Close Button */}
+        {/* Close Button / Timer */}
         <button
           onClick={handleClose}
-          className="absolute top-4 right-4 bg-black/60 hover:bg-brand-red text-gray-300 hover:text-white p-2.5 rounded-full border border-white/10 hover:border-brand-red/20 transition-all z-50 shadow-md"
+          disabled={!canClose}
+          className={`absolute top-4 right-4 p-2.5 rounded-full border transition-all z-50 shadow-md ${
+            canClose 
+              ? 'bg-black/80 hover:bg-brand-red text-white border-white/20 hover:border-brand-red/40 cursor-pointer' 
+              : 'bg-black/40 text-gray-400 border-gray-600 cursor-not-allowed'
+          }`}
           aria-label="Close Ad"
         >
-          <X className="w-4 h-4" />
+          {canClose ? <X className="w-4 h-4" /> : <span className="text-xs font-bold w-4 h-4 flex items-center justify-center text-white">{timerCount}</span>}
         </button>
       </div>
 

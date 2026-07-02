@@ -122,25 +122,58 @@ const Sidebar = () => {
             {top5BoxOffice.map((film, idx) => (
               <div 
                 key={idx}
-                className="flex items-center justify-between p-3 rounded-lg bg-[#18181B]/40 border border-gray-800/40 hover:border-brand-red/10 transition-colors"
+                className="p-4 rounded-xl bg-[#18181B]/60 border border-gray-800/60 hover:border-brand-red/20 transition-all group relative overflow-hidden flex flex-col gap-3 shadow-[0_4px_12px_rgba(0,0,0,0.2)]"
               >
-                <div className="flex items-center gap-3">
-                  <span className={`font-poppins font-bold text-lg w-5 text-center ${idx === 0 ? 'text-yellow-500 text-xl' : 'text-gray-500'}`}>
-                    {film.rank}
-                  </span>
-                  <div>
-                    <div className="font-inter font-bold text-gray-200 text-sm">{film.movieName}</div>
-                    <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded border ${getVerdictColorClass(film.verdict)} mt-1 inline-block`}>
+                {/* Header: Rank, Title, Territory */}
+                <div className="flex items-center justify-between border-b border-gray-800/50 pb-2">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs ${idx === 0 ? 'bg-yellow-500/20 text-yellow-500' : 'bg-gray-800 text-gray-400'}`}>
+                      {film.rank}
+                    </div>
+                    <div>
+                      <div className="font-poppins font-bold text-white text-sm group-hover:text-brand-red transition-colors">{film.movieName}</div>
+                      {film.territory && <div className="text-[9px] text-gray-500 uppercase tracking-widest">{film.territory}</div>}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className={`text-xs font-bold flex items-center justify-end gap-1 ${
+                      film.trend === 'up' ? 'text-green-500' : 
+                      film.trend === 'down' ? 'text-red-500' : 'text-gray-400'
+                    }`}>
+                      {film.trend === 'up' ? '▲' : film.trend === 'down' ? '▼' : '—'}
+                    </div>
+                    <span className={`text-[8px] font-bold uppercase px-1.5 py-0.5 rounded border mt-1 inline-block ${getVerdictColorClass(film.verdict)}`}>
                       {film.verdict}
                     </span>
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="font-poppins font-bold text-yellow-500 text-sm">{film.gross}</div>
-                  <div className={`text-[10px] font-medium flex items-center justify-end ${film.trend?.includes('▲') ? 'text-green-500' : 'text-red-500'}`}>
-                    {film.trend}
+
+                {/* Body: Collections */}
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  {film.openingCollection && (
+                    <div className="bg-black/30 p-2 rounded-lg border border-gray-800/30">
+                      <div className="text-gray-500 text-[9px] uppercase tracking-wider mb-0.5">Opening</div>
+                      <div className="font-bold text-gray-300">{film.openingCollection}</div>
+                    </div>
+                  )}
+                  {film.weekendCollection && (
+                    <div className="bg-black/30 p-2 rounded-lg border border-gray-800/30">
+                      <div className="text-gray-500 text-[9px] uppercase tracking-wider mb-0.5">Weekend</div>
+                      <div className="font-bold text-gray-300">{film.weekendCollection}</div>
+                    </div>
+                  )}
+                  <div className="bg-brand-red/5 p-2 rounded-lg border border-brand-red/10 col-span-2 flex justify-between items-center">
+                    <div className="text-brand-red text-[9px] uppercase tracking-wider font-bold">Total Collection</div>
+                    <div className="font-poppins font-black text-yellow-500 text-sm drop-shadow-md">{film.totalCollection || film.gross}</div>
                   </div>
                 </div>
+
+                {/* Footer: Last Updated */}
+                {film.lastUpdated && (
+                  <div className="text-[9px] text-gray-500 italic text-right mt-1">
+                    Updated: {film.lastUpdated}
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -155,24 +188,28 @@ const Sidebar = () => {
             Upcoming Releases
           </h3>
           <div className="space-y-3.5 mt-6">
-            {upcomingSchedules.slice(0, 4).map((schedule, idx) => (
-              <div 
-                key={idx}
-                className="flex items-center justify-between p-3 rounded-lg bg-[#18181B]/40 border border-gray-800/40"
-              >
-                <div>
-                  <div className="font-inter font-bold text-gray-200 text-sm leading-tight">{schedule.movieName}</div>
-                  <div className="text-[10px] text-gray-400 mt-1 uppercase tracking-wide font-medium">
-                    {schedule.language} • {schedule.releaseDate ? new Date(schedule.releaseDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'TBA'}
+            {upcomingSchedules.slice(0, 4).map((schedule, idx) => {
+              const identifier = schedule.slug || schedule.id;
+              return (
+                <Link 
+                  to={identifier ? `/upcoming/${identifier}` : '#'}
+                  key={schedule.id || idx}
+                  className="flex items-center justify-between p-3 rounded-lg bg-[#18181B]/40 border border-gray-800/40 hover:border-brand-red/30 hover:bg-brand-red/5 transition-all group block"
+                >
+                  <div>
+                    <div className="font-inter font-bold text-gray-200 text-sm leading-tight group-hover:text-brand-red transition-colors">{schedule.movieName}</div>
+                    <div className="text-[10px] text-gray-400 mt-1 uppercase tracking-wide font-medium">
+                      {schedule.language} • {schedule.releaseDate ? new Date(schedule.releaseDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'TBA'}
+                    </div>
                   </div>
-                </div>
-                <div className="text-right shrink-0">
-                  <span className="bg-brand-red/10 border border-brand-red/20 text-brand-red text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-[0_0_10px_rgba(212,43,43,0.1)]">
-                    {getDaysRemainingText(schedule.releaseDate, schedule.status)}
-                  </span>
-                </div>
-              </div>
-            ))}
+                  <div className="text-right shrink-0">
+                    <span className="bg-brand-red/10 border border-brand-red/20 text-brand-red text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-[0_0_10px_rgba(212,43,43,0.1)] group-hover:bg-brand-red/20 transition-colors">
+                      {getDaysRemainingText(schedule.releaseDate, schedule.status)}
+                    </span>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
       )}

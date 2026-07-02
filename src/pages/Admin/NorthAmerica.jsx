@@ -2,8 +2,16 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useOutletContext } from 'react-router-dom';
 import { Plus, Trash2, Edit, Check, X, Loader2 } from 'lucide-react';
+import ImageUpload from '../../components/ImageUpload';
 
-const emptyForm = { movieName: '', hourlyGross: '', totalGross: '', premierGross: '', screens: '', status: 'Live', lastUpdated: '', poster: '' };
+const emptyForm = { 
+  slug: '', movieName: '', releaseDate: '', language: '', distributor: '', genre: '', budget: '',
+  openingDayPreview: '', advanceBookings: '', premiereCollections: '',
+  hourlyGross: '', totalGross: '', premierGross: '', screens: '', 
+  weekendCollections: '', weeklyCollections: '', status: 'Live', notes: '', 
+  lastUpdated: '', poster: '', dailyBreakdown: [] 
+};
+
 const sanitize = (obj) => Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, v === null || v === undefined ? '' : v]));
 
 const NorthAmerica = () => {
@@ -50,6 +58,98 @@ const NorthAmerica = () => {
     setEditingId(null);
   };
 
+  const renderFields = (formState, setFormState) => {
+    return (
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {Object.keys(emptyForm).map(field => {
+            if (field === 'dailyBreakdown') return null;
+            return (
+              <div key={field}>
+                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">
+                  {field.replace(/([A-Z])/g, ' $1').trim()}
+                </label>
+                {field === 'poster' ? (
+                  <ImageUpload 
+                    value={formState[field] ?? ''} 
+                    onChange={url => setFormState(f => ({ ...f, [field]: url }))} 
+                    placeholder="Upload poster..." 
+                  />
+                ) : (
+                  <input
+                    type="text"
+                    value={formState[field] ?? ''}
+                    onChange={e => setFormState(f => ({ ...f, [field]: e.target.value }))}
+                    className="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-brand-red transition-all"
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Daily Breakdown */}
+        <div className="border border-gray-800 rounded-xl p-4 bg-black/20">
+          <div className="flex justify-between items-center mb-4">
+            <label className="block text-[10px] font-bold text-brand-red uppercase tracking-wider">Daily Collections</label>
+            <button 
+              type="button"
+              onClick={() => {
+                const arr = Array.isArray(formState.dailyBreakdown) ? formState.dailyBreakdown : [];
+                setFormState(f => ({ ...f, dailyBreakdown: [...arr, { day: `Day ${arr.length + 1}`, collection: '' }] }));
+              }}
+              className="flex items-center gap-1 text-[10px] font-bold bg-gray-800 hover:bg-gray-700 text-white px-2 py-1 rounded transition-colors"
+            >
+              <Plus className="w-3 h-3" /> Add Day
+            </button>
+          </div>
+          
+          <div className="space-y-2">
+            {(Array.isArray(formState.dailyBreakdown) ? formState.dailyBreakdown : []).map((item, index) => (
+              <div key={index} className="flex gap-2 items-center">
+                <input 
+                  type="text" 
+                  value={item.day} 
+                  onChange={(e) => {
+                    const newArr = [...formState.dailyBreakdown];
+                    newArr[index].day = e.target.value;
+                    setFormState(f => ({ ...f, dailyBreakdown: newArr }));
+                  }}
+                  className="w-24 bg-black/50 border border-gray-800 rounded-lg px-3 py-1.5 text-white text-sm focus:outline-none focus:border-brand-red"
+                  placeholder="Day X"
+                />
+                <input 
+                  type="text" 
+                  value={item.collection} 
+                  onChange={(e) => {
+                    const newArr = [...formState.dailyBreakdown];
+                    newArr[index].collection = e.target.value;
+                    setFormState(f => ({ ...f, dailyBreakdown: newArr }));
+                  }}
+                  className="flex-1 bg-black/50 border border-gray-800 rounded-lg px-3 py-1.5 text-white text-sm focus:outline-none focus:border-brand-red"
+                  placeholder="Collection (e.g. $1.5M)"
+                />
+                <button 
+                  type="button"
+                  onClick={() => {
+                    const newArr = formState.dailyBreakdown.filter((_, i) => i !== index);
+                    setFormState(f => ({ ...f, dailyBreakdown: newArr }));
+                  }}
+                  className="p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
+            {(!formState.dailyBreakdown || formState.dailyBreakdown.length === 0) && (
+              <p className="text-xs text-gray-500 text-center py-2">No daily collections added yet.</p>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -69,20 +169,8 @@ const NorthAmerica = () => {
       {showAdd && (
         <div className="bg-[#18181B] border border-brand-red/30 rounded-2xl p-6 space-y-4">
           <h3 className="text-white font-bold text-sm">New Entry</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {Object.keys(emptyForm).map(field => (
-              <div key={field}>
-                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">{field}</label>
-                <input
-                  type="text"
-                  value={addForm[field]}
-                  onChange={e => setAddForm(f => ({ ...f, [field]: e.target.value }))}
-                  className="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-brand-red transition-all"
-                />
-              </div>
-            ))}
-          </div>
-          <div className="flex gap-3">
+          {renderFields(addForm, setAddForm)}
+          <div className="flex gap-3 pt-2">
             <button onClick={handleAdd} disabled={isSaving} className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold px-4 py-2 rounded-xl text-sm transition-all disabled:opacity-50">
               {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />} Save
             </button>
@@ -102,20 +190,8 @@ const NorthAmerica = () => {
           <div key={item.id} className="bg-[#18181B] border border-gray-800 rounded-2xl p-5 hover:border-gray-700 transition-colors">
             {editingId === item.id ? (
               <div className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {Object.keys(emptyForm).map(field => (
-                    <div key={field}>
-                      <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">{field}</label>
-                      <input
-                        type="text"
-                        value={editForm[field] ?? ''}
-                        onChange={e => setEditForm(f => ({ ...f, [field]: e.target.value }))}
-                        className="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand-red transition-all"
-                      />
-                    </div>
-                  ))}
-                </div>
-                <div className="flex gap-3">
+                {renderFields(editForm, setEditForm)}
+                <div className="flex gap-3 pt-2">
                   <button onClick={handleEditSave} disabled={isSaving} className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold px-4 py-2 rounded-xl text-sm transition-all disabled:opacity-50">
                     {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />} Save
                   </button>
@@ -139,7 +215,10 @@ const NorthAmerica = () => {
                   </div>
                 </div>
                 <div className="flex gap-2 flex-shrink-0">
-                  <button onClick={() => { setEditingId(item.id); setEditForm(sanitize({ ...item })); }} className="p-2 text-gray-500 hover:text-white hover:bg-gray-700 rounded-lg transition-all">
+                  <button onClick={() => { 
+                    setEditingId(item.id); 
+                    setEditForm({ ...sanitize({ ...item }), dailyBreakdown: Array.isArray(item.dailyBreakdown) ? item.dailyBreakdown : [] }); 
+                  }} className="p-2 text-gray-500 hover:text-white hover:bg-gray-700 rounded-lg transition-all">
                     <Edit className="w-4 h-4" />
                   </button>
                   <button onClick={() => handleDelete(item.id)} className="p-2 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all">
