@@ -17,7 +17,7 @@ const Archive = () => {
   });
 
   return (
-    <div className="container mx-auto px-4 lg:px-8 py-8">
+    <div className="wrap py-8">
       <Helmet>
         <title>A-Z Movie News Archive | CHITRAMBHALARE</title>
       </Helmet>

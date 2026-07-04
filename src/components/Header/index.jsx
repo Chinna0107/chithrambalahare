@@ -16,7 +16,7 @@ const Header = () => {
           <button className="ham" onClick={() => setIsMenuOpen(!isMenuOpen)}>☰</button>
           <nav id="nav" className={`nav-drawer ${isMenuOpen ? 'open' : ''}`}>
             <NavLink 
-              to="/" 
+              to="/main" 
               end 
               className={({ isActive }) => isActive ? 'act' : ''} 
               onClick={() => setIsMenuOpen(false)}

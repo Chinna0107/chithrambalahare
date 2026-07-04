@@ -33,10 +33,10 @@ const SingleSchedule = () => {
   
   if (error || !movie) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-20 text-center">
+      <div className="wrap py-20 text-center">
         <h1 className="text-3xl font-bold text-white mb-4">Upcoming Release Not Found</h1>
         <p className="text-gray-400 mb-8">The release data you're looking for doesn't exist.</p>
-        <Link to="/" className="text-brand-red hover:text-white transition-colors">
+        <Link to="/main" className="text-brand-red hover:text-white transition-colors">
           &larr; Back to Home
         </Link>
       </div>
@@ -46,7 +46,7 @@ const SingleSchedule = () => {
   const trailerId = extractYouTubeId(movie.trailerLink);
 
   return (
-    <article className="max-w-5xl mx-auto px-4 py-8">
+    <article className="wrap py-8">
       <Helmet>
         <title>{movie.movieName} - Upcoming Telugu Movies | Tollywood</title>
         <meta name="description" content={`Upcoming release details for ${movie.movieName}. Release Date: ${movie.releaseDate}`} />
@@ -54,7 +54,7 @@ const SingleSchedule = () => {
 
       {/* Breadcrumbs */}
       <nav className="flex items-center gap-2 text-xs text-gray-400 mb-6 font-poppins">
-        <Link to="/" className="hover:text-brand-red transition-colors flex items-center gap-1">
+        <Link to="/main" className="hover:text-brand-red transition-colors flex items-center gap-1">
           <ChevronLeft className="w-3 h-3" /> Home
         </Link>
         <ChevronRight className="w-3 h-3" />

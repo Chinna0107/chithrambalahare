@@ -27,10 +27,10 @@ const SingleNorthAmerica = () => {
   
   if (error || !movie) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-20 text-center">
+      <div className="wrap py-20 text-center">
         <h1 className="text-3xl font-bold text-white mb-4">Collection Not Found</h1>
         <p className="text-gray-400 mb-8">The box office data you're looking for doesn't exist.</p>
-        <Link to="/" className="text-brand-red hover:text-white transition-colors">
+        <Link to="/main" className="text-brand-red hover:text-white transition-colors">
           &larr; Back to Home
         </Link>
       </div>
@@ -47,7 +47,7 @@ const SingleNorthAmerica = () => {
   }
 
   return (
-    <article className="max-w-6xl mx-auto px-4 py-8">
+    <article className="wrap py-8">
       <Helmet>
         <title>{movie.movieName} - North America Box Office | Tollywood</title>
         <meta name="description" content={`North America Box Office collections for ${movie.movieName}. Total Gross: ${movie.totalGross}`} />
@@ -55,7 +55,7 @@ const SingleNorthAmerica = () => {
 
       {/* Breadcrumbs */}
       <nav className="flex items-center gap-2 text-xs text-gray-400 mb-6 font-poppins">
-        <Link to="/" className="hover:text-brand-red transition-colors flex items-center gap-1">
+        <Link to="/main" className="hover:text-brand-red transition-colors flex items-center gap-1">
           <ChevronLeft className="w-3 h-3" /> Home
         </Link>
         <ChevronRight className="w-3 h-3" />

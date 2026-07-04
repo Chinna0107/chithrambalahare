@@ -44,21 +44,21 @@ const Home = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 lg:px-8 py-8">
+    <div className="wrap pt-16 pb-12">
       <Helmet>
         <title>CHITRAMBHALARE | Latest Movie News & Reviews</title>
         <meta name="description" content="Get the latest Tollywood movie news, unbiased reviews, box office collections, and exclusive celebrity interviews on CHITRAMBHALARE." />
       </Helmet>
 
-      {/* Hero Section */}
-      <HeroSlider articles={articles} />
-      
-      {/* Photo Galleries Section */}
-      <GalleryGrid />
-
-      <div className="flex flex-col lg:flex-row gap-8">
-        {/* Main Content Area - 70% */}
-        <div className="w-full lg:w-[70%] space-y-12">
+      <div className="desktop-grid">
+        {/* Main Content Area */}
+        <div className="space-y-12 min-w-0">
+          
+          {/* Hero Section */}
+          <HeroSlider articles={articles} />
+          
+          {/* Photo Galleries Section */}
+          <GalleryGrid />
           
           {/* Latest Movie News Grid */}
           {latestNews.length > 0 && (
@@ -153,7 +153,14 @@ const Home = () => {
 
         </div>
 
-        {/* Sidebar - 30% */}
+        {/* Sidebar */}
+        <div className="sidebar-desktop">
+          <Sidebar />
+        </div>
+      </div>
+      
+      {/* Mobile Sidebar (Shows below content on mobile) */}
+      <div className="mobile-sidebar mt-12">
         <Sidebar />
       </div>
     </div>

@@ -101,17 +101,13 @@ const Lightbox = ({ images, startIndex, onClose }) => {
 // ─── Single Gallery View ──────────────────────────────────────────────────────
 const SingleGalleryView = ({ id }) => {
   const { data: gallery, isLoading, isError } = useGallery(id);
-  const [lightboxIndex, setLightboxIndex] = useState(null);
+  const [current, setCurrent] = useState(0);
 
   if (isLoading) {
     return (
       <div className="wrap py-6">
         <div className="h-8 bg-[#1a2235] rounded w-48 mb-6 animate-pulse" />
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="aspect-square bg-[#1a2235] rounded-xl animate-pulse" />
-          ))}
-        </div>
+        <div className="h-[60vh] bg-[#1a2235] rounded-xl animate-pulse" />
       </div>
     );
   }
@@ -127,6 +123,9 @@ const SingleGalleryView = ({ id }) => {
 
   const images = gallery.images || [];
 
+  const prev = () => setCurrent(i => (i - 1 + images.length) % images.length);
+  const next = () => setCurrent(i => (i + 1) % images.length);
+
   return (
     <>
       <Helmet>
@@ -134,16 +133,12 @@ const SingleGalleryView = ({ id }) => {
         <meta name="description" content={`Exclusive photos from ${gallery.title}`} />
       </Helmet>
 
-      {lightboxIndex !== null && (
-        <Lightbox images={images} startIndex={lightboxIndex} onClose={() => setLightboxIndex(null)} />
-      )}
-
-      <div className="wrap py-6">
+      <div className="wrap">
         {/* Breadcrumb */}
-        <div className="breadcrumb">
-          <Link to="/" className="bc-link">Home</Link>
+        <div style={{ padding: '12px 0 0', fontSize: '11px', color: 'var(--muted)', display: 'flex', alignItems: 'center', gap: '5px' }}>
+          <Link to="/main" style={{ cursor: 'pointer', color: 'var(--gold)', textDecoration: 'none' }}>Home</Link>
           <span>/</span>
-          <Link to="/galleries" className="bc-link">Galleries</Link>
+          <Link to="/galleries" style={{ cursor: 'pointer', color: 'var(--gold)', textDecoration: 'none' }}>Galleries</Link>
           <span>/</span>
           <span style={{ color: 'var(--text)' }}>{gallery.title}</span>
         </div>
@@ -172,44 +167,165 @@ const SingleGalleryView = ({ id }) => {
           </div>
         </div>
 
-        {/* Grid */}
-        {images.length === 0 ? (
-          <div className="text-center py-16 text-[var(--muted)]">No photos in this gallery yet.</div>
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-            {images.map((img, idx) => (
-              <div
-                key={idx}
-                className="group relative aspect-square rounded-xl overflow-hidden cursor-pointer bg-[#0d1b30] border border-[var(--border)] hover:border-[var(--gold)]/40 transition-all hover:-translate-y-0.5"
-                onClick={() => setLightboxIndex(idx)}
-              >
+        <div className="desktop-grid">
+          <div>
+            {images.length === 0 ? (
+              <div className="text-center py-16 text-[var(--muted)]">No photos in this gallery yet.</div>
+            ) : (
+              <div className="relative bg-[#0d1b30] border border-[var(--border)] rounded-xl overflow-hidden shadow-2xl flex flex-col justify-center items-center p-4">
+                {/* Counter */}
+                <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-black/60 text-white text-xs font-bold px-3 py-1 rounded-full z-10">
+                  {current + 1} / {images.length}
+                </div>
+                
+                {/* Image */}
                 <img
-                  src={img.url}
-                  alt={img.caption || `Photo ${idx + 1}`}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  loading="lazy"
+                  src={images[current]?.url}
+                  alt={images[current]?.caption || `Photo ${current + 1}`}
+                  className="max-w-full max-h-[70vh] object-contain rounded-lg mx-auto"
                   onError={(e) => {
-                    e.target.src = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80';
+                    e.target.src = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=800&q=80';
                   }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <div className="bg-black/50 backdrop-blur-sm p-3 rounded-full border border-[var(--gold)]/30">
-                    <Camera className="w-5 h-5 text-white" />
-                  </div>
-                </div>
-                {img.caption && (
-                  <div className="absolute bottom-0 left-0 right-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <p className="text-white text-xs font-medium line-clamp-2">{img.caption}</p>
+
+                {/* Caption */}
+                {images[current]?.caption && (
+                  <p className="text-center text-white/70 text-sm mt-4 font-inter">
+                    {images[current].caption}
+                  </p>
+                )}
+
+                {/* Navigation Buttons */}
+                {images.length > 1 && (
+                  <>
+                    <button
+                      onClick={prev}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-brand-red text-white p-3 rounded-full transition-all border border-white/10"
+                    >
+                      <ChevronLeft className="w-6 h-6" />
+                    </button>
+                    <button
+                      onClick={next}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-brand-red text-white p-3 rounded-full transition-all border border-white/10"
+                    >
+                      <ChevronRight className="w-6 h-6" />
+                    </button>
+                  </>
+                )}
+                
+                {/* Thumbnails strip */}
+                {images.length > 1 && (
+                  <div className="mt-6 flex gap-2 overflow-x-auto max-w-full pb-2 px-2 scrollbar-thin">
+                    {images.map((img, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setCurrent(idx)}
+                        className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-all ${idx === current ? 'border-brand-red scale-110' : 'border-transparent opacity-50 hover:opacity-100'}`}
+                      >
+                        <img
+                          src={img.url}
+                          alt=""
+                          className="w-full h-full object-cover"
+                          onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=100&q=60'; }}
+                        />
+                      </button>
+                    ))}
                   </div>
                 )}
-                <div className="absolute top-2 right-2 bg-black/60 text-white text-[10px] font-bold px-2 py-0.5 rounded">
-                  {idx + 1}
+              </div>
+            )}
+          </div>
+
+          {/* Desktop Sidebar */}
+          <div className="sidebar-desktop" style={{ display: 'none' }}>
+            <div style={{ position: 'sticky', top: '76px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div className="sw">
+                <div className="sw-hdr">
+                  <div className="live-dot"></div>
+                  <div className="sw-title">Live Box Office</div>
+                </div>
+                <Link to="/box-office" className="bo-row">
+                  <div className="bo-rank">1</div>
+                  <div className="bo-name">Peddi</div>
+                  <div className="bo-amt">₹320 Cr</div>
+                </Link>
+                <Link to="/box-office" className="bo-row">
+                  <div className="bo-rank">2</div>
+                  <div className="bo-name">Drishyam 3</div>
+                  <div className="bo-amt">₹236 Cr</div>
+                </Link>
+                <Link to="/box-office" className="bo-row">
+                  <div className="bo-rank">3</div>
+                  <div className="bo-name">Obsession</div>
+                  <div className="bo-amt">₹85 Cr</div>
+                </Link>
+                <Link to="/box-office" className="bo-row">
+                  <div className="bo-rank">4</div>
+                  <div className="bo-name">Hai Jawani Toh Ishq</div>
+                  <div className="bo-amt">₹55 Cr</div>
+                </Link>
+              </div>
+              
+              <div className="sw">
+                <div className="sw-hdr">
+                  <div className="sw-title">Popular Stories</div>
+                </div>
+                <Link to="/movie-news/peddi-crosses-320-cr-worldwide-in-2-weeks-telugu-dominates" className="pop-item">
+                  <div className="pop-num">1</div>
+                  <div>
+                    <div className="pop-text">Peddi Joins the ₹300 Cr Club at the Box Office</div>
+                    <div className="pop-meta">Box Office · June 14</div>
+                  </div>
+                </Link>
+                <Link to="/movie-news/chiranjeevi-venkatesh-rumors-films-not-postponed" className="pop-item">
+                  <div className="pop-num">2</div>
+                  <div>
+                    <div className="pop-text">Chiranjeevi & Venkatesh Rumors: Films Not Postponed</div>
+                    <div className="pop-meta">Movie News · June 18</div>
+                  </div>
+                </Link>
+                <Link to="/movie-news/dhurandhar-unedited-version-streams-on-netflix-june-19" className="pop-item">
+                  <div className="pop-num">3</div>
+                  <div>
+                    <div className="pop-text">Dhurandhar Unedited Version Streams on Netflix June 19</div>
+                    <div className="pop-meta">OTT · June 18</div>
+                  </div>
+                </Link>
+              </div>
+
+              <div className="sw">
+                <div className="sw-hdr">
+                  <div className="sw-title">Browse Topics</div>
+                </div>
+                <div className="tag-cloud">
+                  <Link to="/movie-news?search=Ram Charan" className="tag">Ram Charan</Link>
+                  <Link to="/movie-news?search=Pawan Kalyan" className="tag">Pawan Kalyan</Link>
+                  <Link to="/movie-news?search=Chiranjeevi" className="tag">Chiranjeevi</Link>
+                  <Link to="/movie-news?category=OTT" className="tag">OTT</Link>
+                  <Link to="/box-office" className="tag">Box Office</Link>
+                  <Link to="/reviews" className="tag">Reviews</Link>
                 </div>
               </div>
-            ))}
+            </div>
           </div>
-        )}
+        </div>
+
+        {/* Topics Cloud (Mobile Only) */}
+        <div className="mobile-sidebar mt-8">
+          <div className="sw">
+            <div className="sw-hdr">
+              <div className="sw-title">Browse Topics</div>
+            </div>
+            <div className="tag-cloud">
+              <Link to="/movie-news?search=Ram Charan" className="tag">Ram Charan</Link>
+              <Link to="/movie-news?search=Pawan Kalyan" className="tag">Pawan Kalyan</Link>
+              <Link to="/movie-news?search=Chiranjeevi" className="tag">Chiranjeevi</Link>
+              <Link to="/movie-news?category=OTT" className="tag">OTT</Link>
+              <Link to="/box-office" className="tag">Box Office</Link>
+              <Link to="/reviews" className="tag">Reviews</Link>
+            </div>
+          </div>
+        </div>
       </div>
     </>
   );
@@ -232,7 +348,7 @@ const GalleryListView = () => {
       <div className="wrap py-6">
         {/* Breadcrumb */}
         <div className="breadcrumb">
-          <Link to="/" className="bc-link">Home</Link>
+          <Link to="/main" className="bc-link">Home</Link>
           <span>/</span>
           <span style={{ color: 'var(--text)' }}>Galleries</span>
         </div>

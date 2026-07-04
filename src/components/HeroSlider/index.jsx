@@ -15,7 +15,7 @@ const HeroSlider = ({ articles }) => {
   const featured = articles.slice(0, 5);
 
   return (
-    <div className="relative w-full h-[60vh] md:h-[70vh] rounded-2xl overflow-hidden shadow-xl mb-12 group">
+    <div className="relative w-[95%] lg:w-[90%] mx-auto h-[45vh] md:h-[55vh] rounded-2xl overflow-hidden shadow-xl mb-12 group">
       <Swiper
         modules={[Autoplay, Pagination, Navigation]}
         pagination={{ clickable: true }}
@@ -39,26 +39,26 @@ const HeroSlider = ({ articles }) => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/60 to-transparent z-10" />
 
-              <div className="absolute bottom-0 left-0 w-full p-6 md:p-12 md:w-3/4 lg:w-2/3 z-20">
+              <div className="absolute bottom-0 left-0 w-full p-4 md:p-8 md:w-[85%] lg:w-[80%] z-20">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.1 }}
                 >
-                  <div className="flex items-center space-x-3 mb-4">
-                    <span className="bg-brand-red text-gray-100 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider flex items-center shadow-[0_0_15px_rgba(255,0,0,0.6)]">
-                      <span className="w-2 h-2 rounded-full bg-white mr-2 animate-pulse"></span>
+                  <div className="flex items-center space-x-3 mb-3">
+                    <span className="bg-brand-red text-gray-100 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider flex items-center shadow-[0_0_15px_rgba(255,0,0,0.6)]">
+                      <span className="w-1.5 h-1.5 rounded-full bg-white mr-1.5 animate-pulse"></span>
                       {article.category || 'News'}
                     </span>
                   </div>
 
                   <Link to={`/movie-news/${article.slug}`}>
-                    <h2 className="text-3xl md:text-5xl lg:text-6xl font-poppins font-bold text-gray-100 leading-tight mb-4 hover:text-brand-red/90 transition-colors drop-shadow-lg tracking-tight">
+                    <h2 className="text-xl md:text-2xl lg:text-3xl font-poppins font-bold text-gray-100 leading-tight mb-3 hover:text-brand-red/90 transition-colors drop-shadow-lg tracking-tight">
                       {article.title}
                     </h2>
                   </Link>
 
-                  <p className="text-gray-300 text-sm md:text-lg mb-8 line-clamp-2 max-w-2xl">
+                  <p className="text-gray-300 text-xs md:text-sm mb-6 line-clamp-2 max-w-xl">
                     {article.excerpt}
                   </p>
 

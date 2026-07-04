@@ -24,7 +24,7 @@ const SingleReview = () => {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 lg:px-8 py-10">
+      <div className="wrap py-10">
         <LoadingSkeleton type="page" />
       </div>
     );
@@ -35,7 +35,7 @@ const SingleReview = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 lg:px-8 py-10">
+    <div className="wrap py-10">
       <Helmet>
         <title>{review.movieName} Review | CHITRAMBHALARE</title>
         <meta name="description" content={review.snippet} />

@@ -145,7 +145,6 @@ const ImageStrip = ({ images }) => {
 // ── Main Component ────────────────────────────────────────────────────────────
 const SingleArticle = () => {
   const { slug } = useParams();
-  const [scrollProgress, setScrollProgress] = useState(0);
 
   const { data: article, isLoading } = useQuery({
     queryKey: ['article', slug],
@@ -157,21 +156,6 @@ const SingleArticle = () => {
     queryFn: () => getArticles({ category: article?.category, limit: 5 }),
     enabled: !!article,
   });
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const body = document.getElementById('artBody');
-      if (body) {
-        const rect = body.getBoundingClientRect();
-        const total = body.offsetHeight;
-        const scrolled = Math.max(0, -rect.top);
-        const pct = Math.min(100, Math.round((scrolled / (total - window.innerHeight + 200)) * 100));
-        setScrollProgress(isNaN(pct) ? 0 : pct);
-      }
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [article]);
 
   useEffect(() => {
     function checkWidth() {
@@ -235,15 +219,10 @@ const SingleArticle = () => {
         <meta name="description" content={article.excerpt} />
       </Helmet>
 
-      {/* READING PROGRESS */}
-      <div className="read-progress">
-        <div className="read-bar" style={{ width: `${scrollProgress}%` }}></div>
-      </div>
-
       <div className="wrap">
         {/* BREADCRUMB */}
         <div className="breadcrumb">
-          <Link to="/" className="bc-link">Home</Link>
+          <Link to="/main" className="bc-link">Home</Link>
           <span>/</span>
           <Link to="/movie-news" className="bc-link">Movie News</Link>
           <span>/</span>

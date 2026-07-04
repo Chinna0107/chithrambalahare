@@ -60,21 +60,7 @@
     color: var(--text);
   }
   
-  /* Custom Scrollbar */
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  ::-webkit-scrollbar-track {
-    background: var(--navy);
-  }
-  ::-webkit-scrollbar-thumb {
-    background: var(--crimson);
-    border-radius: 3px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: var(--gold);
-  }
+
 }
 
 /* ==========================================================================
@@ -790,21 +776,6 @@ footer {
 /* ==========================================================================
    ARTICLE DETAIL VIEW STYLES
    ========================================================================== */
-.read-progress {
-  position: fixed;
-  top: 80px; /* matched to header height */
-  left: 0;
-  width: 100%;
-  height: 3px;
-  background: var(--border);
-  z-index: 199;
-}
-.read-bar {
-  height: 100%;
-  background: var(--gold);
-  width: 0%;
-  transition: width 0.1s linear;
-}
 
 .art-layout {
   display: block;
@@ -1922,9 +1893,7 @@ footer {
   .rel-thumb {
     height: 90px;
   }
-  .read-progress {
-    top: 54px; /* matched to sticky desktop header */
-  }
+
   .mob-sidebar-inline {
     display: none !important;
   }

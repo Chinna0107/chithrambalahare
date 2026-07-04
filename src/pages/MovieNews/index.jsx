@@ -55,7 +55,7 @@ const MovieNews = () => {
 
       {/* Breadcrumb */}
       <div style={{ padding: '12px 0 0', fontSize: '11px', color: 'var(--muted)', display: 'flex', alignItems: 'center', gap: '5px' }}>
-        <Link to="/" style={{ cursor: 'pointer', color: 'var(--gold)', textDecoration: 'none' }}>Home</Link>
+        <Link to="/main" style={{ cursor: 'pointer', color: 'var(--gold)', textDecoration: 'none' }}>Home</Link>
         <span>/</span>
         <span style={{ color: 'var(--text)' }}>Movie News</span>
       </div>

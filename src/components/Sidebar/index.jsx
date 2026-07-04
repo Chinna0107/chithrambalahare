@@ -68,7 +68,7 @@ const Sidebar = () => {
   };
 
   return (
-    <aside className="w-full lg:w-[30%] space-y-8 lg:sticky lg:top-24 h-fit">
+    <aside className="w-full space-y-8 pb-4">
       {/* Trending Posts */}
       {trendingArticles && trendingArticles.length > 0 && (
         <div className="glass-card rounded-xl border border-brand-red/10 p-6 relative overflow-hidden">

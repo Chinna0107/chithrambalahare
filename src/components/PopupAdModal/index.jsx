@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { X, ExternalLink } from 'lucide-react';
 import { getPopupAd } from '../../services/api';
 
 const PopupAdModal = ({ forceShow = false }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const { data: adData, isLoading } = useQuery({
     queryKey: ['popupAd'],
     queryFn: getPopupAd,
@@ -29,24 +33,45 @@ const PopupAdModal = ({ forceShow = false }) => {
     }, durationMs);
 
     return () => clearTimeout(timeout);
-  }, [isOpen, currentImageIdx, carouselItems.length, currentItem]);
+  }, [currentImageIdx, isOpen, carouselItems.length, currentItem?.timer]);
 
   useEffect(() => {
-    if (!adData) return;
+    if (isLoading) return;
+    
+    if (!adData || !adData.active || (carouselItems.length === 0 && !forceShow)) {
+      if (location.pathname === '/') {
+        navigate('/main', { replace: true });
+      }
+      return;
+    }
 
-    if (!adData.active && !forceShow) return;
+    if (forceShow) {
+      setIsOpen(true);
+      setCanClose(true);
+      return;
+    }
 
     // Check Scheduling
     if (!forceShow) {
       const now = new Date().getTime();
-      if (adData.scheduleStart && now < new Date(adData.scheduleStart).getTime()) return;
-      if (adData.scheduleEnd && now > new Date(adData.scheduleEnd).getTime()) return;
+      if (adData.scheduleStart && now < new Date(adData.scheduleStart).getTime()) {
+        if (location.pathname === '/') navigate('/main', { replace: true });
+        return;
+      }
+      if (adData.scheduleEnd && now > new Date(adData.scheduleEnd).getTime()) {
+        if (location.pathname === '/') navigate('/main', { replace: true });
+        return;
+      }
     }
 
-    // Check Display Rules
-    if (!forceShow && adData.displayRule === 'once_per_user') {
-      const dismissed = localStorage.getItem('tolly_ad_dismissed');
-      if (dismissed === 'true') return;
+    const dismissed = localStorage.getItem('tolly_ad_dismissed');
+    if (adData.displayRule === 'once_per_user') {
+      if (dismissed === 'true') {
+        if (location.pathname === '/') {
+          navigate('/main', { replace: true });
+        }
+        return;
+      }
     }
 
     // Process Delay
@@ -72,6 +97,7 @@ const PopupAdModal = ({ forceShow = false }) => {
               if (adData.displayRule === 'once_per_user') {
                 localStorage.setItem('tolly_ad_dismissed', 'true');
               }
+              if (location.pathname === '/') navigate('/main', { replace: true });
             }
           }
         }, 1000);
@@ -82,7 +108,7 @@ const PopupAdModal = ({ forceShow = false }) => {
     }, delayMs);
 
     return () => clearTimeout(delayTimer);
-  }, [adData, forceShow]);
+  }, [adData, isLoading, forceShow, carouselItems.length, location.pathname, navigate]);
 
   // Listen to custom admin preview trigger
   useEffect(() => {
@@ -100,20 +126,24 @@ const PopupAdModal = ({ forceShow = false }) => {
     if (!forceShow && adData?.displayRule === 'once_per_user') {
       localStorage.setItem('tolly_ad_dismissed', 'true');
     }
+    if (!forceShow && location.pathname === '/') {
+      navigate('/main');
+    }
   };
 
   if (!isOpen || isLoading || !adData || carouselItems.length === 0) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center">
       {/* Backdrop */}
       <div 
         className="absolute inset-0 bg-brand-dark/90 backdrop-blur-sm transition-opacity duration-300"
-        onClick={() => canClose && handleClose()}
+        onClick={handleClose}
       />
 
       {/* Modal Container */}
-      <div className="relative w-full max-w-[95vw] md:max-w-[75vw] bg-[#131a2b] border border-gray-800 rounded-2xl overflow-hidden shadow-2xl transform transition-all duration-300 animate-scale-up z-50">
+      <div className="wrap relative pointer-events-none z-50 flex items-center justify-center h-full w-full">
+        <div className="relative w-full bg-[#131a2b] border border-gray-800 rounded-2xl overflow-hidden shadow-2xl transform transition-all duration-300 animate-scale-up pointer-events-auto">
         
         {/* Banner Image */}
         {currentItem && (
@@ -143,19 +173,16 @@ const PopupAdModal = ({ forceShow = false }) => {
           </div>
         </div>
 
-        {/* Close Button / Timer */}
-        <button
+        {/* Close Button */}
+        <button 
           onClick={handleClose}
-          disabled={!canClose}
-          className={`absolute top-4 right-4 p-2.5 rounded-full border transition-all z-50 shadow-md ${
-            canClose 
-              ? 'bg-black/80 hover:bg-brand-red text-white border-white/20 hover:border-brand-red/40 cursor-pointer' 
-              : 'bg-black/40 text-gray-400 border-gray-600 cursor-not-allowed'
-          }`}
+          className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all z-50 shadow-md bg-black/80 hover:bg-brand-red text-white border-white/20 hover:border-brand-red/40 cursor-pointer"
           aria-label="Close Ad"
         >
-          {canClose ? <X className="w-4 h-4" /> : <span className="text-xs font-bold w-4 h-4 flex items-center justify-center text-white">{timerCount}</span>}
+          {!canClose && timerCount > 0 && <span className="text-xs font-bold pl-1">{timerCount}s</span>}
+          <X className="w-4 h-4" />
         </button>
+      </div>
       </div>
 
       <style>{`

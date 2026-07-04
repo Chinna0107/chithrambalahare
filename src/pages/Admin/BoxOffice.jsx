@@ -8,7 +8,7 @@ const emptyForm = {
   slug: '', movieName: '', director: '', cast: '', poster: '',
   dayCollection: '', worldwideGross: '', indiaNet: '', indiaGross: '',
   overseas: '', verdict: '', trend: '', days: '', languages: '',
-  percentage: '', date: '', dailyBreakdown: '', budget: '',
+  percentage: '', date: '', dailyBreakdown: [], budget: '',
   totalIndiaNet: '', usPremieres: '',
 };
 const sanitize = (obj) => Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, v === null || v === undefined ? '' : v]));
@@ -26,15 +26,13 @@ const BoxOffice = () => {
 
   const serializeForApi = (item) => ({
     ...item,
-    dailyBreakdown: typeof item.dailyBreakdown === 'string'
-      ? (() => { try { return JSON.parse(item.dailyBreakdown); } catch { return []; } })()
-      : item.dailyBreakdown || [],
+    dailyBreakdown: Array.isArray(item.dailyBreakdown) ? item.dailyBreakdown.filter(d => d.day || d.indiaNet || d.worldwideGross || d.occupancy) : [],
     date: item.date || new Date().toISOString(),
   });
 
   const deserializeForForm = (item) => ({
     ...item,
-    dailyBreakdown: Array.isArray(item.dailyBreakdown) ? JSON.stringify(item.dailyBreakdown, null, 2) : item.dailyBreakdown || '[]',
+    dailyBreakdown: Array.isArray(item.dailyBreakdown) ? item.dailyBreakdown : [],
   });
 
   const refreshDb = async () => {
@@ -137,14 +135,78 @@ const BoxOffice = () => {
         ))}
       </div>
       <div>
-        <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Daily Breakdown (JSON array)</label>
-        <textarea
-          value={formState.dailyBreakdown ?? '[]'}
-          onChange={e => setFormState(f => ({ ...f, dailyBreakdown: e.target.value }))}
-          rows={6}
-          placeholder='[{"day": "Day 1", "collection": "₹25 Cr"}, ...]'
-          className="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white text-sm font-mono focus:outline-none focus:border-brand-red transition-all resize-y"
-        />
+        <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">Daily Breakdown</label>
+        <div className="space-y-2">
+          {(formState.dailyBreakdown || []).map((dbItem, index) => (
+            <div key={index} className="flex gap-2 items-center">
+              <input
+                type="text"
+                placeholder="Day/Date"
+                value={dbItem.day || ''}
+                onChange={(e) => {
+                  const newBd = [...(formState.dailyBreakdown || [])];
+                  newBd[index] = { ...newBd[index], day: e.target.value };
+                  setFormState(f => ({ ...f, dailyBreakdown: newBd }));
+                }}
+                className="w-1/4 bg-black/50 border border-gray-800 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-brand-red transition-all"
+              />
+              <input
+                type="text"
+                placeholder="India Net (e.g. 50cr)"
+                value={dbItem.indiaNet || ''}
+                onChange={(e) => {
+                  const newBd = [...(formState.dailyBreakdown || [])];
+                  newBd[index] = { ...newBd[index], indiaNet: e.target.value };
+                  setFormState(f => ({ ...f, dailyBreakdown: newBd }));
+                }}
+                className="w-1/4 bg-black/50 border border-gray-800 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-brand-red transition-all"
+              />
+              <input
+                type="text"
+                placeholder="WW Gross (e.g. 80cr)"
+                value={dbItem.worldwideGross || ''}
+                onChange={(e) => {
+                  const newBd = [...(formState.dailyBreakdown || [])];
+                  newBd[index] = { ...newBd[index], worldwideGross: e.target.value };
+                  setFormState(f => ({ ...f, dailyBreakdown: newBd }));
+                }}
+                className="w-1/4 bg-black/50 border border-gray-800 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-brand-red transition-all"
+              />
+              <input
+                type="text"
+                placeholder="Occupancy (e.g. 60%)"
+                value={dbItem.occupancy || ''}
+                onChange={(e) => {
+                  const newBd = [...(formState.dailyBreakdown || [])];
+                  newBd[index] = { ...newBd[index], occupancy: e.target.value };
+                  setFormState(f => ({ ...f, dailyBreakdown: newBd }));
+                }}
+                className="w-1/4 bg-black/50 border border-gray-800 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-brand-red transition-all"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  const newBd = [...(formState.dailyBreakdown || [])];
+                  newBd.splice(index, 1);
+                  setFormState(f => ({ ...f, dailyBreakdown: newBd }));
+                }}
+                className="p-2 text-red-500 hover:text-red-400 bg-red-500/10 hover:bg-red-500/20 rounded-xl transition-all"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={() => {
+              const newBd = [...(formState.dailyBreakdown || []), { day: '', indiaNet: '', worldwideGross: '', occupancy: '' }];
+              setFormState(f => ({ ...f, dailyBreakdown: newBd }));
+            }}
+            className="flex items-center gap-1 text-xs text-brand-red hover:text-red-400 font-bold transition-all px-2 py-1 bg-brand-red/10 hover:bg-brand-red/20 rounded-lg w-max mt-1"
+          >
+            <Plus className="w-3 h-3" /> Add Day
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -231,8 +293,17 @@ const BoxOffice = () => {
                         </div>
                         {Array.isArray(item.dailyBreakdown) && item.dailyBreakdown.length > 0 && (
                           <div className="mt-2 pt-2 border-t border-gray-800">
-                            <strong className="text-gray-300">Daily Breakdown:</strong>
-                            <pre className="mt-1 text-[10px] font-mono text-gray-500 whitespace-pre-wrap">{JSON.stringify(item.dailyBreakdown, null, 2)}</pre>
+                            <strong className="text-gray-300 block mb-1">Daily Breakdown:</strong>
+                            <div className="space-y-1">
+                              {item.dailyBreakdown.map((dbItem, idx) => (
+                                <div key={idx} className="flex gap-2 text-[10px] text-gray-400 bg-black/20 p-1.5 rounded">
+                                  <span className="flex-1 truncate">{dbItem.day}</span>
+                                  <span className="flex-1 truncate text-white">{dbItem.indiaNet}</span>
+                                  <span className="flex-1 truncate text-green-400">{dbItem.worldwideGross}</span>
+                                  <span className="w-12 truncate">{dbItem.occupancy}</span>
+                                </div>
+                              ))}
+                            </div>
                           </div>
                         )}
                       </div>

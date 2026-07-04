@@ -14,7 +14,7 @@ const SingleBoxOffice = () => {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 lg:px-8 py-10">
+      <div className="wrap py-10">
         <LoadingSkeleton type="page" />
       </div>
     );
@@ -25,7 +25,7 @@ const SingleBoxOffice = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 lg:px-8 py-10">
+    <div className="wrap py-10">
       <Helmet>
         <title>{bo.movieName} Box Office Collection | CHITRAMBHALARE</title>
         <meta name="description" content={`Check out the detailed day-wise box office collections of ${bo.movieName}.`} />

@@ -53,6 +53,10 @@ const router = createBrowserRouter([
         element: <SuspenseWrapper><Home /></SuspenseWrapper>,
       },
       {
+        path: 'main',
+        element: <SuspenseWrapper><Home /></SuspenseWrapper>,
+      },
+      {
         path: 'about',
         element: <SuspenseWrapper><About /></SuspenseWrapper>,
       },

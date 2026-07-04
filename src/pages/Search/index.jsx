@@ -15,7 +15,7 @@ const Search = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-20 flex flex-col items-center min-h-[60vh]">
+    <div className="wrap py-20 flex flex-col items-center min-h-[60vh]">
       <Helmet>
         <title>Search | CHITRAMBHALARE</title>
       </Helmet>

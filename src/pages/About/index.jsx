@@ -12,7 +12,7 @@ const About = () => {
       {/* Banner */}
       <div className="bg-brand-dark/50 border-b border-brand-red/20 text-gray-100 py-20 px-4 text-center relative overflow-hidden">
         <div className="absolute inset-0 bg-brand-red/5 blur-[100px]"></div>
-        <div className="container mx-auto">
+        <div className="wrap">
           <h1 className="text-4xl md:text-5xl font-poppins font-bold mb-4">About CHITRAMBHALARE</h1>
           <p className="text-xl text-gray-400 font-inter max-w-2xl mx-auto">
             Your most trusted source for Tollywood news, reviews, and box office tracking.
@@ -20,7 +20,7 @@ const About = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 lg:px-8 py-16">
+      <div className="wrap py-16">
         <div className="max-w-4xl mx-auto space-y-16">
           
           {/* About Company */}
