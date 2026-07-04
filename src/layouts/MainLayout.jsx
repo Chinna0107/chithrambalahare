@@ -28,7 +28,7 @@ const MainLayout = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-brand-light text-gray-100 font-inter">
-      <PopupAdModal />
+      {location.pathname === '/' && <PopupAdModal />}
       <FlashNews />
       <ScrollToTop />
       <Header />

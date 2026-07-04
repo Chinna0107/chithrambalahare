@@ -12,6 +12,24 @@ const PopupAdModal = ({ forceShow = false }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [canClose, setCanClose] = useState(false);
   const [timerCount, setTimerCount] = useState(0);
+  const [currentImageIdx, setCurrentImageIdx] = useState(0);
+
+  const carouselItems = adData?.carouselItems?.length > 0 
+    ? adData.carouselItems 
+    : [];
+
+  const currentItem = carouselItems[currentImageIdx];
+
+  useEffect(() => {
+    if (!isOpen || carouselItems.length === 0) return;
+    const durationMs = (currentItem?.timer || 3) * 1000;
+    
+    const timeout = setTimeout(() => {
+      setCurrentImageIdx((prev) => (prev + 1) % carouselItems.length);
+    }, durationMs);
+
+    return () => clearTimeout(timeout);
+  }, [isOpen, currentImageIdx, carouselItems.length, currentItem]);
 
   useEffect(() => {
     if (!adData) return;
@@ -38,7 +56,7 @@ const PopupAdModal = ({ forceShow = false }) => {
       setIsOpen(true);
       
       // Setup Close Timer Logic
-      const closeSecs = adData.closeTimer || 0;
+      const closeSecs = adData.closeTimer || 5; // default 5s
       setTimerCount(closeSecs);
 
       if (closeSecs > 0) {
@@ -49,11 +67,11 @@ const PopupAdModal = ({ forceShow = false }) => {
           if (currentCount <= 0) {
             clearInterval(interval);
             setCanClose(true);
-            if (adData.autoClose && !forceShow) {
-               setIsOpen(false);
-               if (adData.displayRule === 'once_per_user') {
-                 localStorage.setItem('tolly_ad_dismissed', 'true');
-               }
+            if (adData.autoClose) {
+              setIsOpen(false);
+              if (adData.displayRule === 'once_per_user') {
+                localStorage.setItem('tolly_ad_dismissed', 'true');
+              }
             }
           }
         }, 1000);
@@ -84,7 +102,7 @@ const PopupAdModal = ({ forceShow = false }) => {
     }
   };
 
-  if (!isOpen || isLoading || !adData) return null;
+  if (!isOpen || isLoading || !adData || carouselItems.length === 0) return null;
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
@@ -95,62 +113,32 @@ const PopupAdModal = ({ forceShow = false }) => {
       />
 
       {/* Modal Container */}
-      <div className="relative w-full max-w-lg bg-[#131a2b] border border-gray-800 rounded-2xl overflow-hidden shadow-2xl transform transition-all duration-300 animate-scale-up z-50">
+      <div className="relative w-full max-w-[95vw] md:max-w-[75vw] bg-[#131a2b] border border-gray-800 rounded-2xl overflow-hidden shadow-2xl transform transition-all duration-300 animate-scale-up z-50">
         
         {/* Banner Image */}
-        {(adData.imageDesktop || adData.imageMobile || adData.imageUrl) && (
-          <a href={adData.redirectUrl || '#'} target={adData.redirectUrl ? '_blank' : '_self'} rel="noopener noreferrer" className="block relative w-full overflow-hidden min-h-[150px]">
-             {/* Unified ImageUrl fallback */}
-             {adData.imageUrl && !adData.imageDesktop && !adData.imageMobile && (
-                <img 
-                  src={adData.imageUrl} 
-                  alt={adData.title || "Advertisement"} 
-                  className="w-full h-auto object-cover block"
-                />
-             )}
-             {/* Desktop Image */}
-             {adData.imageDesktop && (
-                <img 
-                  src={adData.imageDesktop} 
-                  alt={adData.title || "Advertisement"} 
-                  className={`w-full h-auto object-cover ${adData.imageMobile ? 'hidden sm:block' : 'block'}`}
-                />
-             )}
-             {/* Mobile Image */}
-             {adData.imageMobile && (
-                <img 
-                  src={adData.imageMobile} 
-                  alt={adData.title || "Advertisement"} 
-                  className={`w-full h-auto object-cover ${adData.imageDesktop ? 'block sm:hidden' : 'block'}`}
-                />
-             )}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-transparent pointer-events-none" />
+        {currentItem && (
+          <a href={currentItem.redirectUrl || "https://www.m9.news/"} target="_blank" rel="noopener noreferrer" className="block relative w-full overflow-hidden min-h-[400px] md:min-h-[600px]">
+            <img 
+              src={currentItem.imageUrl} 
+              alt="Advertisement" 
+              className="w-full h-full object-cover absolute inset-0 transition-opacity duration-500"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/60 pointer-events-none" />
           </a>
         )}
 
         {/* Content Box */}
-        <div className="p-6 md:p-8 space-y-6">
-          <div className="space-y-2 text-center">
-            {adData.title && (
-              <h3 className="text-xl md:text-2xl font-poppins font-bold text-gray-100 leading-snug">
-                {adData.title}
+        <div className="p-6 md:p-8 space-y-4">
+          <div className="space-y-3 text-center">
+            {currentItem.title && (
+              <h3 className="text-xl md:text-2xl lg:text-3xl font-poppins font-bold text-white leading-snug">
+                {currentItem.title}
               </h3>
             )}
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 pt-2 justify-center">
-            {adData.redirectUrl && (
-              <a
-                href={adData.redirectUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={handleClose}
-                className="flex-1 max-w-[200px] inline-flex items-center justify-center bg-brand-red text-white text-sm font-bold px-6 py-3.5 rounded-xl hover:bg-brand-red/95 transition-all text-center"
-              >
-                {adData.buttonText || "Learn More"}
-                <ExternalLink className="w-4 h-4 ml-2" />
-              </a>
+            {currentItem.description && (
+              <p className="text-gray-400 text-sm md:text-base whitespace-pre-line">
+                {currentItem.description}
+              </p>
             )}
           </div>
         </div>
