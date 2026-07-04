@@ -13,6 +13,18 @@ const Overview = () => {
   const { dbData } = useOutletContext();
   const analytics = dbData?.analytics || {};
 
+  const mostViewedArticles = useMemo(() => {
+    return (dbData?.articles || []).sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 5);
+  }, [dbData]);
+
+  const mostViewedReviews = useMemo(() => {
+    return (dbData?.reviews || []).sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 5);
+  }, [dbData]);
+
+  const trendingMovies = useMemo(() => {
+    return (dbData?.boxOffice || []).sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 5);
+  }, [dbData]);
+
   // Compute content stats
   const stats = useMemo(() => ({
     articles: (dbData?.articles || []).length,
@@ -118,31 +130,29 @@ const Overview = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <VisitorsAreaChart data={visitorChartData} />
         <ContentBarChart data={contentChartData} />
-        {categoryData.length > 0 && <CategoryPieChart data={categoryData} />}
-        <PageViewsLineChart data={pageViewsData} />
       </div>
 
       {/* Content & Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Most Viewed */}
+        {/* Most Viewed Articles */}
         <div className="bg-[#18181B] rounded-2xl border border-gray-800 p-6">
           <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
             <Eye className="w-4 h-4 text-brand-red" />
             Most Viewed Articles
           </h3>
           <div className="space-y-3">
-            {(analytics.mostViewedArticles || []).map((article, i) => (
+            {mostViewedArticles.map((article, i) => (
               <div key={i} className="flex items-center gap-3 py-2 px-3 rounded-xl hover:bg-white/5 transition-colors">
                 <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
                   i === 0 ? 'bg-yellow-500/20 text-yellow-500' : i === 1 ? 'bg-gray-400/20 text-gray-400' : 'bg-orange-700/20 text-orange-700'
                 }`}>{i + 1}</span>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm text-gray-200 truncate font-medium">{article.title}</p>
-                  <p className="text-[10px] text-gray-500">{article.views}</p>
+                  <p className="text-[10px] text-gray-500">{article.views || 0} Views</p>
                 </div>
               </div>
             ))}
-            {(!analytics.mostViewedArticles || analytics.mostViewedArticles.length === 0) && (
+            {mostViewedArticles.length === 0 && (
               <p className="text-xs text-gray-600 text-center py-4">No data available</p>
             )}
           </div>
@@ -155,31 +165,51 @@ const Overview = () => {
             Most Viewed Reviews
           </h3>
           <div className="space-y-3">
-            {(analytics.mostViewedReviews || []).map((review, i) => (
+            {mostViewedReviews.map((review, i) => (
               <div key={i} className="flex items-center gap-3 py-2 px-3 rounded-xl hover:bg-white/5 transition-colors">
                 <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
                   i === 0 ? 'bg-yellow-500/20 text-yellow-500' : i === 1 ? 'bg-gray-400/20 text-gray-400' : 'bg-orange-700/20 text-orange-700'
                 }`}>{i + 1}</span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-gray-200 truncate font-medium">{review.title}</p>
-                  <p className="text-[10px] text-gray-500">{review.views}</p>
+                  <p className="text-sm text-gray-200 truncate font-medium">{review.movieName || review.title}</p>
+                  <p className="text-[10px] text-gray-500">{review.views || 0} Views</p>
                 </div>
               </div>
             ))}
-            {(!analytics.mostViewedReviews || analytics.mostViewedReviews.length === 0) && (
+            {mostViewedReviews.length === 0 && (
               <p className="text-xs text-gray-600 text-center py-4">No data available</p>
             )}
           </div>
         </div>
 
-        {/* Activity Feed */}
-        <ActivityFeed activities={recentActivity} />
+        {/* Trending Movies */}
+        <div className="bg-[#18181B] rounded-2xl border border-gray-800 p-6">
+          <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
+            <TrendingUp className="w-4 h-4 text-purple-500" />
+            Trending Movies
+          </h3>
+          <div className="space-y-3">
+            {trendingMovies.map((movie, i) => (
+              <div key={i} className="flex items-center gap-3 py-2 px-3 rounded-xl hover:bg-white/5 transition-colors">
+                <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                  i === 0 ? 'bg-yellow-500/20 text-yellow-500' : i === 1 ? 'bg-gray-400/20 text-gray-400' : 'bg-orange-700/20 text-orange-700'
+                }`}>{i + 1}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-gray-200 truncate font-medium">{movie.movieName}</p>
+                  <p className="text-[10px] text-gray-500">{movie.views || 0} Views</p>
+                </div>
+              </div>
+            ))}
+            {trendingMovies.length === 0 && (
+              <p className="text-xs text-gray-600 text-center py-4">No data available</p>
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* Latest Published & SEO Health */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
         {/* Latest Published */}
-        <div className="bg-[#18181B] rounded-2xl border border-gray-800 p-6">
+        <div className="bg-[#18181B] rounded-2xl border border-gray-800 p-6 lg:col-span-2">
           <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
             <FileText className="w-4 h-4 text-green-500" />
             Latest Published Content
@@ -205,52 +235,8 @@ const Overview = () => {
           </div>
         </div>
 
-        {/* SEO Health & System */}
-        <div className="space-y-6">
-          {/* SEO Health */}
-          <div className="bg-[#18181B] rounded-2xl border border-gray-800 p-6">
-            <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
-              <Search className="w-4 h-4 text-green-500" />
-              SEO Health Overview
-            </h3>
-            <div className="flex items-center gap-4">
-              <div className="w-20 h-20 rounded-full border-4 border-green-500/30 flex items-center justify-center">
-                <span className="text-xl font-bold text-green-500">85%</span>
-              </div>
-              <div className="space-y-2 flex-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-400">Articles with SEO</span>
-                  <span className="text-xs font-bold text-green-500">Good</span>
-                </div>
-                <div className="w-full bg-gray-800 rounded-full h-1.5">
-                  <div className="bg-green-500 h-1.5 rounded-full" style={{ width: '85%' }} />
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-400">Sitemap Status</span>
-                  <span className="text-xs font-bold text-green-500">Active</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* System Notifications */}
-          <div className="bg-[#18181B] rounded-2xl border border-gray-800 p-6">
-            <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
-              <Bell className="w-4 h-4 text-yellow-500" />
-              System Notifications
-            </h3>
-            <div className="space-y-2">
-              <div className="flex items-center gap-3 py-2 px-3 rounded-xl bg-yellow-500/5 border border-yellow-500/10">
-                <Shield className="w-4 h-4 text-yellow-500 flex-shrink-0" />
-                <p className="text-xs text-gray-300">Consider adding SEO titles to all content for better search visibility.</p>
-              </div>
-              <div className="flex items-center gap-3 py-2 px-3 rounded-xl bg-blue-500/5 border border-blue-500/10">
-                <Activity className="w-4 h-4 text-blue-500 flex-shrink-0" />
-                <p className="text-xs text-gray-300">System running smoothly. No issues detected.</p>
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Activity Feed */}
+        <ActivityFeed activities={recentActivity} />
       </div>
 
       {/* Top Performing Pages */}

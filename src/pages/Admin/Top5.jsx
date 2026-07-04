@@ -15,6 +15,11 @@ const Top5 = () => {
     gross: '',
     verdict: 'Hit',
     trend: 'stable',
+    slug: '',
+    seoTitle: '',
+    metaDescription: '',
+    metaKeywords: '',
+    canonicalUrl: '',
     ...(dbData.boxOfficeTop5?.[i] || {}),
   }));
 
@@ -155,7 +160,32 @@ const Top5 = () => {
                 />
               </div>
 
-            </div>
+              </div>
+              <div className="mt-4 pt-4 border-t border-gray-800">
+                <h4 className="text-[10px] font-bold text-brand-red uppercase tracking-wider mb-4 border-b border-gray-800 pb-2">SEO Settings</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Slug</label>
+                    <input type="text" value={item.slug ?? ''} onChange={e => handleChange(item.rank, 'slug', e.target.value)} className="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand-red transition-all" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">SEO Title</label>
+                    <input type="text" value={item.seoTitle ?? ''} onChange={e => handleChange(item.rank, 'seoTitle', e.target.value)} className="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand-red transition-all" />
+                  </div>
+                  <div className="lg:col-span-2">
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Meta Description</label>
+                    <textarea value={item.metaDescription ?? ''} onChange={e => handleChange(item.rank, 'metaDescription', e.target.value)} className="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand-red transition-all" rows={2} />
+                  </div>
+                  <div className="lg:col-span-2">
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Meta Keywords</label>
+                    <input type="text" value={item.metaKeywords ?? ''} onChange={e => handleChange(item.rank, 'metaKeywords', e.target.value)} className="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand-red transition-all" />
+                  </div>
+                  <div className="lg:col-span-2">
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Canonical URL</label>
+                    <input type="text" value={item.canonicalUrl ?? ''} onChange={e => handleChange(item.rank, 'canonicalUrl', e.target.value)} className="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand-red transition-all" />
+                  </div>
+                </div>
+              </div>
           </div>
         ))}
 

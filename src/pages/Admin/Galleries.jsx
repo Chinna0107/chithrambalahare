@@ -16,7 +16,7 @@ const CATEGORIES = [
   'Stills'
 ];
 
-const emptyForm = { title: '', category: 'Stills', coverImage: '', images: [], date: '' };
+const emptyForm = { title: '', category: 'Stills', coverImage: '', images: [], date: '', slug: '', seoTitle: '', metaDescription: '', canonicalUrl: '', ogImage: '' };
 const sanitize = (obj) => Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, v === null || v === undefined ? '' : v]));
 
 const SortableImageItem = ({ image, onUpdate, onRemove, onSetFeatured, isFeatured }) => {
@@ -200,6 +200,33 @@ const Galleries = () => {
         <div>
           <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Date</label>
           <input type="date" value={formState.date || ''} onChange={e => setFormState(f => ({ ...f, date: e.target.value }))} className="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand-red" />
+        </div>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Slug</label>
+          <input type="text" value={formState.slug || ''} onChange={e => setFormState(f => ({ ...f, slug: e.target.value }))} className="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand-red" placeholder="e.g. pushpa-2-stills" />
+        </div>
+        <div>
+          <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Canonical URL</label>
+          <input type="text" value={formState.canonicalUrl || ''} onChange={e => setFormState(f => ({ ...f, canonicalUrl: e.target.value }))} className="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand-red" />
+        </div>
+      </div>
+      <div className="mt-4 border border-gray-800 rounded-xl p-4 bg-black/20">
+        <h4 className="text-[10px] font-bold text-brand-red uppercase tracking-wider mb-4">SEO Settings</h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">SEO Title</label>
+            <input type="text" value={formState.seoTitle || ''} onChange={e => setFormState(f => ({ ...f, seoTitle: e.target.value }))} className="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand-red" />
+          </div>
+          <div>
+            <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Open Graph Image</label>
+            <ImageUpload value={formState.ogImage || ''} onChange={url => setFormState(f => ({ ...f, ogImage: url }))} placeholder="Upload OG Image..." />
+          </div>
+          <div className="md:col-span-2">
+            <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Meta Description</label>
+            <textarea value={formState.metaDescription || ''} onChange={e => setFormState(f => ({ ...f, metaDescription: e.target.value }))} className="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand-red" rows={2} />
+          </div>
         </div>
       </div>
       <div>

@@ -9,8 +9,12 @@ const emptyForm = {
   openingDayPreview: '', advanceBookings: '', premiereCollections: '',
   hourlyGross: '', totalGross: '', premierGross: '', screens: '', 
   weekendCollections: '', weeklyCollections: '', status: 'Live', notes: '', 
-  lastUpdated: '', poster: '', dailyBreakdown: [] 
+  lastUpdated: '', poster: '', dailyBreakdown: [],
+  seoTitle: '', metaDescription: '', metaKeywords: '', canonicalUrl: '', 
+  ogTitle: '', ogDescription: '', ogImage: '', twitterCard: '', robots: 'index,follow'
 };
+
+const seoFieldsList = ['seoTitle', 'metaDescription', 'metaKeywords', 'canonicalUrl', 'ogTitle', 'ogDescription', 'ogImage', 'twitterCard', 'robots'];
 
 const sanitize = (obj) => Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, v === null || v === undefined ? '' : v]));
 
@@ -62,8 +66,7 @@ const NorthAmerica = () => {
     return (
       <div className="space-y-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {Object.keys(emptyForm).map(field => {
-            if (field === 'dailyBreakdown') return null;
+          {Object.keys(emptyForm).filter(f => f !== 'dailyBreakdown' && !seoFieldsList.includes(f)).map(field => {
             return (
               <div key={field}>
                 <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">
@@ -86,6 +89,34 @@ const NorthAmerica = () => {
               </div>
             );
           })}
+        </div>
+
+        {/* SEO Settings */}
+        <div className="border border-gray-800 rounded-xl p-4 bg-black/20 mt-6">
+          <h4 className="text-[10px] font-bold text-brand-red uppercase tracking-wider mb-4">SEO Settings</h4>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {seoFieldsList.map(field => (
+              <div key={field}>
+                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">
+                  {field.replace(/([A-Z])/g, ' $1').trim()}
+                </label>
+                {field === 'ogImage' ? (
+                  <ImageUpload 
+                    value={formState[field] ?? ''} 
+                    onChange={url => setFormState(f => ({ ...f, [field]: url }))} 
+                    placeholder="Upload OG Image..." 
+                  />
+                ) : (
+                  <input
+                    type="text"
+                    value={formState[field] ?? ''}
+                    onChange={e => setFormState(f => ({ ...f, [field]: e.target.value }))}
+                    className="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-brand-red transition-all"
+                  />
+                )}
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Daily Breakdown */}

@@ -96,7 +96,6 @@ const Articles = () => {
   const fields = [
     { field: 'category', label: 'Category', type: 'select', options: ['Casting', 'Release Dates', 'OTT Dates', 'Re-Release', 'Production'], colSpan: 1 },
     { field: 'title', label: 'Title', placeholder: 'Article title', colSpan: 2 },
-    { field: 'slug', label: 'Slug', placeholder: 'e.g. pushpa-2-review', colSpan: 1 },
     { field: 'author', label: 'Author', placeholder: 'Author name', colSpan: 1 },
     { field: 'date', label: 'Date', placeholder: '', type: 'date', colSpan: 1 },
     { field: 'status', label: 'Status', type: 'select', options: ['published', 'draft', 'scheduled'], colSpan: 1 },
@@ -163,6 +162,11 @@ const Articles = () => {
       </div>
 
 
+      <SEOFields 
+        values={formState}
+        onChange={(newValues) => setFormState(newValues)}
+        showAdvanced={true}
+      />
     </div>
   );
 

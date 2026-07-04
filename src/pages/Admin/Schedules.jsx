@@ -4,7 +4,7 @@ import { useOutletContext } from 'react-router-dom';
 import { Plus, Trash2, Edit, Check, X, Loader2 } from 'lucide-react';
 import ImageUpload from '../../components/ImageUpload';
 
-const emptyForm = { movieName: '', slug: '', releaseDate: '', language: '', status: 'Upcoming', banner: '', director: '', castList: '', genre: '', trailerLink: '', notes: '' };
+const emptyForm = { movieName: '', slug: '', releaseDate: '', remainingDays: '', language: '', status: 'Upcoming', banner: '', director: '', castList: '', genre: '', trailerLink: '', notes: '', seoTitle: '', metaDescription: '', metaKeywords: '', canonicalUrl: '', ogTitle: '', ogDescription: '', ogImage: '' };
 const sanitize = (obj) => Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, v === null || v === undefined ? '' : v]));
 
 const statusOptions = ['Upcoming', 'Released', 'Postponed', 'Cancelled'];
@@ -13,12 +13,22 @@ const fields = [
   { field: 'slug', label: 'Slug (URL)', type: 'text' },
   { field: 'movieName', label: 'Movie Name', type: 'text' },
   { field: 'releaseDate', label: 'Release Date', type: 'text' },
+  { field: 'remainingDays', label: 'Remaining Days', type: 'text' },
   { field: 'language', label: 'Language', type: 'text' },
   { field: 'director', label: 'Director', type: 'text' },
   { field: 'genre', label: 'Genre', type: 'text' },
   { field: 'castList', label: 'Cast', type: 'text' },
   { field: 'trailerLink', label: 'Trailer Link', type: 'text' },
-  { field: 'notes', label: 'Notes', type: 'text' },
+  { field: 'notes', label: 'Notes', type: 'textarea' },
+];
+
+const seoFields = [
+  { field: 'seoTitle', label: 'SEO Title', type: 'text' },
+  { field: 'metaDescription', label: 'Meta Description', type: 'textarea' },
+  { field: 'metaKeywords', label: 'Meta Keywords', type: 'text' },
+  { field: 'canonicalUrl', label: 'Canonical URL', type: 'text' },
+  { field: 'ogTitle', label: 'Open Graph Title', type: 'text' },
+  { field: 'ogDescription', label: 'Open Graph Description', type: 'textarea' }
 ];
 
 const FormRow = ({ formState, setFormState }) => (
@@ -59,6 +69,39 @@ const FormRow = ({ formState, setFormState }) => (
       >
         {statusOptions.map(s => <option key={s} value={s}>{s}</option>)}
       </select>
+    </div>
+
+    <div className="lg:col-span-4 mt-6">
+      <h4 className="text-[10px] font-bold text-brand-red uppercase tracking-wider mb-4 border-b border-gray-800 pb-2">SEO Settings</h4>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {seoFields.map(({ field, label, type }) => (
+          <div key={field} className={type === 'textarea' ? "lg:col-span-4" : "lg:col-span-2"}>
+            <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">{label}</label>
+            {type === 'textarea' ? (
+              <textarea
+                value={formState[field] ?? ''}
+                onChange={e => setFormState(f => ({ ...f, [field]: e.target.value }))}
+                className="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-brand-red transition-all"
+                rows={2}
+              />
+            ) : (
+              <input
+                type={type}
+                value={formState[field] ?? ''}
+                onChange={e => setFormState(f => ({ ...f, [field]: e.target.value }))}
+                className="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-brand-red transition-all"
+              />
+            )}
+          </div>
+        ))}
+        <div className="lg:col-span-4">
+          <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Open Graph Image</label>
+          <ImageUpload
+            value={formState.ogImage}
+            onChange={(url) => setFormState(f => ({ ...f, ogImage: url }))}
+          />
+        </div>
+      </div>
     </div>
   </div>
 );
@@ -153,6 +196,7 @@ const Schedules = () => {
                 <div className="flex items-center gap-4 flex-1 flex-wrap">
                   <p className="text-white font-bold">{item.movieName}</p>
                   {item.releaseDate && <span className="text-xs text-gray-400">{typeof item.releaseDate === 'string' ? item.releaseDate.split('T')[0] : item.releaseDate}</span>}
+                  {item.remainingDays && <span className="text-xs text-brand-red bg-brand-red/10 px-2 py-0.5 rounded-full">{item.remainingDays} left</span>}
                   {item.language && <span className="text-xs text-gray-500 bg-gray-800 px-2 py-0.5 rounded-full">{item.language}</span>}
                   <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${statusColor[item.status] || 'bg-gray-700 text-gray-400'}`}>{item.status}</span>
                 </div>

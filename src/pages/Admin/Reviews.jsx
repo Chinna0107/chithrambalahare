@@ -4,6 +4,7 @@ import { useOutletContext } from 'react-router-dom';
 import { Plus, Trash2, Edit, Check, X, Loader2, Eye, Calendar, Link as LinkIcon, Star, Film } from 'lucide-react';
 import ImageUpload from '../../components/ImageUpload';
 import TipTapEditor from '../../components/Editor/TipTapEditor';
+import SEOFields from '../../components/SEO/SEOFields';
 
 const emptyForm = { 
   slug: '', movieName: '', poster: '', rating: '', snippet: '', verdict: '', 
@@ -84,7 +85,6 @@ const Reviews = () => {
 
   const basicFields = [
     { field: 'movieName', label: 'Movie Name', placeholder: 'Movie Name', colSpan: 2 },
-    { field: 'slug', label: 'Slug', placeholder: 'e.g. pushpa-2-review', colSpan: 1 },
     { field: 'rating', label: 'Rating', placeholder: 'e.g. 3.5/5', colSpan: 1 },
     { field: 'director', label: 'Director', placeholder: 'Director Name', colSpan: 1 },
     { field: 'producer', label: 'Producer', placeholder: 'Producer Name', colSpan: 1 },
@@ -204,6 +204,11 @@ const Reviews = () => {
         </div>
       </div>
 
+      <SEOFields 
+        values={formState}
+        onChange={(newValues) => setFormState(newValues)}
+        showAdvanced={true}
+      />
     </div>
   );
 
