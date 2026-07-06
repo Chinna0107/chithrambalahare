@@ -158,20 +158,30 @@ const PopupAdModal = ({ forceShow = false }) => {
       {/* Full Screen Layout Container */}
       <div className="relative z-50 flex flex-col h-full w-full pointer-events-none">
         
-        {/* Top Header Section (Stacked Layout) */}
+        {/* Top Header Section (Stacked Layout on Mobile, Single Line on Desktop) */}
         {currentItem && (
           <div className="w-full bg-[#0a0f18]/95 backdrop-blur-2xl border-b border-white/10 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.5)] transform transition-transform duration-500 animate-scale-up pointer-events-auto">
-            <div className="max-w-[1200px] mx-auto px-4 py-4 md:py-5 flex flex-col items-center gap-4">
+            <div className="max-w-[1200px] mx-auto px-4 py-4 md:py-5 flex flex-col md:flex-row items-center md:justify-between gap-4">
               
               {/* Row 1: Logo */}
-              <div className="text-center w-full">
+              <div className="text-center w-full md:w-auto md:flex-shrink-0">
                 <span className="text-2xl md:text-3xl" style={{ fontFamily: "'Bebas Neue', sans-serif", letterSpacing: '2px', color: '#F0EDE8' }}>
                   Chitram<span style={{ color: '#F5C842' }}>Bhalare</span>
                 </span>
               </div>
               
+              {/* Row 3: Timer Message (Centered on desktop) */}
+              {!canClose && timerCount > 0 && (
+                <div className="flex justify-center items-center text-center mt-1 md:mt-0 md:flex-1">
+                  <span className="text-gray-400 font-medium text-sm tracking-wide bg-white/5 px-5 py-2 rounded-full border border-white/10 shadow-inner flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-brand-red animate-pulse" />
+                    The page will load in <span className="text-brand-red font-bold text-base">{timerCount}</span> seconds
+                  </span>
+                </div>
+              )}
+
               {/* Row 2: Actions Row */}
-              <div className="flex items-center justify-center gap-4 md:gap-6 w-full">
+              <div className="flex items-center justify-center md:justify-end gap-4 md:gap-6 w-full md:w-auto md:flex-shrink-0">
                 {currentItem.redirectUrl && (
                   <a href={currentItem.redirectUrl} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-1.5 px-6 py-2 rounded-full bg-brand-red/10 border border-brand-red/30 text-brand-red font-bold text-sm hover:bg-brand-red hover:text-white transition-all duration-300 shadow-[0_0_15px_-3px_rgba(220,38,38,0.3)]">
                     Click to watch <ExternalLink className="w-4 h-4" />
@@ -188,15 +198,6 @@ const PopupAdModal = ({ forceShow = false }) => {
                 </button>
               </div>
 
-              {/* Row 3: Timer Message */}
-              {!canClose && timerCount > 0 && (
-                <div className="flex justify-center items-center text-center mt-1">
-                  <span className="text-gray-400 font-medium text-sm tracking-wide bg-white/5 px-5 py-2 rounded-full border border-white/10 shadow-inner flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-brand-red animate-pulse" />
-                    The page will load in <span className="text-brand-red font-bold text-base">{timerCount}</span> seconds
-                  </span>
-                </div>
-              )}
             </div>
           </div>
         )}
@@ -204,11 +205,11 @@ const PopupAdModal = ({ forceShow = false }) => {
         {/* Center Image Section */}
         {currentItem && (
           <div className="flex-1 flex items-center justify-center p-4 md:p-8 w-full transform transition-all duration-500 animate-scale-up pointer-events-none">
-            <a href={currentItem.redirectUrl || "https://www.m9.news/"} target="_blank" rel="noopener noreferrer" className="block relative max-w-5xl w-full flex justify-center items-center group rounded-2xl overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)] border border-white/10 bg-black/40 pointer-events-auto">
+            <a href={currentItem.redirectUrl || "https://www.m9.news/"} target="_blank" rel="noopener noreferrer" className="relative max-w-5xl w-full flex justify-center items-center group rounded-2xl overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)] border border-white/10 bg-black/40 pointer-events-auto mx-auto">
               <img 
                 src={currentItem.imageUrl} 
                 alt="Advertisement" 
-                className="w-full h-auto max-h-[75vh] object-contain transition-transform duration-700 group-hover:scale-105"
+                className="max-w-full w-auto h-auto max-h-[75vh] object-contain transition-transform duration-700 group-hover:scale-105 mx-auto"
               />
             </a>
           </div>
