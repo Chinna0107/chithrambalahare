@@ -27,7 +27,7 @@ const PopupAd = () => {
   };
 
   const addCarouselItem = () => {
-    handleChange('carouselItems', [...form.carouselItems, { imageUrl: '', redirectUrl: '', timer: 3, title: '', description: '' }]);
+    handleChange('carouselItems', [...form.carouselItems, { imageUrl: '', redirectUrl: '', timer: 3, title: '', companyName: '', description: '' }]);
   };
 
   const removeCarouselItem = (index) => {
@@ -135,6 +135,16 @@ const PopupAd = () => {
                   <ImageUpload value={item.imageUrl} onChange={(url) => handleCarouselChange(idx, 'imageUrl', url)} placeholder="Upload popup image..." />
                 </div>
                 
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Company Name</label>
+                  <input
+                    type="text"
+                    value={item.companyName || ''}
+                    onChange={e => handleCarouselChange(idx, 'companyName', e.target.value)}
+                    placeholder="e.g. My Company..."
+                    className="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand-red transition-all"
+                  />
+                </div>
                 <div>
                   <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Title</label>
                   <input

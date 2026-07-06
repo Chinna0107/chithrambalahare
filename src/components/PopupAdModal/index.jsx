@@ -24,16 +24,40 @@ const PopupAdModal = ({ forceShow = false }) => {
 
   const currentItem = carouselItems[currentImageIdx];
 
+  const handleClose = React.useCallback(() => {
+    setIsOpen(false);
+    if (!forceShow && adData?.displayRule === 'once_per_user') {
+      localStorage.setItem('tolly_ad_dismissed', 'true');
+    }
+    if (!forceShow) {
+      navigate('/main');
+    }
+  }, [forceShow, adData?.displayRule, navigate]);
+
+  const handleSkip = () => {
+    if (currentImageIdx < carouselItems.length - 1) {
+      setCurrentImageIdx(prev => prev + 1);
+    } else {
+      handleClose();
+    }
+  };
+
   useEffect(() => {
     if (!isOpen || carouselItems.length === 0) return;
+    
     const durationMs = (currentItem?.timer || 3) * 1000;
     
     const timeout = setTimeout(() => {
-      setCurrentImageIdx((prev) => (prev + 1) % carouselItems.length);
+      if (currentImageIdx < carouselItems.length - 1) {
+        setCurrentImageIdx((prev) => prev + 1);
+      } else {
+        // Popups completed, automatically close and navigate
+        handleClose();
+      }
     }, durationMs);
 
     return () => clearTimeout(timeout);
-  }, [currentImageIdx, isOpen, carouselItems.length, currentItem?.timer]);
+  }, [currentImageIdx, isOpen, carouselItems.length, currentItem?.timer, handleClose]);
 
   useEffect(() => {
     if (isLoading) return;
@@ -121,16 +145,6 @@ const PopupAdModal = ({ forceShow = false }) => {
     return () => window.removeEventListener('tolly_ad_preview', handlePreview);
   }, []);
 
-  const handleClose = () => {
-    setIsOpen(false);
-    if (!forceShow && adData?.displayRule === 'once_per_user') {
-      localStorage.setItem('tolly_ad_dismissed', 'true');
-    }
-    if (!forceShow && location.pathname === '/') {
-      navigate('/main');
-    }
-  };
-
   if (!isOpen || isLoading || !adData || carouselItems.length === 0) return null;
 
   return (
@@ -141,48 +155,64 @@ const PopupAdModal = ({ forceShow = false }) => {
         onClick={handleClose}
       />
 
-      {/* Modal Container */}
-      <div className="wrap relative pointer-events-none z-50 flex items-center justify-center h-full w-full">
-        <div className="relative w-full bg-[#131a2b] border border-gray-800 rounded-2xl overflow-hidden shadow-2xl transform transition-all duration-300 animate-scale-up pointer-events-auto">
+      {/* Full Screen Layout Container */}
+      <div className="relative z-50 flex flex-col h-full w-full pointer-events-none">
         
-        {/* Banner Image */}
+        {/* Top Header Section (Stacked Layout) */}
         {currentItem && (
-          <a href={currentItem.redirectUrl || "https://www.m9.news/"} target="_blank" rel="noopener noreferrer" className="block relative w-full overflow-hidden min-h-[400px] md:min-h-[600px]">
-            <img 
-              src={currentItem.imageUrl} 
-              alt="Advertisement" 
-              className="w-full h-full object-cover absolute inset-0 transition-opacity duration-500"
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/60 pointer-events-none" />
-          </a>
+          <div className="w-full bg-[#0a0f18]/95 backdrop-blur-2xl border-b border-white/10 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.5)] transform transition-transform duration-500 animate-scale-up pointer-events-auto">
+            <div className="max-w-[1200px] mx-auto px-4 py-4 md:py-5 flex flex-col items-center gap-4">
+              
+              {/* Row 1: Logo */}
+              <div className="text-center w-full">
+                <span className="text-2xl md:text-3xl" style={{ fontFamily: "'Bebas Neue', sans-serif", letterSpacing: '2px', color: '#F0EDE8' }}>
+                  Chitram<span style={{ color: '#F5C842' }}>Bhalare</span>
+                </span>
+              </div>
+              
+              {/* Row 2: Actions Row */}
+              <div className="flex items-center justify-center gap-4 md:gap-6 w-full">
+                {currentItem.redirectUrl && (
+                  <a href={currentItem.redirectUrl} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-1.5 px-6 py-2 rounded-full bg-brand-red/10 border border-brand-red/30 text-brand-red font-bold text-sm hover:bg-brand-red hover:text-white transition-all duration-300 shadow-[0_0_15px_-3px_rgba(220,38,38,0.3)]">
+                    Click to watch <ExternalLink className="w-4 h-4" />
+                  </a>
+                )}
+                
+                <button 
+                  onClick={handleSkip}
+                  className="flex items-center justify-center gap-1.5 px-6 py-2 rounded-full font-bold text-sm transition-all duration-300 bg-gradient-to-r from-gray-700 to-gray-800 hover:from-brand-red hover:to-red-600 text-white shadow-lg border border-white/10"
+                  aria-label="Skip Ad"
+                >
+                  <X className="w-4 h-4" /> 
+                  Skip Ad
+                </button>
+              </div>
+
+              {/* Row 3: Timer Message */}
+              {!canClose && timerCount > 0 && (
+                <div className="flex justify-center items-center text-center mt-1">
+                  <span className="text-gray-400 font-medium text-sm tracking-wide bg-white/5 px-5 py-2 rounded-full border border-white/10 shadow-inner flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-brand-red animate-pulse" />
+                    The page will load in <span className="text-brand-red font-bold text-base">{timerCount}</span> seconds
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
         )}
 
-        {/* Content Box */}
-        <div className="p-6 md:p-8 space-y-4">
-          <div className="space-y-3 text-center">
-            {currentItem.title && (
-              <h3 className="text-xl md:text-2xl lg:text-3xl font-poppins font-bold text-white leading-snug">
-                {currentItem.title}
-              </h3>
-            )}
-            {currentItem.description && (
-              <p className="text-gray-400 text-sm md:text-base whitespace-pre-line">
-                {currentItem.description}
-              </p>
-            )}
+        {/* Center Image Section */}
+        {currentItem && (
+          <div className="flex-1 flex items-center justify-center p-4 md:p-8 w-full transform transition-all duration-500 animate-scale-up pointer-events-none">
+            <a href={currentItem.redirectUrl || "https://www.m9.news/"} target="_blank" rel="noopener noreferrer" className="block relative max-w-5xl w-full flex justify-center items-center group rounded-2xl overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)] border border-white/10 bg-black/40 pointer-events-auto">
+              <img 
+                src={currentItem.imageUrl} 
+                alt="Advertisement" 
+                className="w-full h-auto max-h-[75vh] object-contain transition-transform duration-700 group-hover:scale-105"
+              />
+            </a>
           </div>
-        </div>
-
-        {/* Close Button */}
-        <button 
-          onClick={handleClose}
-          className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all z-50 shadow-md bg-black/80 hover:bg-brand-red text-white border-white/20 hover:border-brand-red/40 cursor-pointer"
-          aria-label="Close Ad"
-        >
-          {!canClose && timerCount > 0 && <span className="text-xs font-bold pl-1">{timerCount}s</span>}
-          <X className="w-4 h-4" />
-        </button>
-      </div>
+        )}
       </div>
 
       <style>{`
