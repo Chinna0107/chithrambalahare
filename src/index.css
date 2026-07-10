@@ -60,7 +60,15 @@
     color: var(--text);
   }
   
-
+  /* Hide main scrollbar as requested (remove that slider) */
+  ::-webkit-scrollbar {
+    width: 0px;
+    background: transparent; /* make scrollbar transparent */
+    display: none;
+  }
+  * {
+    scrollbar-width: none;
+  }
 }
 
 /* ==========================================================================

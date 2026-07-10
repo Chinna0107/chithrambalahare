@@ -71,201 +71,66 @@ const Sidebar = () => {
     <aside className="w-full space-y-8 pb-4">
       {/* Trending Posts */}
       {trendingArticles && trendingArticles.length > 0 && (
-        <div className="glass-card rounded-xl border border-brand-red/10 p-6 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
-          <h3 className="text-xl font-poppins font-bold mb-4 flex items-center border-b border-gray-100/20 pb-2">
-            <Flame className="w-5 h-5 text-brand-red mr-2" />
-            Trending Now
-          </h3>
-          <div className="space-y-4 mt-6">
-            {trendingArticles.map((article, idx) => (
-              <Link 
-                to={`/movie-news/${article.slug}`} 
-                key={article.id} 
-                className="flex group items-start gap-4 p-3 rounded-xl hover:bg-white/5 transition-all duration-300 border border-transparent hover:border-brand-red/20 hover:shadow-[0_5px_20px_rgba(255,0,0,0.05)]"
-              >
-                <div className="relative shrink-0">
-                  <img 
-                    src={article.thumbnail || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80'} 
-                    alt={article.title} 
-                    onError={(e) => {
-                      e.target.src = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80';
-                    }}
-                    className="w-16 h-16 rounded-lg object-cover shadow-md border border-gray-800 group-hover:border-brand-red/50 transition-colors"
-                  />
-                  <div className="absolute -top-1.5 -left-1.5 w-6 h-6 bg-brand-red rounded-full flex items-center justify-center text-white font-poppins font-bold text-[10px] shadow-[0_0_10px_rgba(255,0,0,0.5)] ring-2 ring-[#18181B]">
-                    {idx + 1}
-                  </div>
-                </div>
-                <div className="flex flex-col justify-center h-full pt-0.5">
-                  <h4 className="font-inter font-bold text-gray-200 group-hover:text-brand-red transition-colors line-clamp-2 leading-snug text-sm">
-                    {article.title}
-                  </h4>
-                  <p className="text-[9px] text-gray-400 mt-1 uppercase tracking-wider font-semibold">
-                    {new Date(article.date).toLocaleDateString()}
-                  </p>
-                </div>
-              </Link>
-            ))}
+        <div className="sw">
+          <div className="sw-hdr">
+            <div className="live-dot"></div>
+            <div className="sw-title">Trending Now</div>
           </div>
-        </div>
-      )}
-
-      {/* Box Office Top 5 (Admin Controlled) */}
-      {top5BoxOffice && top5BoxOffice.length > 0 && (
-        <div className="glass-card rounded-xl border border-brand-red/10 p-6 relative overflow-hidden">
-          <h3 className="text-xl font-poppins font-bold mb-4 flex items-center border-b border-gray-100/20 pb-2">
-            <TrendingUp className="w-5 h-5 text-brand-red mr-2" />
-            Box Office Top 5
-          </h3>
-          <div className="space-y-3 mt-6">
-            {top5BoxOffice.map((film, idx) => (
-              <div 
-                key={idx}
-                className="p-4 rounded-xl bg-[#18181B]/60 border border-gray-800/60 hover:border-brand-red/20 transition-all group relative overflow-hidden flex flex-col gap-3 shadow-[0_4px_12px_rgba(0,0,0,0.2)]"
-              >
-                {/* Header: Rank, Title, Territory */}
-                <div className="flex items-center justify-between border-b border-gray-800/50 pb-2">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs ${idx === 0 ? 'bg-yellow-500/20 text-yellow-500' : 'bg-gray-800 text-gray-400'}`}>
-                      {film.rank}
-                    </div>
-                    <div>
-                      <div className="font-poppins font-bold text-white text-sm group-hover:text-brand-red transition-colors">{film.movieName}</div>
-                      {film.territory && <div className="text-[9px] text-gray-500 uppercase tracking-widest">{film.territory}</div>}
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className={`text-xs font-bold flex items-center justify-end gap-1 ${
-                      film.trend === 'up' ? 'text-green-500' : 
-                      film.trend === 'down' ? 'text-red-500' : 'text-gray-400'
-                    }`}>
-                      {film.trend === 'up' ? '▲' : film.trend === 'down' ? '▼' : '—'}
-                    </div>
-                    <span className={`text-[8px] font-bold uppercase px-1.5 py-0.5 rounded border mt-1 inline-block ${getVerdictColorClass(film.verdict)}`}>
-                      {film.verdict}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Body: Collections */}
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  {film.openingCollection && (
-                    <div className="bg-black/30 p-2 rounded-lg border border-gray-800/30">
-                      <div className="text-gray-500 text-[9px] uppercase tracking-wider mb-0.5">Opening</div>
-                      <div className="font-bold text-gray-300">{film.openingCollection}</div>
-                    </div>
-                  )}
-                  {film.weekendCollection && (
-                    <div className="bg-black/30 p-2 rounded-lg border border-gray-800/30">
-                      <div className="text-gray-500 text-[9px] uppercase tracking-wider mb-0.5">Weekend</div>
-                      <div className="font-bold text-gray-300">{film.weekendCollection}</div>
-                    </div>
-                  )}
-                  <div className="bg-brand-red/5 p-2 rounded-lg border border-brand-red/10 col-span-2 flex justify-between items-center">
-                    <div className="text-brand-red text-[9px] uppercase tracking-wider font-bold">Total Collection</div>
-                    <div className="font-poppins font-black text-yellow-500 text-sm drop-shadow-md">{film.totalCollection || film.gross}</div>
-                  </div>
-                </div>
-
-                {/* Footer: Last Updated */}
-                {film.lastUpdated && (
-                  <div className="text-[9px] text-gray-500 italic text-right mt-1">
-                    Updated: {film.lastUpdated}
-                  </div>
-                )}
+          {trendingArticles.map((article, idx) => (
+            <Link to={`/movie-news/${article.slug}`} key={article.id} className="pop-item">
+              <div className="pop-num">{idx + 1}</div>
+              <div>
+                <div className="pop-text">{article.title}</div>
+                <div className="pop-meta">{new Date(article.date).toLocaleDateString()}</div>
               </div>
-            ))}
-          </div>
+            </Link>
+          ))}
         </div>
       )}
 
       {/* Upcoming Schedules (Admin Controlled) */}
       {upcomingSchedules && upcomingSchedules.length > 0 && (
-        <div className="glass-card rounded-xl border border-brand-red/10 p-6 relative overflow-hidden">
-          <h3 className="text-xl font-poppins font-bold mb-4 flex items-center border-b border-gray-100/20 pb-2">
-            <Calendar className="w-5 h-5 text-brand-red mr-2" />
-            Upcoming Releases
-          </h3>
-          <div className="space-y-3.5 mt-6">
-            {upcomingSchedules.slice(0, 4).map((schedule, idx) => {
-              const identifier = schedule.slug || schedule.id;
-              return (
-                <Link 
-                  to={identifier ? `/upcoming/${identifier}` : '#'}
-                  key={schedule.id || idx}
-                  className="flex items-center justify-between p-3 rounded-lg bg-[#18181B]/40 border border-gray-800/40 hover:border-brand-red/30 hover:bg-brand-red/5 transition-all group block"
-                >
-                  <div>
-                    <div className="font-inter font-bold text-gray-200 text-sm leading-tight group-hover:text-brand-red transition-colors">{schedule.movieName}</div>
-                    <div className="text-[10px] text-gray-400 mt-1 uppercase tracking-wide font-medium">
-                      {schedule.language} • {schedule.releaseDate ? new Date(schedule.releaseDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'TBA'}
-                    </div>
-                  </div>
-                  <div className="text-right shrink-0">
-                    <span className="bg-brand-red/10 border border-brand-red/20 text-brand-red text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-[0_0_10px_rgba(212,43,43,0.1)] group-hover:bg-brand-red/20 transition-colors">
-                      {getDaysRemainingText(schedule.releaseDate, schedule.status)}
-                    </span>
-                  </div>
-                </Link>
-              );
-            })}
+        <div className="sw">
+          <div className="sw-hdr">
+            <div className="sw-title">Upcoming Releases</div>
           </div>
-        </div>
-      )}
-
-      {/* Latest Reviews */}
-      {latestReviews && latestReviews.length > 0 && (
-        <div className="glass-card rounded-xl border border-brand-red/10 p-6 relative overflow-hidden">
-          <h3 className="text-xl font-poppins font-bold mb-4 flex items-center border-b border-gray-100/20 pb-2">
-            <Film className="w-5 h-5 text-brand-red mr-2" />
-            Latest Reviews
-          </h3>
-          <div className="space-y-5 mt-6">
-            {latestReviews.map((review) => (
-              <Link to={`/reviews/${review.slug}`} key={review.id} className="flex group items-center relative p-2 rounded-lg hover:bg-brand-red/5 transition-colors duration-300">
-                <img 
-                  src={review.poster || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80'} 
-                  alt={review.movieName} 
-                  onError={(e) => {
-                    e.target.src = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80';
-                  }}
-                  className="w-12 h-18 object-cover rounded shadow-[0_0_15px_rgba(0,0,0,0.5)] border border-brand-red/10 group-hover:border-brand-red/80 transition-all group-hover:scale-105 z-10"
-                />
-                <div className="ml-4 flex flex-col justify-center z-10 w-full min-w-0">
-                  <h4 className="font-inter font-bold text-gray-200 group-hover:text-brand-red transition-colors line-clamp-2 leading-tight text-sm">
-                    {review.movieName}
-                  </h4>
-                  <div className="flex items-center mt-2 justify-between">
-                    <span className="bg-[#18181B] border border-yellow-500/30 text-yellow-500 flex items-center text-[10px] font-bold px-1.5 py-0.5 rounded shadow-sm">
-                      <Star className="w-2.5 h-2.5 mr-0.5 fill-current" />
-                      {review.rating}/5
-                    </span>
-                    {review.ottPlatform && review.ottPlatform !== 'Theatrical' && (
-                      <span className="text-[9px] uppercase font-bold text-brand-red border border-brand-red/20 px-1.5 py-0.5 rounded bg-brand-red/5">
-                        {review.ottPlatform}
-                      </span>
-                    )}
+          {upcomingSchedules.slice(0, 4).map((schedule, idx) => {
+            const identifier = schedule.slug || schedule.id;
+            return (
+              <Link 
+                to={identifier ? `/upcoming/${identifier}` : '#'}
+                key={schedule.id || idx}
+                className="pop-item"
+              >
+                <div className="pop-num">{idx + 1}</div>
+                <div style={{ flex: 1 }}>
+                  <div className="pop-text">{schedule.movieName}</div>
+                  <div className="pop-meta">
+                    {schedule.language} • {schedule.releaseDate ? new Date(schedule.releaseDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'TBA'}
                   </div>
                 </div>
+                <div className="text-right shrink-0">
+                  <span className="text-[9px] uppercase font-bold text-brand-red border border-brand-red/20 px-1.5 py-0.5 rounded bg-brand-red/5">
+                    {getDaysRemainingText(schedule.releaseDate, schedule.status)}
+                  </span>
+                </div>
               </Link>
-            ))}
-          </div>
+            );
+          })}
         </div>
       )}
 
       {/* Popular Tags */}
-      <div className="glass-card rounded-xl border border-brand-red/10 p-6">
-        <h3 className="text-xl font-poppins font-bold mb-4 flex items-center border-b border-gray-100/20 pb-2">
-          <span className="w-1.5 h-5 bg-brand-red mr-2 inline-block"></span>
-          Popular Tags
-        </h3>
-        <div className="flex flex-wrap gap-2">
+      <div className="sw">
+        <div className="sw-hdr">
+          <div className="sw-title">Popular Tags</div>
+        </div>
+        <div className="tag-cloud">
           {popularTags.map(tag => (
             <Link
               key={tag}
               to={`/movie-news?category=${tag}`}
-              className="px-3 py-1.5 bg-[#18181B] border border-brand-red/10 text-gray-300 text-xs font-medium rounded-full hover:bg-brand-red hover:border-brand-red hover:text-white hover:shadow-[0_0_15px_rgba(255,0,0,0.4)] transition-all"
+              className="tag"
             >
               {tag}
             </Link>

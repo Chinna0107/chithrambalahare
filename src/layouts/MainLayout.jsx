@@ -32,7 +32,7 @@ const MainLayout = () => {
       <FlashNews />
       <ScrollToTop />
       <Header />
-      <main className="flex-grow">
+      <main className="flex-grow mt-8">
         <Outlet />
       </main>
       <Footer />

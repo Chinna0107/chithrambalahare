@@ -3,6 +3,8 @@ import { useQuery } from '@tanstack/react-query';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { getBoxOffice, getUpcomingSchedules } from '../../services/api';
+import NorthAmericaCollections from '../../components/NorthAmericaCollections';
+import BoxOfficeCard from '../../components/BoxOfficeCard';
 
 const BoxOffice = () => {
   const { data: boxOfficeData, isLoading } = useQuery({
@@ -150,6 +152,9 @@ const BoxOffice = () => {
       <div className="main-layout">
         {/* LEFT CONTENT */}
         <div style={{ minWidth: 0 }}>
+          {/* North America Collections (Combined into inside page) */}
+          <NorthAmericaCollections hideHeader={false} />
+          
           {isLoading ? (
             <div style={{ color: 'var(--muted)', padding: '50px 0', textAlign: 'center' }}>
               Loading Box Office Collections...
@@ -161,31 +166,10 @@ const BoxOffice = () => {
                 <div className="sec-title">Running Now</div>
                 <span className="sec-badge">🔴 8 Films Live</span>
               </div>
-              <div className="live-scroll">
-                <div className="live-row">
-                  {boxOfficeData?.map((film) => {
-                    const isNew = film.verdict === 'New';
-                    const isHot = film.verdict === 'Blockbuster';
-                    return (
-                      <Link to={`/box-office/${film.slug}`} key={film.id} className={`live-card ${isHot ? 'hot' : ''}`}>
-                        <div className="lc-indicator">
-                          <div className={`lc-dot ${isNew ? 'green' : ''}`}></div>
-                          <span className={isNew ? 'lc-label-new' : 'lc-label-live'}>
-                            {isNew ? 'New' : 'Live'}
-                          </span>
-                        </div>
-                        <div className="lc-movie">{film.movieName}</div>
-                        <div className="lc-dir">{film.cast}</div>
-                        <div className="lc-amount">{film.worldwideGross}</div>
-                        <div className="lc-amt-lbl">Worldwide Gross</div>
-                        <div className="lc-days">Day {film.days} · {film.languages}</div>
-                        <div className="lc-bar-wrap">
-                          <div className={`lc-bar ${isHot ? 'red' : ''}`} style={{ width: `${film.percentage}%` }}></div>
-                        </div>
-                      </Link>
-                    );
-                  })}
-                </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-12">
+                {boxOfficeData?.map((film) => (
+                  <BoxOfficeCard key={film.id} boxOffice={film} />
+                ))}
               </div>
 
               {/* DETAILED TABLE */}

@@ -62,12 +62,12 @@ const HeroSlider = ({ articles }) => {
                     {article.excerpt}
                   </p>
 
-                  <Link
+                  {/* <Link
                     to={`/movie-news/${article.slug}`}
                     className="inline-flex items-center bg-brand-red text-gray-100 font-bold px-8 py-4 rounded-full hover:bg-brand-red/80 transition-all shadow-[0_0_20px_rgba(255,0,0,0.5)] hover:shadow-[0_0_30px_rgba(255,0,0,0.8)] hover:-translate-y-1"
                   >
                     Read Full Story <ChevronRight className="ml-2 w-5 h-5" />
-                  </Link>
+                  </Link> */}
                 </motion.div>
               </div>
             </div>

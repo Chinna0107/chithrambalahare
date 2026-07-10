@@ -44,7 +44,7 @@ const Home = () => {
   }
 
   return (
-    <div className="wrap pt-16 pb-12">
+    <div className="wrap pt-28 pb-12">
       <Helmet>
         <title>CHITRAMBHALARE | Latest Movie News & Reviews</title>
         <meta name="description" content="Get the latest Tollywood movie news, unbiased reviews, box office collections, and exclusive celebrity interviews on CHITRAMBHALARE." />
@@ -56,9 +56,6 @@ const Home = () => {
           
           {/* Hero Section */}
           <HeroSlider articles={articles} />
-          
-          {/* Photo Galleries Section */}
-          <GalleryGrid />
           
           {/* Latest Movie News Grid */}
           {latestNews.length > 0 && (
@@ -100,8 +97,34 @@ const Home = () => {
             </section>
           )}
 
-          {/* North America Collections */}
-          <NorthAmericaCollections />
+          {/* Combined Collections Section */}
+          <section>
+            <div className="flex justify-between items-center mb-6 border-b-2 border-brand-red/10 pb-2">
+              <h2 className="text-2xl font-poppins font-bold text-gray-100 border-b-2 border-brand-red -mb-[10px] pb-2">
+                Box Office Collections
+              </h2>
+              <Link to="/box-office" className="text-sm font-semibold text-gray-100 hover:text-gray-300 flex items-center">
+                View All <ChevronRight className="w-4 h-4 ml-1" />
+              </Link>
+            </div>
+
+            <NorthAmericaCollections hideHeader={true} compact={true} />
+
+            {boxOfficeLoading ? (
+              <LoadingSkeleton type="card" />
+            ) : (
+              boxOfficeData && boxOfficeData.length > 0 && (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+                  {boxOfficeData.map(bo => (
+                    <BoxOfficeCard key={bo.id} boxOffice={bo} compact={true} />
+                  ))}
+                </div>
+              )
+            )}
+          </section>
+
+          {/* Photo Galleries Section */}
+          <GalleryGrid />
 
           {/* Latest Reviews */}
           {reviewsLoading ? (
@@ -121,30 +144,6 @@ const Home = () => {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                   {reviewsData.map(review => (
                     <ReviewCard key={review.id} review={review} />
-                  ))}
-                </div>
-              </section>
-            )
-          )}
-
-          {/* Box Office Updates */}
-          {boxOfficeLoading ? (
-            <LoadingSkeleton type="card" />
-          ) : (
-            boxOfficeData && boxOfficeData.length > 0 && (
-              <section>
-                <div className="flex justify-between items-center mb-6 border-b-2 border-brand-red/10 pb-2">
-                  <h2 className="text-2xl font-poppins font-bold text-gray-100 border-b-2 border-brand-red -mb-[10px] pb-2">
-                    Box Office Collections
-                  </h2>
-                  <Link to="/box-office" className="text-sm font-semibold text-gray-100 hover:text-gray-300 flex items-center">
-                    View All <ChevronRight className="w-4 h-4 ml-1" />
-                  </Link>
-                </div>
-                
-                <div className="grid grid-cols-1 gap-6">
-                  {boxOfficeData.map(bo => (
-                    <BoxOfficeCard key={bo.id} boxOffice={bo} />
                   ))}
                 </div>
               </section>

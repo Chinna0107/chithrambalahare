@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { Globe, RefreshCw, Star, TrendingUp } from 'lucide-react';
 import { getNorthAmericaCollections } from '../../services/api';
 
-const NorthAmericaCollections = () => {
+const NorthAmericaCollections = ({ hideHeader = false, compact = false }) => {
   const { data: collections, isLoading, refetch } = useQuery({
     queryKey: ['northAmericaCollections'],
     queryFn: getNorthAmericaCollections,
@@ -35,35 +35,36 @@ const NorthAmericaCollections = () => {
   if (!collections || collections.length === 0) return null;
 
   return (
-    <section className="mb-12">
-      <div className="flex justify-between items-center mb-6 border-b-2 border-brand-red/10 pb-2">
-        <div className="flex items-center gap-2.5">
-          <h2 className="text-2xl font-poppins font-bold text-gray-100 border-b-2 border-brand-red -mb-[10px] pb-2 flex items-center">
-            <Globe className="w-5 h-5 mr-2 text-brand-red animate-spin-slow" />
-            North America Collections
-          </h2>
-          <span className="bg-brand-red/10 border border-brand-red/30 text-brand-red text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center mt-1 animate-pulse shadow-[0_0_10px_rgba(212,43,43,0.2)]">
-            <span className="w-1.5 h-1.5 bg-brand-red rounded-full mr-1"></span>
-            LIVE TRACKING
-          </span>
+    <section className={hideHeader ? "" : "mb-12"}>
+      {!hideHeader && (
+        <div className="flex justify-between items-center mb-6 border-b-2 border-brand-red/10 pb-2">
+          <div className="flex items-center gap-2.5">
+            <h2 className="text-2xl font-poppins font-bold text-gray-100 border-b-2 border-brand-red -mb-[10px] pb-2 flex items-center">
+              <Globe className="w-5 h-5 mr-2 text-brand-red animate-spin-slow" />
+              North America Collections
+            </h2>
+            <span className="bg-brand-red/10 border border-brand-red/30 text-brand-red text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center mt-1 animate-pulse shadow-[0_0_10px_rgba(212,43,43,0.2)]">
+              <span className="w-1.5 h-1.5 bg-brand-red rounded-full mr-1"></span>
+              LIVE TRACKING
+            </span>
+          </div>
+          <button 
+            onClick={() => refetch()} 
+            className="text-xs font-semibold text-gray-400 hover:text-white flex items-center gap-1 transition-colors"
+            title="Refresh Data"
+          >
+            <RefreshCw className="w-3.5 h-3.5" /> Refresh
+          </button>
         </div>
-        <button 
-          onClick={() => refetch()} 
-          className="text-xs font-semibold text-gray-400 hover:text-white flex items-center gap-1 transition-colors"
-          title="Refresh Data"
-        >
-          <RefreshCw className="w-3.5 h-3.5" /> Refresh
-        </button>
-      </div>
+      )}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className={compact ? "grid grid-cols-2 md:grid-cols-3 gap-4" : "grid grid-cols-2 md:grid-cols-3 gap-6"}>
         {collections.map((movie) => {
+          const identifier = movie.slug || movie.id;
+          
           const CardContent = (
-            <>
-              {/* Upper Info Section */}
-            <div className="p-5 flex gap-4">
-              {/* Poster Thumbnail */}
-              <div className="w-20 h-28 shrink-0 rounded-lg overflow-hidden border border-gray-800 bg-brand-dark shadow-md group-hover:border-brand-red/40 transition-colors">
+            <div className="p-3 flex flex-row items-center h-full">
+              <div className="w-20 h-28 relative rounded-lg overflow-hidden border border-gray-800 bg-brand-dark shadow-md group-hover:border-brand-red/40 transition-colors shrink-0">
                 <img 
                   src={movie.poster || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80'} 
                   alt={movie.movieName} 
@@ -72,79 +73,27 @@ const NorthAmericaCollections = () => {
                   }}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-brand-dark/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                {movie.status && (
+                  <div className="absolute top-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded text-white bg-green-600/90 border border-green-400 shadow-sm uppercase tracking-wider">
+                    {movie.status}
+                  </div>
+                )}
               </div>
-
-              {/* Title & Key Stats */}
-              <div className="space-y-1.5 min-w-0">
-                <h3 className="font-poppins font-bold text-gray-200 group-hover:text-brand-red transition-colors truncate text-lg leading-tight">
+              <div className="ml-4 flex flex-col flex-grow justify-center text-left">
+                <h3 className="text-base font-poppins font-bold text-gray-200 group-hover:text-brand-red transition-colors leading-tight mb-1 line-clamp-2">
                   {movie.movieName}
                 </h3>
-                <div className="flex items-center gap-1.5 text-xs text-gray-400">
-                  <span className="px-1.5 py-0.5 bg-gray-800 rounded font-semibold text-[10px]">
-                    {movie.screens || 'N/A'} Screens
-                  </span>
-                  <span>•</span>
-                  <span className="text-[10px] text-green-500 font-bold uppercase tracking-wider flex items-center">
-                    <Star className="w-3 h-3 fill-current mr-0.5" /> {movie.status || 'Active'}
-                  </span>
-                </div>
-                <div className="pt-2">
-                  <div className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Hourly Gross</div>
-                  <div className="text-2xl font-poppins font-bold text-yellow-500 flex items-center gap-1">
-                    {movie.hourlyGross || '$0'}
-                    <span className="w-2 h-2 rounded-full bg-green-500 inline-block animate-ping shadow-[0_0_8px_rgba(34,197,94,0.5)]"></span>
+                <div className="mt-2">
+                  <div className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider mb-0.5">Total Gross</div>
+                  <div className="text-lg font-poppins font-black text-brand-red">
+                    {movie.totalGross || '—'}
                   </div>
                 </div>
               </div>
             </div>
+          );
 
-            {/* Detailed Info Grid */}
-            <div className="bg-[#151515] p-4 text-xs border-t border-brand-red/10 grid grid-cols-2 gap-y-2 gap-x-4 text-gray-300">
-              {movie.distributor && <div><span className="text-gray-500 font-medium">Distributor:</span> {movie.distributor}</div>}
-              {movie.releaseDate && <div><span className="text-gray-500 font-medium">Release:</span> {movie.releaseDate}</div>}
-              {movie.language && <div><span className="text-gray-500 font-medium">Language:</span> {movie.language}</div>}
-              {movie.budget && <div><span className="text-gray-500 font-medium">Budget:</span> {movie.budget}</div>}
-            </div>
-
-            {/* Bottom Collections Grid */}
-            <div className="bg-[#18181B]/80 border-t border-brand-red/10 p-4 grid grid-cols-2 gap-4 text-center">
-              <div>
-                <div className="text-[9px] text-gray-400 font-semibold uppercase tracking-wider">Premiere</div>
-                <div className="font-poppins font-bold text-gray-200 text-sm">{movie.premierGross || movie.premiereCollections || '—'}</div>
-              </div>
-              <div className="border-l border-gray-800">
-                <div className="text-[9px] text-gray-400 font-semibold uppercase tracking-wider">Total Gross</div>
-                <div className="font-poppins font-bold text-brand-red text-sm">{movie.totalGross || '—'}</div>
-              </div>
-            </div>
-
-            {/* Daily Breakdown */}
-            {movie.dailyBreakdown && Array.isArray(movie.dailyBreakdown) && movie.dailyBreakdown.length > 0 && (
-              <div className="border-t border-brand-red/10 p-4 bg-[#111113]">
-                <div className="text-[10px] text-brand-red font-bold uppercase tracking-wider mb-2">Daily Breakdown</div>
-                <div className="space-y-1.5 max-h-32 overflow-y-auto pr-1">
-                  {movie.dailyBreakdown.map((d, i) => (
-                    <div key={i} className="flex justify-between items-center text-xs bg-black/40 rounded px-2 py-1 border border-gray-800/50">
-                      <span className="text-gray-400 font-medium">{d.day}</span>
-                      <span className="font-poppins font-bold text-green-400">{d.collection}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Last Updated Footer Banner */}
-            <div className="bg-brand-red/5 px-4 py-1.5 border-t border-brand-red/5 flex justify-between items-center text-[10px] text-gray-400">
-              <span className="flex items-center gap-1 font-semibold text-[9px] uppercase tracking-wide text-brand-red">
-                <TrendingUp className="w-3 h-3" /> Live Feed
-              </span>
-              <span>Updated: {movie.lastUpdated || 'Just now'}</span>
-            </div>
-          </>
-        );
-
-        const identifier = movie.slug || movie.id;
-        
         return (
           <Link 
             to={`/north-america/${identifier}`} 
