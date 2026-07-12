@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import logoImg from '../../assets/cb1.png';
 
 const Footer = () => {
   return (
@@ -9,8 +10,9 @@ const Footer = () => {
           
           {/* Brand Info */}
           <div className="flex flex-col">
-            <Link to="/" className="logo mb-6">
-              Chitram<span>Bhalare</span>
+            <Link to="/" className="logo mb-6" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <img src={logoImg} alt="CB Logo" style={{ height: '48px', width: 'auto' }} />
+              <div>Chitram<span>Bhalare</span></div>
             </Link>
             <p className="text-gray-400 text-sm leading-relaxed mb-6 pr-4">
               Your ultimate destination for Tollywood news, reviews, box office updates, and exclusive celebrity interviews. Stay connected with the magic of Telugu cinema.

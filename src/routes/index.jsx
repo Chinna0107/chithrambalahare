@@ -12,6 +12,7 @@ const SingleArticle = lazy(() => import('../pages/MovieNews/SingleArticle'));
 const Archive = lazy(() => import('../pages/MovieNews/Archive'));
 const Reviews = lazy(() => import('../pages/Reviews'));
 const SingleReview = lazy(() => import('../pages/Reviews/SingleReview'));
+const LiveTracking = lazy(() => import('../pages/LiveTracking'));
 const BoxOffice = lazy(() => import('../pages/BoxOffice'));
 const SingleBoxOffice = lazy(() => import('../pages/BoxOffice/SingleBoxOffice'));
 const SingleNorthAmerica = lazy(() => import('../pages/NorthAmerica/SingleNorthAmerica'));
@@ -105,6 +106,10 @@ const router = createBrowserRouter([
             element: <SuspenseWrapper><SingleBoxOffice /></SuspenseWrapper>,
           },
         ]
+      },
+      {
+        path: 'live-tracking',
+        element: <SuspenseWrapper><LiveTracking /></SuspenseWrapper>,
       },
       {
         path: 'north-america',

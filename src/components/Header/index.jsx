@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
+import logoImg from '../../assets/cb1.png';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -8,8 +9,9 @@ const Header = () => {
   return (
     <header>
       <div className="h-top">
-        <Link to="/" className="logo">
-          Chitram<span>Bhalare</span>
+        <Link to="/" className="logo" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <img src={logoImg} alt="CB Logo" style={{ height: '48px', width: 'auto' }} />
+          <div>Chitram<span>Bhalare</span></div>
         </Link>
         <div className="h-right">
           <button className="sbtn" onClick={() => navigate('/search')}>🔍</button>
@@ -69,7 +71,7 @@ const Header = () => {
             </Link>
 
             <NavLink 
-              to="/box-office" 
+              to="/live-tracking" 
               className="nav-hot-m" 
               onClick={() => setIsMenuOpen(false)}
             >

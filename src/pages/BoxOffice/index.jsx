@@ -1,397 +1,305 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Helmet } from 'react-helmet-async';
-import { Link } from 'react-router-dom';
-import { getBoxOffice, getUpcomingSchedules } from '../../services/api';
-import NorthAmericaCollections from '../../components/NorthAmericaCollections';
-import BoxOfficeCard from '../../components/BoxOfficeCard';
+import { getArticles } from '../../services/api';
+
+const CATEGORIES = [
+  { name: 'All', value: 'Box Office' },
+  { name: 'Tollywood', value: 'Tollywood Box Office' },
+  { name: 'Bollywood', value: 'Bollywood Box Office' },
+  { name: 'Kollywood', value: 'Kollywood Box Office' },
+  { name: 'Pan-India', value: 'Pan-India Box Office' }
+];
 
 const BoxOffice = () => {
-  const { data: boxOfficeData, isLoading } = useQuery({
-    queryKey: ['all-box-office'],
-    queryFn: getBoxOffice,
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  
+  const category = searchParams.get('category') || 'Box Office';
+  const page = parseInt(searchParams.get('page') || '1', 10);
+  const search = searchParams.get('search') || '';
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['articles', { category, page, search }],
+    queryFn: () => getArticles({ 
+      page, 
+      limit: 12, 
+      category: category,
+      search
+    }),
   });
 
-  const { data: upcomingSchedules, refetch: refetchSchedules } = useQuery({
-    queryKey: ['boxoffice-schedules'],
-    queryFn: getUpcomingSchedules,
-  });
-
-  useEffect(() => {
-    const handleDbChange = () => {
-      refetchSchedules();
-    };
-    window.addEventListener('tolly_db_change', handleDbChange);
-    return () => window.removeEventListener('tolly_db_change', handleDbChange);
-  }, [refetchSchedules]);
-
-  const getDaysRemainingText = (dateStr, status) => {
-    if (status === 'TBA' || !dateStr) return 'TBA';
-    const release = new Date(dateStr);
-    if (isNaN(release.getTime())) return status || '2026';
-    const now = new Date();
-    release.setHours(0,0,0,0);
-    now.setHours(0,0,0,0);
-    const diffTime = release - now;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    if (diffDays === 0) return 'Today';
-    if (diffDays < 0) return 'Released';
-    return `${diffDays} Days`;
+  const handleCategoryChange = (catVal) => {
+    setSearchParams({ category: catVal, page: '1' });
   };
 
-  const [activeFilter, setActiveFilter] = useState('🔴 Running Now');
-
-  const scrollToSection = (id) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
+  const handlePageChange = (newPage) => {
+    const params = Object.fromEntries(searchParams.entries());
+    setSearchParams({ ...params, page: newPage.toString() });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const filteredBoxOffice = boxOfficeData?.filter(film => {
-    const filterLower = activeFilter.toLowerCase();
-    if (filterLower.includes('running')) {
-      return film.verdict?.toLowerCase() !== 'closed';
-    }
-    if (filterLower.includes('telugu')) {
-      return film.languages?.toLowerCase().includes('telugu');
-    }
-    if (filterLower.includes('hindi')) {
-      return film.languages?.toLowerCase().includes('hindi');
-    }
-    if (filterLower.includes('tamil')) {
-      return film.languages?.toLowerCase().includes('tamil');
-    }
-    if (filterLower.includes('ott')) {
-      return film.languages?.toLowerCase().includes('ott') || film.verdict?.toLowerCase().includes('ott');
-    }
-    if (filterLower.includes('closed')) {
-      return film.verdict?.toLowerCase().includes('closed') || film.verdict?.toLowerCase().includes('flop');
-    }
-    return true;
-  }) || [];
-
-  const filters = [
-    '🔴 Running Now',
-    'All Telugu',
-    'All Hindi',
-    'All Tamil',
-    'OTT Releases',
-    'Closed Films',
-    'All Time Records'
-  ];
-
-  const getVerdictClass = (verdict) => {
-    switch (verdict?.toLowerCase()) {
-      case 'blockbuster':
-        return 'verdict v-blockbuster';
-      case 'hit':
-        return 'verdict v-hit';
-      case 'flop':
-        return 'verdict v-flop';
-      case 'new':
-      case 'running':
-      default:
-        return 'verdict v-running';
-    }
-  };
-
-  const getTrendClass = (trend) => {
-    if (trend?.includes('▲')) return 'trend-up';
-    return 'trend-dn';
-  };
+  const allFetchedArticles = data?.data || [];
+  const featuredArticle = page === 1 && allFetchedArticles[0] ? allFetchedArticles[0] : null;
+  const sideArticles = page === 1 ? allFetchedArticles.slice(1, 4) : [];
+  const gridArticles = page === 1 ? allFetchedArticles.slice(4) : allFetchedArticles;
 
   return (
     <div className="wrap">
       <Helmet>
-        <title>Live Box Office Tracking | CHITRAMBHALARE</title>
-        <meta name="description" content="Real-time worldwide & AP/TS collections for all running Telugu, Tamil & Hindi films." />
+        <title>Box Office News | CHITRAMBHALARE</title>
+        <meta name="description" content="Latest box office collections, records, and trade reports from Tollywood and Indian Cinema." />
       </Helmet>
 
-      {/* PAGE HERO */}
-      <div className="page-hero">
-        <div className="page-hero-inner">
-          <div className="page-hero-left">
-            <div className="page-eyebrow">
-              <div className="live-dot"></div>
-              Box Office Portal · Live Tracking
+      {/* Breadcrumb */}
+      <div style={{ padding: '12px 0 0', fontSize: '11px', color: 'var(--muted)', display: 'flex', alignItems: 'center', gap: '5px' }}>
+        <Link to="/main" style={{ cursor: 'pointer', color: 'var(--gold)', textDecoration: 'none' }}>Home</Link>
+        <span>/</span>
+        <span style={{ color: 'var(--text)' }}>Box Office</span>
+      </div>
+
+      {/* Category Banner */}
+      <div className="cat-banner">
+        <div>
+          <div className="cat-eyebrow">Trade Reports</div>
+          <div className="cat-title">Box Office News</div>
+          <div className="cat-desc">Latest collections, box office records, and trade updates from Indian Cinema.</div>
+          <div className="cat-stats">
+            <div><div className="cat-stat-val">1,200+</div><div className="cat-stat-lbl">Articles</div></div>
+            <div><div className="cat-stat-val">Daily</div><div className="cat-stat-lbl">Updates</div></div>
+            <div><div className="cat-stat-val">8</div><div className="cat-stat-lbl">Today</div></div>
+          </div>
+        </div>
+        <div className="cat-icon">📈</div>
+      </div>
+
+      <div className="desktop-grid">
+        <div>
+          {/* Filter tabs */}
+          <div className="filter-scroll">
+            <div className="filter-tabs">
+              {CATEGORIES.map((cat) => (
+                <button
+                  key={cat.name}
+                  className={`ftab ${category === cat.value ? 'on' : ''}`}
+                  onClick={() => handleCategoryChange(cat.value)}
+                >
+                  {cat.name}
+                </button>
+              ))}
             </div>
-            <div className="page-title">Live Box Office<br />Tracking</div>
-            <div className="page-subtitle">Real-time worldwide &amp; AP/TS collections for all running Telugu, Tamil &amp; Hindi films.</div>
-            <div className="last-updated">Last updated: <span>June 18, 2026 · 11:45 PM IST</span> &nbsp;🔄</div>
           </div>
-          <div className="hero-stats">
-            <div className="hstat"><div className="hstat-val">8</div><div className="hstat-lbl">Live Films</div></div>
-            <div className="hstat"><div className="hstat-val">₹720Cr</div><div className="hstat-lbl">WW Total</div></div>
-            <div className="hstat"><div className="hstat-val">Daily</div><div className="hstat-lbl">Updates</div></div>
-            <div className="hstat"><div className="hstat-val">3</div><div className="hstat-lbl">New This Week</div></div>
-          </div>
-        </div>
-      </div>
 
-      {/* FILTER TABS */}
-      <div className="filter-scroll">
-        <div className="filter-tabs">
-          {filters.map((tab) => (
-            <button
-              key={tab}
-              className={`ftab ${tab.includes('Running') ? 'live-tab' : ''} ${activeFilter === tab ? 'on' : ''}`}
-              onClick={() => {
-                setActiveFilter(tab);
-                if (tab === 'All Time Records') {
-                  scrollToSection('all-time-records');
-                }
-              }}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="main-layout">
-        {/* LEFT CONTENT */}
-        <div style={{ minWidth: 0 }}>
-          {/* North America Collections (Combined into inside page) */}
-          <NorthAmericaCollections hideHeader={false} />
-          
           {isLoading ? (
-            <div style={{ color: 'var(--muted)', padding: '50px 0', textAlign: 'center' }}>
-              Loading Box Office Collections...
+            <div style={{ color: 'var(--muted)', padding: '40px 0', textAlign: 'center' }}>
+              Loading Box Office News...
+            </div>
+          ) : allFetchedArticles.length === 0 ? (
+            <div style={{ padding: '60px 0', textAlign: 'center', background: 'var(--card)', borderRadius: '10px', border: '1px solid var(--border)' }}>
+              <p style={{ color: 'var(--muted)' }}>No articles found. Try another category or search term.</p>
             </div>
           ) : (
             <>
-              {/* RUNNING NOW CARDS */}
-              <div className="sec-hdr">
-                <div className="sec-title">Running Now</div>
-                <span className="sec-badge">🔴 8 Films Live</span>
-              </div>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-12">
-                {boxOfficeData?.map((film) => (
-                  <BoxOfficeCard key={film.id} boxOffice={film} />
-                ))}
+              {/* Featured Section */}
+              {featuredArticle && (
+                <>
+                  <div className="section-hdr">
+                    <div className="section-hdr-title">Featured</div>
+                    <span className="see-all">See all →</span>
+                  </div>
+                  <Link to={`/movie-news/${featuredArticle.slug}`} className="feat-main" style={{ display: 'block', textDecoration: 'none' }}>
+                    <div className="feat-img" style={{ position: 'relative', overflow: 'hidden' }}>
+                      {featuredArticle.featuredImage ? (
+                        <img 
+                          src={featuredArticle.featuredImage} 
+                          alt={featuredArticle.title} 
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', top: 0, left: 0 }}
+                        />
+                      ) : (
+                        featuredArticle.title.split(' ')[0]
+                      )}
+                      <div className="feat-badge" style={{ zIndex: 2 }}>🔥 Top Story</div>
+                    </div>
+                    <div className="feat-body">
+                      <div className="feat-title">{featuredArticle.title}</div>
+                      <div className="feat-excerpt">{featuredArticle.excerpt}</div>
+                      <div className="feat-meta">
+                        <span>By {featuredArticle.author}</span>
+                        <span className="dot">◆</span>
+                        <span>{new Date(featuredArticle.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+                        <span className="dot">◆</span>
+                        <span>3 min read</span>
+                      </div>
+                    </div>
+                  </Link>
+                </>
+              )}
+
+              {/* Side Scroll Section */}
+              {sideArticles.length > 0 && (
+                <div className="side-scroll">
+                  {sideArticles.map((art) => (
+                    <Link to={`/movie-news/${art.slug}`} key={art.id} className="side-card">
+                      <div className="side-cat">{art.category}</div>
+                      <div className="side-title">{art.title}</div>
+                      <div className="side-date">
+                        {new Date(art.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+
+              {/* Mobile Sidebar */}
+              <div className="mobile-sidebar">
+                <div className="sw">
+                  <div className="sw-hdr">
+                    <div className="live-dot"></div>
+                    <div className="sw-title">Live Tracking Portal</div>
+                  </div>
+                  <Link to="/live-tracking" className="bo-row">
+                    <div className="bo-name">View Real-time Collections →</div>
+                  </Link>
+                </div>
               </div>
 
-              {/* DETAILED TABLE */}
-              <div className="sec-hdr" id="detailed-collections">
-                <div className="sec-title">Detailed Collections</div>
-                <span className="sec-link">Full Portal →</span>
-              </div>
-              <div className="track-table-wrap">
-                <div className="track-table-hdr">
-                  <div className="track-table-hdr-title">Telugu & major regional films — Running Collections</div>
-                  <div className="track-table-hdr-sub">Updated June 18, 2026</div>
+              {/* All News Grid */}
+              {gridArticles.length > 0 && (
+                <>
+                  <div className="section-hdr">
+                    <div className="section-hdr-title">All Box Office News</div>
+                    <span className="see-all">1,200+ →</span>
+                  </div>
+                  <div className="news-grid">
+                    {gridArticles.map((art) => (
+                      <Link to={`/movie-news/${art.slug}`} key={art.id} className="n-card">
+                        <div className="n-thumb" style={{ background: '#0d1b30', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          {art.thumbnail ? (
+                            <img 
+                              src={art.thumbnail} 
+                              alt={art.title} 
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            />
+                          ) : (
+                            '🎬'
+                          )}
+                        </div>
+                        <div className="n-body">
+                          <div className="n-cat">{art.category}</div>
+                          <div className="n-title">{art.title}</div>
+                          <div className="n-meta">
+                            {new Date(art.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {/* Pagination */}
+              {data?.totalPages > 1 && (
+                <div className="pagination">
+                  <button 
+                    className="pg-btn" 
+                    onClick={() => handlePageChange(page - 1)}
+                    disabled={page === 1}
+                  >
+                    ‹
+                  </button>
+                  {[...Array(data.totalPages)].map((_, i) => (
+                    <button
+                      key={i + 1}
+                      className={`pg-btn ${page === i + 1 ? 'cur' : ''}`}
+                      onClick={() => handlePageChange(i + 1)}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+                  <button 
+                    className="pg-btn" 
+                    onClick={() => handlePageChange(page + 1)}
+                    disabled={page === data.totalPages}
+                  >
+                    ›
+                  </button>
                 </div>
-                <div className="tbl-scroll">
-                  <table className="track-table">
-                    <thead>
-                      <tr>
-                        <th style={{ textAlign: 'left' }}># &nbsp;Film</th>
-                        <th>WW Gross</th>
-                        <th>Tel. Share</th>
-                        <th>Days</th>
-                        <th>Verdict</th>
-                        <th>Trend</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredBoxOffice.length > 0 ? (
-                        filteredBoxOffice.map((film, idx) => (
-                          <tr key={film.id}>
-                            <td>
-                              <span className="t-rank">{idx + 1}</span>
-                              <div className="t-movie">
-                                <Link to={`/box-office/${film.slug}`} className="hover:text-brand-red font-semibold transition-colors">
-                                  {film.movieName}
-                                </Link>
-                                <div className="t-sub">{film.director}</div>
-                              </div>
-                            </td>
-                            <td><span className="t-amt">{film.worldwideGross}</span></td>
-                            <td><span className="t-share">{film.indiaNet}</span></td>
-                            <td><span className="t-days">{film.days}</span></td>
-                            <td><span className={getVerdictClass(film.verdict)}>{film.verdict}</span></td>
-                            <td><span className={getTrendClass(film.trend)}>{film.trend}</span></td>
-                          </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan="6" style={{ textAlign: 'center', padding: '20px', color: 'var(--muted)' }}>
-                            No active releases found matching this filter.
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-                <div className="legend">
-                  <div className="leg-item"><div className="leg-dot" style={{ background: 'var(--gold)' }}></div>Blockbuster</div>
-                  <div className="leg-item"><div className="leg-dot" style={{ background: 'var(--green)' }}></div>Hit</div>
-                  <div className="leg-item"><div className="leg-dot" style={{ background: 'var(--muted)' }}></div>Average / Running</div>
-                  <div className="leg-item"><div className="leg-dot" style={{ background: 'var(--crimson)' }}></div>Flop</div>
-                </div>
-              </div>
+              )}
             </>
           )}
+        </div>
 
-          {/* ALL TIME RECORDS */}
-          <div className="sec-hdr" id="all-time-records">
-            <div className="sec-title">All Time WW Records</div>
-            <span className="sec-link">Full List →</span>
-          </div>
-          <div className="records-grid">
-            <div className="record-card">
-              <div className="rc-rank gold-rank">1</div>
-              <div className="rc-body">
-                <div className="rc-movie">RRR</div>
-                <div className="rc-meta">SS Rajamouli · 2022</div>
-                <div className="rc-bar-wrap"><div className="rc-bar" style={{ width: '100%' }}></div></div>
+        {/* Desktop Sidebar */}
+        <div className="sidebar-desktop" style={{ display: 'none' }}>
+          <div style={{ position: 'sticky', top: '76px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div className="sw">
+              <div className="sw-hdr">
+                <div className="live-dot"></div>
+                <div className="sw-title">Live Tracking</div>
               </div>
-              <div className="rc-amount">₹365.8Cr</div>
+              <Link to="/live-tracking" className="bo-row">
+                <div className="bo-name" style={{ color: 'var(--brand-red)', fontWeight: 'bold' }}>Access Live Tracker →</div>
+              </Link>
             </div>
-            <div className="record-card">
-              <div className="rc-rank">2</div>
-              <div className="rc-body">
-                <div className="rc-movie">Baahubali 2</div>
-                <div className="rc-meta">SS Rajamouli · 2017</div>
-                <div className="rc-bar-wrap"><div className="rc-bar" style={{ width: '85%' }}></div></div>
+            
+            <div className="sw">
+              <div className="sw-hdr">
+                <div className="sw-title">Trending Box Office</div>
               </div>
-              <div className="rc-amount">₹310Cr</div>
+              <Link to="/movie-news/peddi-crosses-320-cr-worldwide-in-2-weeks-telugu-dominates" className="pop-item">
+                <div className="pop-num">1</div>
+                <div>
+                  <div className="pop-text">Peddi Joins the ₹300 Cr Club at the Box Office</div>
+                  <div className="pop-meta">Box Office · June 14</div>
+                </div>
+              </Link>
+              <Link to="/movie-news/kalki-2898-ad-final-closing-collections" className="pop-item">
+                <div className="pop-num">2</div>
+                <div>
+                  <div className="pop-text">Kalki 2898 AD Final Worldwide Closing Collections</div>
+                  <div className="pop-meta">Box Office · June 18</div>
+                </div>
+              </Link>
+              <Link to="/movie-news/pushpa-2-day-1-records" className="pop-item">
+                <div className="pop-num">3</div>
+                <div>
+                  <div className="pop-text">Pushpa 2 Day 1 Advance Bookings Create History</div>
+                  <div className="pop-meta">Box Office · June 18</div>
+                </div>
+              </Link>
             </div>
-            <div className="record-card">
-              <div className="rc-rank">3</div>
-              <div className="rc-body">
-                <div className="rc-movie">Pushpa 2</div>
-                <div className="rc-meta">Sukumar · 2024</div>
-                <div className="rc-bar-wrap"><div className="rc-bar" style={{ width: '83%' }}></div></div>
-              </div>
-              <div className="rc-amount">₹302Cr</div>
-            </div>
-            <div className="record-card">
-              <div className="rc-rank">4</div>
-              <div className="rc-body">
-                <div className="rc-movie">Kalki 2898 AD</div>
-                <div className="rc-meta">Nag Ashwin · 2024</div>
-                <div className="rc-bar-wrap"><div className="rc-bar" style={{ width: '79%' }}></div></div>
-              </div>
-              <div className="rc-amount">₹290Cr</div>
-            </div>
-            <div className="record-card">
-              <div className="rc-rank">5</div>
-              <div className="rc-body">
-                <div className="rc-movie">Peddi</div>
-                <div className="rc-meta">Buchi Babu Sana · 2026 · Running</div>
-                <div className="rc-bar-wrap"><div className="rc-bar" style={{ width: '88%', background: 'var(--crimson)' }}></div></div>
-              </div>
-              <div className="rc-amount" style={{ color: 'var(--crimson)' }}>₹320Cr+</div>
-            </div>
-            <div className="record-card">
-              <div className="rc-rank">6</div>
-              <div className="rc-body">
-                <div className="rc-movie">Salaar</div>
-                <div className="rc-meta">Prashanth Neel · 2023</div>
-                <div className="rc-bar-wrap"><div className="rc-bar" style={{ width: '58%' }}></div></div>
-              </div>
-              <div className="rc-amount">₹213.5Cr</div>
-            </div>
-          </div>
 
-          {/* AP/TS AREA WISE */}
-          <div className="sec-hdr" id="ap-ts-area-wise">
-            <div className="sec-title">AP/TS Area Wise Top 5</div>
-            <span className="sec-link">All Areas →</span>
-          </div>
-          <div className="area-grid">
-            <div className="area-card">
-              <div className="area-hdr">
-                <div className="area-name">Day 1 — AP/TS</div>
-                <div className="area-total">All-Time</div>
+            <div className="sw">
+              <div className="sw-hdr">
+                <div className="sw-title">Browse Topics</div>
               </div>
-              <div className="area-row"><div className="area-pos">1</div><div className="area-movie">Pushpa 2</div><div className="area-share">₹74.33 Cr</div></div>
-              <div className="area-row"><div className="area-pos">2</div><div className="area-movie">RRR</div><div className="area-share">₹73.99 Cr</div></div>
-              <div className="area-row"><div className="area-pos">3</div><div className="area-movie">OG</div><div className="area-share">₹62.69 Cr</div></div>
-              <div className="area-row"><div className="area-pos">4</div><div className="area-movie">Devara: Part 1</div><div className="area-share">₹61.25 Cr</div></div>
-              <div className="area-row"><div className="area-pos">5</div><div className="area-movie">Salaar</div><div className="area-share">₹47.48 Cr</div></div>
-            </div>
-            <div className="area-card">
-              <div className="area-hdr">
-                <div className="area-name">Day 1 — Worldwide</div>
-                <div className="area-total">All-Time</div>
+              <div className="tag-cloud">
+                <Link to="/box-office?category=Tollywood+Box+Office" className="tag">Tollywood</Link>
+                <Link to="/box-office?category=Bollywood+Box+Office" className="tag">Bollywood</Link>
+                <Link to="/box-office?category=Pan-India+Box+Office" className="tag">Pan-India</Link>
+                <Link to="/live-tracking" className="tag">Live Tracking</Link>
+                <Link to="/movie-news" className="tag">Movie News</Link>
+                <Link to="/reviews" className="tag">Reviews</Link>
               </div>
-              <div className="area-row"><div className="area-pos">1</div><div className="area-movie">RRR</div><div className="area-share">₹108.79 Cr</div></div>
-              <div className="area-row"><div className="area-pos">2</div><div className="area-movie">Pushpa 2</div><div className="area-share">₹105.33 Cr</div></div>
-              <div className="area-row"><div className="area-pos">3</div><div className="area-movie">OG</div><div className="area-share">₹88.45 Cr</div></div>
-              <div className="area-row"><div className="area-pos">4</div><div className="area-movie">Devara: Part 1</div><div className="area-share">₹87.45 Cr</div></div>
-              <div className="area-row"><div className="area-pos">5</div><div className="area-movie">Kalki 2898 AD</div><div className="area-share">₹77.65 Cr</div></div>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* SIDEBAR */}
-        <div className="sidebar">
-          <div style={{ position: 'sticky', top: '70px', display: 'flex', flexDirection: 'column', gap: '14px', minWidth: 0 }}>
-            <div className="sw">
-              <div className="sw-hdr"><div className="live-dot"></div><div className="sw-title">Today's Updates</div></div>
-              {boxOfficeData?.slice(0, 5).map((film, idx) => (
-                <Link to={`/box-office/${film.slug}`} className="ud-row" key={film.id}>
-                  <div className="ud-rank">{idx + 1}</div>
-                  <div className="ud-body">
-                    <div className="ud-movie">{film.movieName}</div>
-                    <div className="ud-day">Day {film.days} · WW Gross</div>
-                  </div>
-                  <div className="ud-right">
-                    <div className="ud-amt">{film.worldwideGross}</div>
-                    <div className={`ud-trend ${getTrendClass(film.trend)}`}>
-                      {film.trend}
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-
-            <div className="sw">
-              <div className="sw-hdr"><div className="sw-title">Upcoming Releases</div></div>
-              {upcomingSchedules?.slice(0, 4).map((schedule, idx) => (
-                <div className="ud-row" key={idx}>
-                  <div className="ud-body">
-                    <div className="ud-movie">{schedule.movieName}</div>
-                    <div className="ud-day">
-                      {schedule.language} · {schedule.releaseDate ? new Date(schedule.releaseDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'TBA'}
-                    </div>
-                  </div>
-                  <div className="ud-right" style={{ fontSize: '11px', color: 'var(--muted)' }}>
-                    {getDaysRemainingText(schedule.releaseDate, schedule.status)}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="sw">
-              <div className="sw-hdr"><div className="sw-title">Quick Access</div></div>
-              <div style={{ padding: '10px 13px', display: 'flex', flexDirection: 'column', gap: '7px' }}>
-                <a className="quick-link" onClick={() => scrollToSection('ap-ts-area-wise')}>
-                  AP/TS Day 1 Top 5 <span>→</span>
-                </a>
-                <a className="quick-link" onClick={() => scrollToSection('ap-ts-area-wise')}>
-                  AP/TS Week 1 Top 5 <span>→</span>
-                </a>
-                <a className="quick-link" onClick={() => scrollToSection('ap-ts-area-wise')}>
-                  WW Day 1 Top 10 <span>→</span>
-                </a>
-                <a className="quick-link" onClick={() => scrollToSection('all-time-records')}>
-                  WW Closing Top 15 <span>→</span>
-                </a>
-                <a 
-                  className="quick-link" 
-                  onClick={() => {
-                    setActiveFilter('All Telugu');
-                    scrollToSection('detailed-collections');
-                  }}
-                >
-                  Telugu Verdicts <span>→</span>
-                </a>
-              </div>
-            </div>
+      {/* Topics Cloud (Mobile Only) */}
+      <div className="mobile-sidebar">
+        <div className="sw">
+          <div className="sw-hdr">
+            <div className="sw-title">Browse Topics</div>
+          </div>
+          <div className="tag-cloud">
+            <Link to="/box-office?category=Tollywood+Box+Office" className="tag">Tollywood</Link>
+            <Link to="/box-office?category=Bollywood+Box+Office" className="tag">Bollywood</Link>
+            <Link to="/box-office?category=Pan-India+Box+Office" className="tag">Pan-India</Link>
+            <Link to="/live-tracking" className="tag">Live Tracking</Link>
+            <Link to="/movie-news" className="tag">Movie News</Link>
+            <Link to="/reviews" className="tag">Reviews</Link>
           </div>
         </div>
       </div>
