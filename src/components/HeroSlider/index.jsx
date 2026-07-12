@@ -15,7 +15,7 @@ const HeroSlider = ({ articles }) => {
   const featured = articles.slice(0, 5);
 
   return (
-    <div className="relative w-[95%] lg:w-[90%] mx-auto h-[45vh] md:h-[55vh] rounded-2xl overflow-hidden shadow-xl mb-12 group">
+    <div className="relative w-full h-[45vh] md:h-[55vh] rounded-2xl overflow-hidden mb-12 group">
       <Swiper
         modules={[Autoplay, Pagination, Navigation]}
         pagination={{ clickable: true }}
@@ -37,7 +37,7 @@ const HeroSlider = ({ articles }) => {
                 onError={(e) => { e.target.src = FALLBACK; }}
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/60 to-transparent z-10" />
+              <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-brand-dark to-transparent z-10" />
 
               <div className="absolute bottom-0 left-0 w-full p-4 md:p-8 md:w-[85%] lg:w-[80%] z-20">
                 <motion.div

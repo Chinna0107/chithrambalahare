@@ -2,7 +2,48 @@ import { Link } from 'react-router-dom';
 import { Calendar, Tag } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-const NewsCard = ({ article, isFeatured = false }) => {
+const NewsCard = ({ article, isFeatured = false, compact = false }) => {
+  if (compact) {
+    return (
+      <motion.div 
+        initial={{ opacity: 0, y: 10 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.3 }}
+        className="glass-card rounded-xl hover:shadow-[0_10px_30px_rgba(255,0,0,0.3)] transition-all duration-300 overflow-hidden flex flex-col md:flex-row items-center p-3 group border border-brand-red/10 h-full"
+      >
+        <Link to={`/movie-news/${article.slug}`} className="w-full h-24 md:w-24 md:h-20 rounded-lg relative overflow-hidden shrink-0 shadow-md">
+          <img 
+            src={article.thumbnail || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80'} 
+            alt={article.title} 
+            onError={(e) => {
+              e.target.src = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80';
+            }}
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-hover:opacity-80"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-brand-dark/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        </Link>
+
+        <div className="mt-2 md:mt-0 md:ml-4 flex flex-col justify-center flex-grow text-left w-full">
+          <div className="flex items-center space-x-2 text-[10px] text-gray-400 font-semibold mb-1">
+            <span>{new Date(article.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+            {article.category && (
+              <>
+                <span className="w-1 h-1 rounded-full bg-gray-500"></span>
+                <span className="text-brand-red uppercase">{article.category}</span>
+              </>
+            )}
+          </div>
+          <Link to={`/movie-news/${article.slug}`}>
+            <h3 className="text-sm md:text-base font-poppins font-bold text-gray-100 group-hover:text-brand-red transition-colors line-clamp-2">
+              {article.title}
+            </h3>
+          </Link>
+        </div>
+      </motion.div>
+    );
+  }
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -10,7 +51,7 @@ const NewsCard = ({ article, isFeatured = false }) => {
       viewport={{ once: true }}
       transition={{ duration: 0.4 }}
       className={`group flex flex-col glass-card rounded-2xl overflow-hidden hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)] transition-all duration-300 ${
-        isFeatured ? 'md:flex-row md:col-span-2' : ''
+        isFeatured ? 'col-span-2 md:flex-row md:col-span-full' : ''
       }`}
     >
       <Link 

@@ -19,8 +19,8 @@ const Home = () => {
   });
 
   const { data: ottData } = useQuery({
-    queryKey: ['articles', { limit: 4, category: 'ott' }],
-    queryFn: () => getArticles({ limit: 4, category: 'ott' }),
+    queryKey: ['articles', { limit: 7, category: 'ott' }],
+    queryFn: () => getArticles({ limit: 7, category: 'ott' }),
   });
 
   const { data: reviewsData, isLoading: reviewsLoading } = useQuery({
@@ -30,13 +30,13 @@ const Home = () => {
   });
 
   const { data: boxOfficeData, isLoading: boxOfficeLoading } = useQuery({
-    queryKey: ['boxOffice', { limit: 3 }],
+    queryKey: ['boxOffice', { limit: 6 }],
     queryFn: () => getBoxOffice(),
-    select: (data) => data.slice(0, 3),
+    select: (data) => data.slice(0, 6),
   });
 
   const articles = articlesData?.data || [];
-  const latestNews = articles.slice(5, 10); // After 5 slider items, fetch 5 to fill grid
+  const latestNews = articles.slice(5, 12); // After 5 slider items, fetch 7 to fill grid
   const ottNews = ottData?.data || [];
 
   if (articlesLoading) {
@@ -69,9 +69,9 @@ const Home = () => {
                 </Link>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
                 {latestNews.map((article, idx) => (
-                  <NewsCard key={article.id} article={article} isFeatured={idx === 0} />
+                  <NewsCard key={article.id} article={article} isFeatured={idx === 0} compact={idx !== 0} />
                 ))}
               </div>
             </section>
@@ -89,9 +89,9 @@ const Home = () => {
                 </Link>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {ottNews.map(article => (
-                  <NewsCard key={article.id} article={article} />
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+                {ottNews.map((article, idx) => (
+                  <NewsCard key={article.id} article={article} isFeatured={idx === 0} compact={idx !== 0} />
                 ))}
               </div>
             </section>
@@ -108,13 +108,11 @@ const Home = () => {
               </Link>
             </div>
 
-            <NorthAmericaCollections hideHeader={true} compact={true} />
-
             {boxOfficeLoading ? (
               <LoadingSkeleton type="card" />
             ) : (
               boxOfficeData && boxOfficeData.length > 0 && (
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {boxOfficeData.map(bo => (
                     <BoxOfficeCard key={bo.id} boxOffice={bo} compact={true} />
                   ))}

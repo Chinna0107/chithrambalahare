@@ -35,6 +35,9 @@ const AdminSettings = lazy(() => import('../pages/Admin/Settings'));
 const AdminMedia = lazy(() => import('../pages/Admin/Media'));
 const Gallery = lazy(() => import('../pages/Gallery'));
 const NotFound = lazy(() => import('../pages/NotFound'));
+const Advertise = lazy(() => import('../pages/Advertise'));
+const Policy = lazy(() => import('../pages/Policy'));
+const Contact = lazy(() => import('../pages/Contact'));
 
 // Wrapper to provide suspense fallback
 const SuspenseWrapper = ({ children }) => (
@@ -159,6 +162,18 @@ const router = createBrowserRouter([
           { path: 'settings', element: <SuspenseWrapper><AdminSettings /></SuspenseWrapper> },
           { path: 'media', element: <SuspenseWrapper><AdminMedia /></SuspenseWrapper> }
         ]
+      },
+      {
+        path: 'advertise',
+        element: <SuspenseWrapper><Advertise /></SuspenseWrapper>,
+      },
+      {
+        path: 'policy',
+        element: <SuspenseWrapper><Policy /></SuspenseWrapper>,
+      },
+      {
+        path: 'contact',
+        element: <SuspenseWrapper><Contact /></SuspenseWrapper>,
       },
       {
         path: '*',

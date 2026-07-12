@@ -59,7 +59,7 @@ const NorthAmericaCollections = ({ hideHeader = false, compact = false }) => {
       )}
 
       <div className={compact ? "grid grid-cols-2 md:grid-cols-3 gap-4" : "grid grid-cols-2 md:grid-cols-3 gap-6"}>
-        {collections.map((movie) => {
+        {(compact ? collections.slice(0, 3) : collections).map((movie) => {
           const identifier = movie.slug || movie.id;
           
           const CardContent = (
