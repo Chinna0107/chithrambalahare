@@ -11,7 +11,7 @@ const GalleryGrid = () => {
       <section className="mb-16">
         <div className="flex items-center justify-between mb-8 border-b border-brand-red/20 pb-4">
           <h2 className="text-3xl font-poppins font-bold text-gray-100 flex items-center">
-            <Camera className="w-8 h-8 mr-3 text-brand-red" />
+            {/* <Camera className="w-8 h-8 mr-3 text-brand-red" /> */}
             Exclusive Galleries
           </h2>
         </div>
@@ -30,7 +30,7 @@ const GalleryGrid = () => {
     <section className="mb-16">
       <div className="flex items-center justify-between mb-8 border-b border-brand-red/20 pb-4">
         <h2 className="text-3xl font-poppins font-bold text-gray-100 flex items-center">
-          <Camera className="w-8 h-8 mr-3 text-brand-red" />
+          {/* <Camera className="w-8 h-8 mr-3 text-brand-red" /> */}
           Exclusive Galleries
         </h2>
         <Link

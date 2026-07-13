@@ -69,6 +69,27 @@ const Sidebar = () => {
 
   return (
     <aside className="w-full space-y-8 pb-4">
+      {/* Telugu News */}
+      <div className="sw">
+        <div className="sw-hdr">
+          <div className="sw-title">Telugu News</div>
+        </div>
+        <Link to="#" className="pop-item">
+          <div className="pop-num">1</div>
+          <div>
+            <div className="pop-text">Chiranjeevi & Venkatesh Rumors: Films Not Postponed</div>
+            <div className="pop-meta">6/18/2026</div>
+          </div>
+        </Link>
+        <Link to="#" className="pop-item">
+          <div className="pop-num">2</div>
+          <div>
+            <div className="pop-text">Dhurandhar Unedited Version Streams on Netflix June 19</div>
+            <div className="pop-meta">6/18/2026</div>
+          </div>
+        </Link>
+      </div>
+
       {/* Trending Posts */}
       {trendingArticles && trendingArticles.length > 0 && (
         <div className="sw">
