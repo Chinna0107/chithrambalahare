@@ -49,8 +49,25 @@ const SingleNorthAmerica = () => {
   return (
     <article className="wrap py-8">
       <Helmet>
-        <title>{movie.movieName} - North America Box Office | Tollywood</title>
-        <meta name="description" content={`North America Box Office collections for ${movie.movieName}. Total Gross: ${movie.totalGross}`} />
+        <title>{movie.seoTitle || `${movie.movieName} - North America Box Office | Tollywood`}</title>
+        <meta name="description" content={movie.metaDescription || `North America Box Office collections for ${movie.movieName}. Total Gross: ${movie.totalGross}`} />
+        {movie.metaKeywords && <meta name="keywords" content={movie.metaKeywords} />}
+        {movie.canonicalUrl && <link rel="canonical" href={movie.canonicalUrl} />}
+        
+        {/* Open Graph Tags */}
+        <meta property="og:title" content={movie.ogTitle || movie.seoTitle || `${movie.movieName} - North America Box Office | Tollywood`} />
+        <meta property="og:description" content={movie.ogDescription || movie.metaDescription || `North America Box Office collections for ${movie.movieName}. Total Gross: ${movie.totalGross}`} />
+        <meta property="og:image" content={movie.ogImage || movie.poster || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba'} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:type" content="article" />
+        {movie.canonicalUrl && <meta property="og:url" content={movie.canonicalUrl} />}
+
+        {/* Twitter Card Tags */}
+        <meta name="twitter:card" content={movie.twitterCard || "summary_large_image"} />
+        <meta name="twitter:title" content={movie.ogTitle || movie.seoTitle || `${movie.movieName} - North America Box Office | Tollywood`} />
+        <meta name="twitter:description" content={movie.ogDescription || movie.metaDescription || `North America Box Office collections for ${movie.movieName}. Total Gross: ${movie.totalGross}`} />
+        <meta name="twitter:image" content={movie.ogImage || movie.poster || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba'} />
       </Helmet>
 
       {/* Breadcrumbs */}

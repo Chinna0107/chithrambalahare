@@ -52,11 +52,13 @@ const Comments = ({ entityType, entityId }) => {
   };
 
   return (
-    <div className="comments-section" style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '1px solid var(--border)' }}>
-      <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem', color: 'var(--text)' }}>Comments ({comments.length})</h3>
+    <div className="mt-12 pt-8 border-t border-gray-800/50">
+      <h3 className="text-2xl font-poppins font-bold text-white mb-6 flex items-center">
+        Comments <span className="ml-2 text-sm bg-gray-800 text-gray-300 py-1 px-3 rounded-full">{comments.length}</span>
+      </h3>
       
-      <form onSubmit={handleSubmit} style={{ marginBottom: '2rem' }}>
-        <div style={{ marginBottom: '1rem' }}>
+      <form onSubmit={handleSubmit} className="mb-10 p-6 bg-black/20 rounded-2xl border border-gray-800/50">
+        <div className="mb-4">
           <input
             type="text"
             placeholder="Your Name"
@@ -64,10 +66,10 @@ const Comments = ({ entityType, entityId }) => {
             onChange={(e) => setName(e.target.value)}
             required
             disabled={submitting}
-            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)', background: 'var(--card)', color: 'var(--text)' }}
+            className="w-full px-4 py-3 rounded-xl border border-gray-800 bg-black/50 text-white placeholder-gray-500 focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red transition-all"
           />
         </div>
-        <div style={{ marginBottom: '1rem' }}>
+        <div className="mb-4">
           <textarea
             placeholder="Add a comment..."
             value={text}
@@ -75,40 +77,42 @@ const Comments = ({ entityType, entityId }) => {
             required
             rows="3"
             disabled={submitting}
-            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)', background: 'var(--card)', color: 'var(--text)', resize: 'vertical' }}
+            className="w-full px-4 py-3 rounded-xl border border-gray-800 bg-black/50 text-white placeholder-gray-500 focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red transition-all resize-y"
           ></textarea>
         </div>
         <button
           type="submit"
           disabled={submitting}
-          className="w-full md:w-auto bg-brand-red text-white font-bold px-6 py-3 rounded-xl flex items-center justify-center hover:bg-red-700 transition-all disabled:opacity-70 disabled:cursor-not-allowed shadow-[0_0_15px_rgba(212,43,43,0.3)] hover:shadow-[0_0_25px_rgba(212,43,43,0.6)] hover:-translate-y-0.5"
+          className="bg-brand-red text-white font-bold px-8 py-3 rounded-xl hover:bg-red-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_15px_rgba(212,43,43,0.3)] hover:shadow-[0_0_25px_rgba(212,43,43,0.6)]"
         >
           {submitting ? 'Posting...' : 'Post Comment'}
         </button>
       </form>
 
       {loading ? (
-        <div style={{ color: 'var(--muted)' }}>Loading comments...</div>
+        <div className="text-gray-500 animate-pulse">Loading comments...</div>
       ) : (
-        <div className="comments-list" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        <div className="flex flex-col gap-6">
           {comments.map((comment) => (
-            <div key={comment.id} className="comment-item" style={{ display: 'flex', gap: '1rem' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--brand-red)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', flexShrink: 0 }}>
+            <div key={comment.id} className="flex gap-4 p-4 rounded-xl hover:bg-gray-900/30 transition-colors">
+              <div className="w-12 h-12 rounded-full bg-brand-red/20 border border-brand-red/30 text-brand-red flex items-center justify-center font-bold text-lg flex-shrink-0">
                 {comment.name.charAt(0).toUpperCase()}
               </div>
               <div>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                  <span style={{ fontWeight: 'bold', color: 'var(--text)' }}>{comment.name}</span>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--muted)' }}>
+                <div className="flex items-center gap-3 mb-1">
+                  <span className="font-bold text-gray-200">{comment.name}</span>
+                  <span className="text-xs text-gray-500">
                     {new Date(comment.date).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
-                <p style={{ color: 'var(--muted)', margin: 0, lineHeight: 1.5 }}>{comment.text}</p>
+                <p className="text-gray-400 text-sm leading-relaxed m-0">{comment.text}</p>
               </div>
             </div>
           ))}
           {comments.length === 0 && (
-            <div style={{ color: 'var(--muted)' }}>No comments yet. Be the first to comment!</div>
+            <div className="text-gray-500 py-4 text-center bg-gray-900/20 rounded-xl border border-gray-800/30">
+              No comments yet. Be the first to share your thoughts!
+            </div>
           )}
         </div>
       )}

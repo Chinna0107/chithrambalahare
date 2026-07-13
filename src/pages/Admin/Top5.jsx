@@ -27,11 +27,36 @@ const Top5 = () => {
   const [isSaving, setIsSaving] = useState(false);
 
   const handleChange = (rank, field, value) => {
-    setList(l => l.map(item => item.rank === rank ? { ...item, [field]: value } : item));
+    setList(l => l.map(item => {
+      if (item.rank === rank) {
+        const updated = { ...item, [field]: value };
+        if (field === 'movieName') {
+          const generatedSlug = value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+          if (!item.slug || item.slug === (item.movieName ? item.movieName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') : '')) {
+            updated.slug = generatedSlug;
+            updated.canonicalUrl = `https://chitrambhalare.com/${generatedSlug}`;
+          }
+        }
+        return updated;
+      }
+      return item;
+    }));
   };
 
   const handleSave = async (e) => {
     e.preventDefault();
+    for (const item of list) {
+      if (item.movieName?.trim()) {
+        if (!item.slug?.trim()) {
+          triggerNotification(`Slug is required for rank #${item.rank}`, 'error');
+          return;
+        }
+        if (!item.seoTitle?.trim() || !item.metaDescription?.trim() || !item.metaKeywords?.trim()) {
+          triggerNotification(`Please fill all required SEO fields for rank #${item.rank}`, 'error');
+          return;
+        }
+      }
+    }
     setIsSaving(true);
     try {
       await axios.post('/api/box-office-top5', list);

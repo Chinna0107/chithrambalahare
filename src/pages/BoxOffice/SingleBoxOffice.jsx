@@ -27,8 +27,25 @@ const SingleBoxOffice = () => {
   return (
     <div className="wrap py-10">
       <Helmet>
-        <title>{bo.movieName} Box Office Collection | CHITRAMBHALARE</title>
-        <meta name="description" content={`Check out the detailed day-wise box office collections of ${bo.movieName}.`} />
+        <title>{bo.seoTitle || bo.movieName + " Box Office Collection"} | CHITRAMBHALARE</title>
+        <meta name="description" content={bo.metaDescription || `Check out the detailed day-wise box office collections of ${bo.movieName}.`} />
+        {bo.metaKeywords && <meta name="keywords" content={bo.metaKeywords} />}
+        {bo.canonicalUrl && <link rel="canonical" href={bo.canonicalUrl} />}
+        
+        {/* Open Graph Tags */}
+        <meta property="og:title" content={bo.ogTitle || bo.seoTitle || bo.movieName + " Box Office Collection"} />
+        <meta property="og:description" content={bo.ogDescription || bo.metaDescription || `Check out the detailed day-wise box office collections of ${bo.movieName}.`} />
+        <meta property="og:image" content={bo.ogImage || bo.poster || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba'} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:type" content="article" />
+        {bo.canonicalUrl && <meta property="og:url" content={bo.canonicalUrl} />}
+
+        {/* Twitter Card Tags */}
+        <meta name="twitter:card" content={bo.twitterCard || "summary_large_image"} />
+        <meta name="twitter:title" content={bo.ogTitle || bo.seoTitle || bo.movieName + " Box Office Collection"} />
+        <meta name="twitter:description" content={bo.ogDescription || bo.metaDescription || `Check out the detailed day-wise box office collections of ${bo.movieName}.`} />
+        <meta name="twitter:image" content={bo.ogImage || bo.poster || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba'} />
       </Helmet>
 
       <div className="glass-card rounded-2xl border border-brand-red/10 shadow-[0_10px_40px_rgba(0,0,0,0.5)] overflow-hidden max-w-5xl mx-auto">

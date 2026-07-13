@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { Camera, X, ChevronLeft, ChevronRight, ArrowLeft, Images } from 'lucide-react';
+import { Camera, X, ChevronLeft, ChevronRight, ArrowLeft, Images, Maximize2 } from 'lucide-react';
 import { useGalleries, useGallery } from '../../hooks/useGalleries';
+import Sidebar from '../../components/Sidebar';
 
 // ─── Lightbox ────────────────────────────────────────────────────────────────
 const Lightbox = ({ images, startIndex, onClose }) => {
@@ -129,8 +130,25 @@ const SingleGalleryView = ({ id }) => {
   return (
     <>
       <Helmet>
-        <title>{gallery.title} | CHITRAMBHALARE Galleries</title>
-        <meta name="description" content={`Exclusive photos from ${gallery.title}`} />
+        <title>{gallery.seoTitle || `${gallery.title} | CHITRAMBHALARE Galleries`}</title>
+        <meta name="description" content={gallery.metaDescription || `Exclusive photos from ${gallery.title}`} />
+        {gallery.metaKeywords && <meta name="keywords" content={gallery.metaKeywords} />}
+        {gallery.canonicalUrl && <link rel="canonical" href={gallery.canonicalUrl} />}
+        
+        {/* Open Graph Tags */}
+        <meta property="og:title" content={gallery.ogTitle || gallery.seoTitle || `${gallery.title} | CHITRAMBHALARE Galleries`} />
+        <meta property="og:description" content={gallery.ogDescription || gallery.metaDescription || `Exclusive photos from ${gallery.title}`} />
+        <meta property="og:image" content={gallery.ogImage || gallery.coverImage || (images[0] && images[0].url) || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba'} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:type" content="article" />
+        {gallery.canonicalUrl && <meta property="og:url" content={gallery.canonicalUrl} />}
+
+        {/* Twitter Card Tags */}
+        <meta name="twitter:card" content={gallery.twitterCard || "summary_large_image"} />
+        <meta name="twitter:title" content={gallery.ogTitle || gallery.seoTitle || `${gallery.title} | CHITRAMBHALARE Galleries`} />
+        <meta name="twitter:description" content={gallery.ogDescription || gallery.metaDescription || `Exclusive photos from ${gallery.title}`} />
+        <meta name="twitter:image" content={gallery.ogImage || gallery.coverImage || (images[0] && images[0].url) || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba'} />
       </Helmet>
 
       <div className="wrap">
@@ -177,7 +195,7 @@ const SingleGalleryView = ({ id }) => {
                 <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-black/60 text-white text-xs font-bold px-3 py-1 rounded-full z-10">
                   {current + 1} / {images.length}
                 </div>
-                
+
                 {/* Image */}
                 <img
                   src={images[current]?.url}
@@ -212,7 +230,7 @@ const SingleGalleryView = ({ id }) => {
                     </button>
                   </>
                 )}
-                
+
                 {/* Thumbnails strip */}
                 {images.length > 1 && (
                   <div className="mt-6 flex gap-2 overflow-x-auto max-w-full pb-2 px-2 scrollbar-thin">
@@ -237,94 +255,14 @@ const SingleGalleryView = ({ id }) => {
           </div>
 
           {/* Desktop Sidebar */}
-          <div className="sidebar-desktop" style={{ display: 'none' }}>
-            <div style={{ position: 'sticky', top: '76px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div className="sw">
-                <div className="sw-hdr">
-                  <div className="live-dot"></div>
-                  <div className="sw-title">Live Box Office</div>
-                </div>
-                <Link to="/box-office" className="bo-row">
-                  <div className="bo-rank">1</div>
-                  <div className="bo-name">Peddi</div>
-                  <div className="bo-amt">₹320 Cr</div>
-                </Link>
-                <Link to="/box-office" className="bo-row">
-                  <div className="bo-rank">2</div>
-                  <div className="bo-name">Drishyam 3</div>
-                  <div className="bo-amt">₹236 Cr</div>
-                </Link>
-                <Link to="/box-office" className="bo-row">
-                  <div className="bo-rank">3</div>
-                  <div className="bo-name">Obsession</div>
-                  <div className="bo-amt">₹85 Cr</div>
-                </Link>
-                <Link to="/box-office" className="bo-row">
-                  <div className="bo-rank">4</div>
-                  <div className="bo-name">Hai Jawani Toh Ishq</div>
-                  <div className="bo-amt">₹55 Cr</div>
-                </Link>
-              </div>
-              
-              <div className="sw">
-                <div className="sw-hdr">
-                  <div className="sw-title">Popular Stories</div>
-                </div>
-                <Link to="/movie-news/peddi-crosses-320-cr-worldwide-in-2-weeks-telugu-dominates" className="pop-item">
-                  <div className="pop-num">1</div>
-                  <div>
-                    <div className="pop-text">Peddi Joins the ₹300 Cr Club at the Box Office</div>
-                    <div className="pop-meta">Box Office · June 14</div>
-                  </div>
-                </Link>
-                <Link to="/movie-news/chiranjeevi-venkatesh-rumors-films-not-postponed" className="pop-item">
-                  <div className="pop-num">2</div>
-                  <div>
-                    <div className="pop-text">Chiranjeevi & Venkatesh Rumors: Films Not Postponed</div>
-                    <div className="pop-meta">Movie News · June 18</div>
-                  </div>
-                </Link>
-                <Link to="/movie-news/dhurandhar-unedited-version-streams-on-netflix-june-19" className="pop-item">
-                  <div className="pop-num">3</div>
-                  <div>
-                    <div className="pop-text">Dhurandhar Unedited Version Streams on Netflix June 19</div>
-                    <div className="pop-meta">OTT · June 18</div>
-                  </div>
-                </Link>
-              </div>
-
-              <div className="sw">
-                <div className="sw-hdr">
-                  <div className="sw-title">Browse Topics</div>
-                </div>
-                <div className="tag-cloud">
-                  <Link to="/movie-news?search=Ram Charan" className="tag">Ram Charan</Link>
-                  <Link to="/movie-news?search=Pawan Kalyan" className="tag">Pawan Kalyan</Link>
-                  <Link to="/movie-news?search=Chiranjeevi" className="tag">Chiranjeevi</Link>
-                  <Link to="/movie-news?category=OTT" className="tag">OTT</Link>
-                  <Link to="/box-office" className="tag">Box Office</Link>
-                  <Link to="/reviews" className="tag">Reviews</Link>
-                </div>
-              </div>
-            </div>
+          <div className="sidebar-desktop">
+            <Sidebar />
           </div>
         </div>
 
-        {/* Topics Cloud (Mobile Only) */}
+        {/* Mobile Sidebar */}
         <div className="mobile-sidebar mt-8">
-          <div className="sw">
-            <div className="sw-hdr">
-              <div className="sw-title">Browse Topics</div>
-            </div>
-            <div className="tag-cloud">
-              <Link to="/movie-news?search=Ram Charan" className="tag">Ram Charan</Link>
-              <Link to="/movie-news?search=Pawan Kalyan" className="tag">Pawan Kalyan</Link>
-              <Link to="/movie-news?search=Chiranjeevi" className="tag">Chiranjeevi</Link>
-              <Link to="/movie-news?category=OTT" className="tag">OTT</Link>
-              <Link to="/box-office" className="tag">Box Office</Link>
-              <Link to="/reviews" className="tag">Reviews</Link>
-            </div>
-          </div>
+          <Sidebar />
         </div>
       </div>
     </>

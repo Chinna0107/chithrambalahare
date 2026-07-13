@@ -44,7 +44,14 @@ const NorthAmerica = () => {
   };
 
   const handleAdd = async () => {
-    if (!addForm.movieName.trim()) return;
+    if (!addForm.movieName.trim() || !addForm.slug?.trim()) {
+      triggerNotification('Movie Name and Slug are required', 'error');
+      return;
+    }
+    if (!addForm.seoTitle?.trim() || !addForm.metaDescription?.trim() || !addForm.metaKeywords?.trim()) {
+      triggerNotification('Please fill all required SEO fields (Title, Description, Meta Keywords)', 'error');
+      return;
+    }
     const updated = [...list, { ...addForm, id: Date.now() }];
     await save(updated);
     setShowAdd(false);
@@ -57,6 +64,14 @@ const NorthAmerica = () => {
   };
 
   const handleEditSave = async () => {
+    if (!editForm.movieName.trim() || !editForm.slug?.trim()) {
+      triggerNotification('Movie Name and Slug are required', 'error');
+      return;
+    }
+    if (!editForm.seoTitle?.trim() || !editForm.metaDescription?.trim() || !editForm.metaKeywords?.trim()) {
+      triggerNotification('Please fill all required SEO fields (Title, Description, Meta Keywords)', 'error');
+      return;
+    }
     const updated = list.map(item => item.id === editingId ? { ...item, ...editForm } : item);
     await save(updated);
     setEditingId(null);
@@ -82,7 +97,20 @@ const NorthAmerica = () => {
                   <input
                     type="text"
                     value={formState[field] ?? ''}
-                    onChange={e => setFormState(f => ({ ...f, [field]: e.target.value }))}
+                    onChange={e => {
+                      const val = e.target.value;
+                      setFormState(f => {
+                        const newState = { ...f, [field]: val };
+                        if (field === 'movieName') {
+                          const generatedSlug = val.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+                          if (isNew && (!f.slug || f.slug === (f.movieName ? f.movieName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') : ''))) {
+                            newState.slug = generatedSlug;
+                            newState.canonicalUrl = `https://chitrambhalare.com/${generatedSlug}`;
+                          }
+                        }
+                        return newState;
+                      });
+                    }}
                     className="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-brand-red transition-all"
                   />
                 )}

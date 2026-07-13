@@ -47,7 +47,14 @@ const Articles = () => {
   };
 
   const handleAdd = async () => {
-    if (!addForm.title.trim() || !addForm.slug.trim()) return;
+    if (!addForm.title.trim() || !addForm.slug.trim()) {
+      triggerNotification('Title and Slug are required', 'error');
+      return;
+    }
+    if (!addForm.seoTitle?.trim() || !addForm.metaDescription?.trim() || !addForm.metaKeywords?.trim()) {
+      triggerNotification('Please fill all required SEO fields (Title, Description, Meta Keywords)', 'error');
+      return;
+    }
     setIsSaving(true);
     try {
       await axios.post('/api/articles', serializeForApi({ ...addForm, id: Date.now().toString() }));
@@ -79,6 +86,14 @@ const Articles = () => {
   };
 
   const handleEditSave = async () => {
+    if (!editForm.title.trim() || !editForm.slug.trim()) {
+      triggerNotification('Title and Slug are required', 'error');
+      return;
+    }
+    if (!editForm.seoTitle?.trim() || !editForm.metaDescription?.trim() || !editForm.metaKeywords?.trim()) {
+      triggerNotification('Please fill all required SEO fields (Title, Description, Meta Keywords)', 'error');
+      return;
+    }
     setIsSaving(true);
     try {
       await axios.put(`/api/articles/${editingId}`, serializeForApi(editForm));
@@ -129,7 +144,21 @@ const Articles = () => {
               <input
                 type={type || 'text'}
                 value={formState[field] ?? ''}
-                onChange={e => setFormState(f => ({ ...f, [field]: e.target.value }))}
+                onChange={e => {
+                  const val = e.target.value;
+                  setFormState(f => {
+                    const newState = { ...f, [field]: val };
+                    if (field === 'title') {
+                      const generatedSlug = val.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+                      // Only auto-fill if the user hasn't typed a slug yet, or if they are creating a new post
+                      if (isNew && (!f.slug || f.slug === (f.title ? f.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') : ''))) {
+                        newState.slug = generatedSlug;
+                        newState.canonicalUrl = `https://chitrambhalare.com/${generatedSlug}`;
+                      }
+                    }
+                    return newState;
+                  });
+                }}
                 placeholder={placeholder}
                 className="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand-red transition-all"
               />

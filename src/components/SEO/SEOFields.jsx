@@ -64,7 +64,7 @@ const SEOFields = ({ values = {}, onChange, showAdvanced = true }) => {
           {/* SEO Title */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">SEO Title</label>
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">SEO Title <span className="text-red-500">*</span></label>
               <span className={`text-xs font-mono ${seoTitleColor}`}>{seoTitleLength}/60</span>
             </div>
             <input
@@ -77,7 +77,7 @@ const SEOFields = ({ values = {}, onChange, showAdvanced = true }) => {
           {/* Meta Description */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Meta Description</label>
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Meta Description <span className="text-red-500">*</span></label>
               <span className={`text-xs font-mono ${metaDescColor}`}>{metaDescLength}/155</span>
             </div>
             <textarea
@@ -102,7 +102,7 @@ const SEOFields = ({ values = {}, onChange, showAdvanced = true }) => {
 
           {/* Meta Keywords */}
           <div>
-            <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Meta Keywords</label>
+            <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Meta Keywords <span className="text-red-500">*</span></label>
             <input
               type="text" value={values.metaKeywords || ''} onChange={e => update('metaKeywords', e.target.value)}
               placeholder="keyword1, keyword2, keyword3"

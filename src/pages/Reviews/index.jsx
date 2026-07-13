@@ -2,6 +2,7 @@ import React from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Helmet } from 'react-helmet-async';
+import Sidebar from '../../components/Sidebar';
 import { getReviews, getStats } from '../../services/api';
 import { Star } from 'lucide-react';
 
@@ -27,7 +28,7 @@ const Reviews = () => {
 
   const reviews = allReviews || [];
   const totalPages = Math.ceil(reviews.length / limit) || 1;
-  
+
   const currentReviews = reviews.slice((page - 1) * limit, page * limit);
   const featuredReview = page === 1 && currentReviews[0] ? currentReviews[0] : null;
   const sideReviews = page === 1 ? currentReviews.slice(1, 4) : [];
@@ -83,9 +84,9 @@ const Reviews = () => {
                   <Link to={`/reviews/${featuredReview.slug}`} className="feat-main" style={{ display: 'block', textDecoration: 'none' }}>
                     <div className="feat-img" style={{ position: 'relative', overflow: 'hidden' }}>
                       {featuredReview.poster ? (
-                        <img 
-                          src={featuredReview.poster} 
-                          alt={featuredReview.movieName} 
+                        <img
+                          src={featuredReview.poster}
+                          alt={featuredReview.movieName}
                           style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', top: 0, left: 0 }}
                           onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80'; }}
                         />
@@ -163,9 +164,9 @@ const Reviews = () => {
                       <Link to={`/reviews/${rev.slug}`} key={rev.id} className="n-card">
                         <div className="n-thumb" style={{ background: '#0d1b30', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           {rev.poster ? (
-                            <img 
-                              src={rev.poster} 
-                              alt={rev.movieName} 
+                            <img
+                              src={rev.poster}
+                              alt={rev.movieName}
                               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                               onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80'; }}
                             />
@@ -189,8 +190,8 @@ const Reviews = () => {
               {/* Pagination */}
               {totalPages > 1 && (
                 <div className="pagination">
-                  <button 
-                    className="pg-btn" 
+                  <button
+                    className="pg-btn"
                     onClick={() => handlePageChange(page - 1)}
                     disabled={page === 1}
                   >
@@ -205,8 +206,8 @@ const Reviews = () => {
                       {i + 1}
                     </button>
                   ))}
-                  <button 
-                    className="pg-btn" 
+                  <button
+                    className="pg-btn"
                     onClick={() => handlePageChange(page + 1)}
                     disabled={page === totalPages}
                   >
@@ -219,94 +220,14 @@ const Reviews = () => {
         </div>
 
         {/* Desktop Sidebar */}
-        <div className="sidebar-desktop" style={{ display: 'none' }}>
-          <div style={{ position: 'sticky', top: '76px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <div className="sw">
-              <div className="sw-hdr">
-                <div className="live-dot"></div>
-                <div className="sw-title">Live Box Office</div>
-              </div>
-              <Link to="/box-office" className="bo-row">
-                <div className="bo-rank">1</div>
-                <div className="bo-name">Peddi</div>
-                <div className="bo-amt">₹320 Cr</div>
-              </Link>
-              <Link to="/box-office" className="bo-row">
-                <div className="bo-rank">2</div>
-                <div className="bo-name">Drishyam 3</div>
-                <div className="bo-amt">₹236 Cr</div>
-              </Link>
-              <Link to="/box-office" className="bo-row">
-                <div className="bo-rank">3</div>
-                <div className="bo-name">Obsession</div>
-                <div className="bo-amt">₹85 Cr</div>
-              </Link>
-              <Link to="/box-office" className="bo-row">
-                <div className="bo-rank">4</div>
-                <div className="bo-name">Hai Jawani Toh Ishq</div>
-                <div className="bo-amt">₹55 Cr</div>
-              </Link>
-            </div>
-            
-            <div className="sw">
-              <div className="sw-hdr">
-                <div className="sw-title">Popular Stories</div>
-              </div>
-              <Link to="/movie-news/peddi-crosses-320-cr-worldwide-in-2-weeks-telugu-dominates" className="pop-item">
-                <div className="pop-num">1</div>
-                <div>
-                  <div className="pop-text">Peddi Joins the ₹300 Cr Club at the Box Office</div>
-                  <div className="pop-meta">Box Office · June 14</div>
-                </div>
-              </Link>
-              <Link to="/movie-news/chiranjeevi-venkatesh-rumors-films-not-postponed" className="pop-item">
-                <div className="pop-num">2</div>
-                <div>
-                  <div className="pop-text">Chiranjeevi & Venkatesh Rumors: Films Not Postponed</div>
-                  <div className="pop-meta">Movie News · June 18</div>
-                </div>
-              </Link>
-              <Link to="/movie-news/dhurandhar-unedited-version-streams-on-netflix-june-19" className="pop-item">
-                <div className="pop-num">3</div>
-                <div>
-                  <div className="pop-text">Dhurandhar Unedited Version Streams on Netflix June 19</div>
-                  <div className="pop-meta">OTT · June 18</div>
-                </div>
-              </Link>
-            </div>
-
-            <div className="sw">
-              <div className="sw-hdr">
-                <div className="sw-title">Browse Topics</div>
-              </div>
-              <div className="tag-cloud">
-                <Link to="/movie-news?search=Ram Charan" className="tag">Ram Charan</Link>
-                <Link to="/movie-news?search=Pawan Kalyan" className="tag">Pawan Kalyan</Link>
-                <Link to="/movie-news?search=Chiranjeevi" className="tag">Chiranjeevi</Link>
-                <Link to="/movie-news?category=OTT" className="tag">OTT</Link>
-                <Link to="/box-office" className="tag">Box Office</Link>
-                <Link to="/reviews" className="tag">Reviews</Link>
-              </div>
-            </div>
-          </div>
+        <div className="sidebar-desktop">
+          <Sidebar />
         </div>
       </div>
 
-      {/* Topics Cloud (Mobile Only) */}
+      {/* Mobile Sidebar */}
       <div className="mobile-sidebar mt-8">
-        <div className="sw">
-          <div className="sw-hdr">
-            <div className="sw-title">Browse Topics</div>
-          </div>
-          <div className="tag-cloud">
-            <Link to="/movie-news?search=Ram Charan" className="tag">Ram Charan</Link>
-            <Link to="/movie-news?search=Pawan Kalyan" className="tag">Pawan Kalyan</Link>
-            <Link to="/movie-news?search=Chiranjeevi" className="tag">Chiranjeevi</Link>
-            <Link to="/movie-news?category=OTT" className="tag">OTT</Link>
-            <Link to="/box-office" className="tag">Box Office</Link>
-            <Link to="/reviews" className="tag">Reviews</Link>
-          </div>
-        </div>
+        <Sidebar />
       </div>
     </div>
   );

@@ -2,7 +2,9 @@ import React, { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Helmet } from 'react-helmet-async';
-import { Star, Link as LinkIcon } from 'lucide-react';
+import { Star, ChevronLeft, ChevronRight, X, Link as LinkIcon, Share2 } from 'lucide-react';
+import Sidebar from '../../components/Sidebar';
+import 'swiper/css';
 import { getReviewBySlug } from '../../services/api';
 import Comments from '../../components/Comments';
 
@@ -25,26 +27,8 @@ const SingleReview = () => {
   });
 
   useEffect(() => {
-    function checkWidth() {
-      const w = window.innerWidth;
-      const aside = document.getElementById('deskSidebar');
-      const mobileInlines = document.querySelectorAll('.mob-sidebar-inline');
-      if (aside) {
-        if (w >= 700) {
-          aside.style.display = 'block';
-          mobileInlines.forEach((el) => { el.style.display = 'none'; });
-        } else {
-          aside.style.display = 'none';
-          mobileInlines.forEach((el) => { el.style.display = 'block'; });
-        }
-      }
-    }
-    if (review) {
-      checkWidth();
-      window.addEventListener('resize', checkWidth);
-    }
-    return () => window.removeEventListener('resize', checkWidth);
-  }, [review]);
+    window.scrollTo(0, 0);
+  }, [slug]);
 
   if (isLoading) {
     return (
@@ -68,8 +52,25 @@ const SingleReview = () => {
   return (
     <>
       <Helmet>
-        <title>{review.movieName} Review | CHITRAMBHALARE</title>
-        <meta name="description" content={review.snippet} />
+        <title>{review.seoTitle || review.movieName + " Review"} | CHITRAMBHALARE</title>
+        <meta name="description" content={review.metaDescription || review.snippet || review.verdict} />
+        {review.metaKeywords && <meta name="keywords" content={review.metaKeywords} />}
+        {review.canonicalUrl && <link rel="canonical" href={review.canonicalUrl} />}
+        
+        {/* Open Graph Tags */}
+        <meta property="og:title" content={review.ogTitle || review.seoTitle || review.movieName + " Review"} />
+        <meta property="og:description" content={review.ogDescription || review.metaDescription || review.snippet || review.verdict} />
+        <meta property="og:image" content={review.ogImage || heroImage} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:type" content="article" />
+        {review.canonicalUrl && <meta property="og:url" content={review.canonicalUrl} />}
+
+        {/* Twitter Card Tags */}
+        <meta name="twitter:card" content={review.twitterCard || "summary_large_image"} />
+        <meta name="twitter:title" content={review.ogTitle || review.seoTitle || review.movieName + " Review"} />
+        <meta name="twitter:description" content={review.ogDescription || review.metaDescription || review.snippet || review.verdict} />
+        <meta name="twitter:image" content={review.ogImage || heroImage} />
       </Helmet>
 
       <div className="wrap">
@@ -182,20 +183,6 @@ const SingleReview = () => {
               </div>
             </div>
 
-            {/* INLINE SIDEBAR (mobile only) */}
-            <div className="mob-sidebar-inline">
-              <div className="sw">
-                <div className="sw-hdr">
-                  <div className="live-dot"></div>
-                  <div className="sw-title">Live Box Office</div>
-                </div>
-                <Link to="/box-office" className="bo-row"><div className="bo-rank2">1</div><div className="bo-name2">Peddi</div><div className="bo-amt2">₹320 Cr</div></Link>
-                <Link to="/box-office" className="bo-row"><div className="bo-rank2">2</div><div className="bo-name2">Drishyam 3</div><div className="bo-amt2">₹236 Cr</div></Link>
-                <Link to="/box-office" className="bo-row"><div className="bo-rank2">3</div><div className="bo-name2">Karuppu</div><div className="bo-amt2">₹150 Cr</div></Link>
-                <Link to="/box-office" className="bo-row"><div className="bo-rank2">4</div><div className="bo-name2">Obsession</div><div className="bo-amt2">₹85 Cr</div></Link>
-                <Link to="/box-office" className="bo-row"><div className="bo-rank2">5</div><div className="bo-name2">Sing Geetham</div><div className="bo-amt2">₹5 Cr</div></Link>
-              </div>
-            </div>
 
             {/* BODY CONTENT */}
             <div className="art-body prose prose-invert max-w-none" id="artBody">
@@ -283,25 +270,15 @@ const SingleReview = () => {
 
           </article>
 
-          {/* DESKTOP SIDEBAR */}
-          <aside style={{ display: 'none' }} id="deskSidebar">
-            <div style={{ position: 'sticky', top: '76px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div className="sw">
-                <div className="sw-hdr"><div className="live-dot"></div><div className="sw-title">Live Box Office</div></div>
-                <Link to="/box-office" className="bo-row"><div className="bo-rank2">1</div><div className="bo-name2">Peddi</div><div className="bo-amt2">₹320 Cr</div></Link>
-                <Link to="/box-office" className="bo-row"><div className="bo-rank2">2</div><div className="bo-name2">Drishyam 3</div><div className="bo-amt2">₹236 Cr</div></Link>
-                <Link to="/box-office" className="bo-row"><div className="bo-rank2">3</div><div className="bo-name2">Karuppu</div><div className="bo-amt2">₹150 Cr</div></Link>
-                <Link to="/box-office" className="bo-row"><div className="bo-rank2">4</div><div className="bo-name2">Obsession</div><div className="bo-amt2">₹85 Cr</div></Link>
-                <Link to="/box-office" className="bo-row"><div className="bo-rank2">5</div><div className="bo-name2">Sing Geetham</div><div className="bo-amt2">₹5 Cr</div></Link>
-              </div>
-              <div className="sw">
-                <div className="sw-hdr"><div className="sw-title">You May Also Like</div></div>
-                <Link to="/box-office" className="pop-item"><div className="pop-num">1</div><div><div className="pop-text">All Time Worldwide Top 15 Telugu Movies</div><div className="pop-meta">Records</div></div></Link>
-                <Link to="/movie-news/dhurandhar-unedited-version-streams-on-netflix-june-19" className="pop-item"><div className="pop-num">2</div><div><div className="pop-text">Drishyam 3 — ₹236 Cr in 24 Days Worldwide</div><div className="pop-meta">Box Office</div></div></Link>
-                <Link to="/reviews" className="pop-item"><div className="pop-num">3</div><div><div className="pop-text">Peddi Review: Ram Charan Powers Engaging Drama</div><div className="pop-meta">Review</div></div></Link>
-              </div>
-            </div>
-          </aside>
+          {/* Desktop Sidebar */}
+          <div className="sidebar-desktop">
+            <Sidebar />
+          </div>
+        </div>
+
+        {/* Mobile Sidebar */}
+        <div className="mobile-sidebar mt-8 px-4">
+          <Sidebar />
         </div>
       </div>
     </>

@@ -126,7 +126,14 @@ const Galleries = () => {
   };
 
   const handleAdd = async () => {
-    if (!addForm.title.trim()) return;
+    if (!addForm.title.trim() || !addForm.slug?.trim()) {
+      triggerNotification('Title and Slug are required', 'error');
+      return;
+    }
+    if (!addForm.seoTitle?.trim() || !addForm.metaDescription?.trim() || !addForm.metaKeywords?.trim()) {
+      triggerNotification('Please fill all required SEO fields (Title, Description, Meta Keywords)', 'error');
+      return;
+    }
     await save([...list, { ...addForm, id: Date.now() }]);
     setShowAdd(false);
     setAddForm(emptyForm);
@@ -135,6 +142,14 @@ const Galleries = () => {
   const handleDelete = (id) => save(list.filter(item => item.id !== id));
 
   const handleEditSave = async () => {
+    if (!editForm.title.trim() || !editForm.slug?.trim()) {
+      triggerNotification('Title and Slug are required', 'error');
+      return;
+    }
+    if (!editForm.seoTitle?.trim() || !editForm.metaDescription?.trim() || !editForm.metaKeywords?.trim()) {
+      triggerNotification('Please fill all required SEO fields (Title, Description, Meta Keywords)', 'error');
+      return;
+    }
     await save(list.map(item => item.id === editingId ? { ...item, ...editForm } : item));
     setEditingId(null);
   };
@@ -216,7 +231,7 @@ const Galleries = () => {
         <h4 className="text-[10px] font-bold text-brand-red uppercase tracking-wider mb-4">SEO Settings</h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">SEO Title</label>
+            <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">SEO Title <span className="text-red-500">*</span></label>
             <input type="text" value={formState.seoTitle || ''} onChange={e => setFormState(f => ({ ...f, seoTitle: e.target.value }))} className="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand-red" />
           </div>
           <div>
@@ -224,8 +239,12 @@ const Galleries = () => {
             <ImageUpload value={formState.ogImage || ''} onChange={url => setFormState(f => ({ ...f, ogImage: url }))} placeholder="Upload OG Image..." />
           </div>
           <div className="md:col-span-2">
-            <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Meta Description</label>
+            <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Meta Description <span className="text-red-500">*</span></label>
             <textarea value={formState.metaDescription || ''} onChange={e => setFormState(f => ({ ...f, metaDescription: e.target.value }))} className="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand-red" rows={2} />
+          </div>
+          <div className="md:col-span-2">
+            <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Meta Keywords <span className="text-red-500">*</span></label>
+            <input type="text" value={formState.metaKeywords || ''} onChange={e => setFormState(f => ({ ...f, metaKeywords: e.target.value }))} className="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand-red" placeholder="keyword1, keyword2" />
           </div>
         </div>
       </div>

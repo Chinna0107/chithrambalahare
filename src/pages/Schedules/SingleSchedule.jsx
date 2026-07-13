@@ -48,8 +48,25 @@ const SingleSchedule = () => {
   return (
     <article className="wrap py-8">
       <Helmet>
-        <title>{movie.movieName} - Upcoming Telugu Movies | Tollywood</title>
-        <meta name="description" content={`Upcoming release details for ${movie.movieName}. Release Date: ${movie.releaseDate}`} />
+        <title>{movie.seoTitle || `${movie.movieName} - Upcoming Telugu Movies | Tollywood`}</title>
+        <meta name="description" content={movie.metaDescription || `Upcoming release details for ${movie.movieName}. Release Date: ${movie.releaseDate}`} />
+        {movie.metaKeywords && <meta name="keywords" content={movie.metaKeywords} />}
+        {movie.canonicalUrl && <link rel="canonical" href={movie.canonicalUrl} />}
+        
+        {/* Open Graph Tags */}
+        <meta property="og:title" content={movie.ogTitle || movie.seoTitle || `${movie.movieName} - Upcoming Telugu Movies | Tollywood`} />
+        <meta property="og:description" content={movie.ogDescription || movie.metaDescription || `Upcoming release details for ${movie.movieName}. Release Date: ${movie.releaseDate}`} />
+        <meta property="og:image" content={movie.ogImage || movie.banner || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba'} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:type" content="article" />
+        {movie.canonicalUrl && <meta property="og:url" content={movie.canonicalUrl} />}
+
+        {/* Twitter Card Tags */}
+        <meta name="twitter:card" content={movie.twitterCard || "summary_large_image"} />
+        <meta name="twitter:title" content={movie.ogTitle || movie.seoTitle || `${movie.movieName} - Upcoming Telugu Movies | Tollywood`} />
+        <meta name="twitter:description" content={movie.ogDescription || movie.metaDescription || `Upcoming release details for ${movie.movieName}. Release Date: ${movie.releaseDate}`} />
+        <meta name="twitter:image" content={movie.ogImage || movie.banner || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba'} />
       </Helmet>
 
       {/* Breadcrumbs */}
