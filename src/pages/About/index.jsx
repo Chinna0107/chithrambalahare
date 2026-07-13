@@ -50,7 +50,7 @@ const About = () => {
           </div>
 
           {/* Editorial Team */}
-          <section>
+          {/* <section>
             <h2 className="text-3xl font-poppins font-bold text-gray-100 mb-8 text-center">Our Editorial Team</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
               {[
@@ -72,10 +72,10 @@ const About = () => {
                 </div>
               ))}
             </div>
-          </section>
+          </section> */}
 
           {/* Contact Information */}
-          <section className="glass-card text-gray-100 p-8 md:p-12 rounded-2xl border border-brand-red/20 relative overflow-hidden">
+          {/* <section className="glass-card text-gray-100 p-8 md:p-12 rounded-2xl border border-brand-red/20 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-brand-red/10 rounded-full blur-[80px] -mr-32 -mt-32"></div>
             <h2 className="text-3xl font-poppins font-bold mb-8 text-center relative z-10">Get In Touch</h2>
             <div className="grid md:grid-cols-3 gap-8 text-center relative z-10">
@@ -101,7 +101,7 @@ const About = () => {
                 <p className="text-gray-400">Jubilee Hills, Hyderabad</p>
               </div>
             </div>
-          </section>
+          </section> */}
 
         </div>
       </div>

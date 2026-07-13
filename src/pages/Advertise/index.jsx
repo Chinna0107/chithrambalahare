@@ -54,7 +54,7 @@ const Advertise = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-20">
+      {/* <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-20">
         {stats.map((stat, idx) => (
           <motion.div
             key={stat.label}
@@ -69,7 +69,7 @@ const Advertise = () => {
             <div className="text-xs md:text-sm text-gray-400 font-semibold uppercase tracking-wider">{stat.label}</div>
           </motion.div>
         ))}
-      </div>
+      </div> */}
 
       {/* Ad Options */}
       <div className="mb-20">
@@ -120,7 +120,7 @@ const Advertise = () => {
           <p className="text-gray-400 mb-8 text-lg">
             Our team will work with you to create a custom campaign that hits your marketing goals.
           </p>
-          <a href="mailto:sales@chitrambhalare.com" className="inline-block bg-brand-red text-gray-100 font-bold px-8 py-4 rounded-full hover:bg-brand-red/80 transition-all shadow-[0_0_20px_rgba(212,43,43,0.4)] hover:shadow-[0_0_30px_rgba(212,43,43,0.6)] hover:-translate-y-1">
+          <a href="mailto:chitrambhalare1984@gmail.com" className="inline-block bg-brand-red text-gray-100 font-bold px-8 py-4 rounded-full hover:bg-brand-red/80 transition-all shadow-[0_0_20px_rgba(212,43,43,0.4)] hover:shadow-[0_0_30px_rgba(212,43,43,0.6)] hover:-translate-y-1">
             Contact Sales Team
           </a>
         </div>

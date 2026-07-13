@@ -64,6 +64,11 @@ export const getPopupAd = async () => {
   return response.data || { active: false };
 };
 
+export const getStats = async (type) => {
+  const response = await axios.get('/api/stats', { params: { type } });
+  return response.data;
+};
+
 export const getUpcomingSchedules = async () => {
   const response = await axios.get('/api/schedules');
   return response.data || [];

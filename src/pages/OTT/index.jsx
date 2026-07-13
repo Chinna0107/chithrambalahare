@@ -1,44 +1,30 @@
-import React, { useState } from 'react';
-import { useSearchParams, Link, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { useSearchParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Helmet } from 'react-helmet-async';
 import { getArticles, getStats } from '../../services/api';
 
-const CATEGORIES = [
-  { name: 'All', value: 'All' },
-  { name: 'Casting', value: 'Casting' },
-  { name: 'Release Dates', value: 'Release Date' },
-  { name: 'OTT Dates', value: 'OTT' },
-  { name: 'Re-Release', value: 'Re-Release' },
-  { name: 'Production', value: 'Production' }
-];
-
-const MovieNews = () => {
+const OTT = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
   
-  const category = searchParams.get('category') || 'All';
   const page = parseInt(searchParams.get('page') || '1', 10);
   const search = searchParams.get('search') || '';
+  const category = 'OTT'; // Hardcoded for this page
 
   const { data, isLoading } = useQuery({
     queryKey: ['articles', { category, page, search }],
     queryFn: () => getArticles({ 
       page, 
       limit: 12, 
-      category: category === 'All' ? null : category,
+      category,
       search
     }),
   });
 
   const { data: stats } = useQuery({
-    queryKey: ['stats', 'movie-news'],
-    queryFn: () => getStats('movie-news'),
+    queryKey: ['stats', 'ott'],
+    queryFn: () => getStats('ott'),
   });
-
-  const handleCategoryChange = (catVal) => {
-    setSearchParams({ category: catVal, page: '1' });
-  };
 
   const handlePageChange = (newPage) => {
     const params = Object.fromEntries(searchParams.entries());
@@ -54,56 +40,41 @@ const MovieNews = () => {
   return (
     <div className="wrap">
       <Helmet>
-        <title>Movie News | CHITRAMBHALARE</title>
-        <meta name="description" content="Browse the latest updates, casting news, release dates, and production rumors from Tollywood." />
+        <title>OTT News | CHITRAMBHALARE</title>
+        <meta name="description" content="Latest OTT releases, digital streaming dates, and news for Tollywood." />
       </Helmet>
 
       {/* Breadcrumb */}
       <div style={{ padding: '12px 0 0', fontSize: '11px', color: 'var(--muted)', display: 'flex', alignItems: 'center', gap: '5px' }}>
         <Link to="/main" style={{ cursor: 'pointer', color: 'var(--gold)', textDecoration: 'none' }}>Home</Link>
         <span>/</span>
-        <span style={{ color: 'var(--text)' }}>Movie News</span>
+        <span style={{ color: 'var(--text)' }}>OTT</span>
       </div>
 
       {/* Category Banner */}
       <div className="cat-banner">
         <div>
           <div className="cat-eyebrow">Browse Category</div>
-          <div className="cat-title">Movie News</div>
-          <div className="cat-desc">Latest updates, announcements, casting & release dates from Tollywood.</div>
+          <div className="cat-title">OTT Updates</div>
+          <div className="cat-desc">Latest OTT releases, digital streaming dates, and exclusive news.</div>
           <div className="cat-stats">
             <div><div className="cat-stat-val">{stats ? stats.total.toLocaleString() : '...'}</div><div className="cat-stat-lbl">Articles</div></div>
             <div><div className="cat-stat-val">Daily</div><div className="cat-stat-lbl">Updates</div></div>
             <div><div className="cat-stat-val">{stats ? stats.today : '...'}</div><div className="cat-stat-lbl">Today</div></div>
           </div>
         </div>
-        <div className="cat-icon">NEWS</div>
+        <div className="cat-icon">📺</div>
       </div>
 
       <div className="desktop-grid">
         <div>
-          {/* Filter tabs */}
-          <div className="filter-scroll">
-            <div className="filter-tabs">
-              {CATEGORIES.map((cat) => (
-                <button
-                  key={cat.name}
-                  className={`ftab ${category === cat.value ? 'on' : ''}`}
-                  onClick={() => handleCategoryChange(cat.value)}
-                >
-                  {cat.name}
-                </button>
-              ))}
-            </div>
-          </div>
-
           {isLoading ? (
             <div style={{ color: 'var(--muted)', padding: '40px 0', textAlign: 'center' }}>
-              Loading Movie News...
+              Loading OTT News...
             </div>
           ) : allFetchedArticles.length === 0 ? (
             <div style={{ padding: '60px 0', textAlign: 'center', background: 'var(--card)', borderRadius: '10px', border: '1px solid var(--border)' }}>
-              <p style={{ color: 'var(--muted)' }}>No articles found. Try another category or search term.</p>
+              <p style={{ color: 'var(--muted)' }}>No OTT articles found.</p>
             </div>
           ) : (
             <>
@@ -112,7 +83,6 @@ const MovieNews = () => {
                 <>
                   <div className="section-hdr">
                     <div className="section-hdr-title">Featured</div>
-                    <span className="see-all">See all →</span>
                   </div>
                   <Link to={`/movie-news/${featuredArticle.slug}`} className="feat-main" style={{ display: 'block', textDecoration: 'none' }}>
                     <div className="feat-img" style={{ position: 'relative', overflow: 'hidden' }}>
@@ -157,7 +127,7 @@ const MovieNews = () => {
                 </div>
               )}
 
-              {/* Mobile Sidebar (Box Office lists inline on mobile) */}
+              {/* Mobile Sidebar */}
               <div className="mobile-sidebar">
                 <div className="sw">
                   <div className="sw-hdr">
@@ -191,8 +161,7 @@ const MovieNews = () => {
               {gridArticles.length > 0 && (
                 <>
                   <div className="section-hdr">
-                    <div className="section-hdr-title">All Movie News</div>
-                    <span className="see-all">2,400+ →</span>
+                    <div className="section-hdr-title">All OTT News</div>
                   </div>
                   <div className="news-grid">
                     {gridArticles.map((art) => (
@@ -318,7 +287,7 @@ const MovieNews = () => {
                 <Link to="/movie-news?search=Ram Charan" className="tag">Ram Charan</Link>
                 <Link to="/movie-news?search=Pawan Kalyan" className="tag">Pawan Kalyan</Link>
                 <Link to="/movie-news?search=Chiranjeevi" className="tag">Chiranjeevi</Link>
-                <Link to="/movie-news?category=OTT" className="tag">OTT</Link>
+                <Link to="/ott" className="tag">OTT</Link>
                 <Link to="/box-office" className="tag">Box Office</Link>
                 <Link to="/reviews" className="tag">Reviews</Link>
               </div>
@@ -337,7 +306,7 @@ const MovieNews = () => {
             <Link to="/movie-news?search=Ram Charan" className="tag">Ram Charan</Link>
             <Link to="/movie-news?search=Pawan Kalyan" className="tag">Pawan Kalyan</Link>
             <Link to="/movie-news?search=Chiranjeevi" className="tag">Chiranjeevi</Link>
-            <Link to="/movie-news?category=OTT" className="tag">OTT</Link>
+            <Link to="/ott" className="tag">OTT</Link>
             <Link to="/box-office" className="tag">Box Office</Link>
             <Link to="/reviews" className="tag">Reviews</Link>
           </div>
@@ -347,4 +316,4 @@ const MovieNews = () => {
   );
 };
 
-export default MovieNews;
+export default OTT;

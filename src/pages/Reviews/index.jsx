@@ -2,7 +2,7 @@ import React from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Helmet } from 'react-helmet-async';
-import { getReviews } from '../../services/api';
+import { getReviews, getStats } from '../../services/api';
 import { Star } from 'lucide-react';
 
 const Reviews = () => {
@@ -13,6 +13,11 @@ const Reviews = () => {
   const { data: allReviews, isLoading } = useQuery({
     queryKey: ['all-reviews'],
     queryFn: getReviews,
+  });
+
+  const { data: stats } = useQuery({
+    queryKey: ['stats', 'reviews'],
+    queryFn: () => getStats('reviews'),
   });
 
   const handlePageChange = (newPage) => {
@@ -49,9 +54,9 @@ const Reviews = () => {
           <div className="cat-title">Movie Reviews</div>
           <div className="cat-desc">Honest, unbiased, and detailed analysis of the newest releases in Tollywood and beyond.</div>
           <div className="cat-stats">
-            <div><div className="cat-stat-val">300+</div><div className="cat-stat-lbl">Reviews</div></div>
-            <div><div className="cat-stat-val">Weekly</div><div className="cat-stat-lbl">Updates</div></div>
-            <div><div className="cat-stat-val">⭐</div><div className="cat-stat-lbl">Ratings</div></div>
+            <div><div className="cat-stat-val">{stats ? stats.total.toLocaleString() : '...'}</div><div className="cat-stat-lbl">Reviews</div></div>
+            <div><div className="cat-stat-val">Daily</div><div className="cat-stat-lbl">Updates</div></div>
+            <div><div className="cat-stat-val">{stats ? stats.today : '...'}</div><div className="cat-stat-lbl">Today</div></div>
           </div>
         </div>
         <div className="cat-icon">⭐</div>

@@ -63,12 +63,13 @@ const Header = () => {
             >
               Archive
             </NavLink>
-            <Link 
-              to="/movie-news?category=OTT" 
+            <NavLink 
+              to="/ott" 
+              className={({ isActive }) => isActive ? 'act' : ''} 
               onClick={() => setIsMenuOpen(false)}
             >
               OTT
-            </Link>
+            </NavLink>
 
             <NavLink 
               to="/live-tracking" 

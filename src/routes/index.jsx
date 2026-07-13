@@ -12,6 +12,7 @@ const SingleArticle = lazy(() => import('../pages/MovieNews/SingleArticle'));
 const Archive = lazy(() => import('../pages/MovieNews/Archive'));
 const Reviews = lazy(() => import('../pages/Reviews'));
 const SingleReview = lazy(() => import('../pages/Reviews/SingleReview'));
+const OTT = lazy(() => import('../pages/OTT'));
 const LiveTracking = lazy(() => import('../pages/LiveTracking'));
 const BoxOffice = lazy(() => import('../pages/BoxOffice'));
 const SingleBoxOffice = lazy(() => import('../pages/BoxOffice/SingleBoxOffice'));
@@ -93,6 +94,10 @@ const router = createBrowserRouter([
             element: <SuspenseWrapper><SingleReview /></SuspenseWrapper>,
           },
         ]
+      },
+      {
+        path: 'ott',
+        element: <SuspenseWrapper><OTT /></SuspenseWrapper>,
       },
       {
         path: 'box-office',

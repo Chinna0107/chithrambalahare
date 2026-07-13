@@ -37,7 +37,7 @@ const GalleryGrid = () => {
           to="/galleries"
           className="text-brand-red hover:text-white transition-colors text-sm font-bold uppercase tracking-wider"
         >
-          View All Photos &rarr;
+          View All  &rarr;
         </Link>
       </div>
 
