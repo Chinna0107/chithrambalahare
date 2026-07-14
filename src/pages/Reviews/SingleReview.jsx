@@ -250,7 +250,12 @@ const SingleReview = () => {
             </div>
 
             {/* SHARE BAR */}
-            <ShareWidget title={review.movieName + " Review"} url={window.location.href} image={heroImage} />
+            <ShareWidget 
+              title={review.movieName + " Review"} 
+              url={window.location.href} 
+              shareUrl={`${window.location.origin}/api/share/review/${review.slug}`}
+              image={heroImage} 
+            />
             
             {/* COMMENTS SECTION */}
             <Comments entityType="review" entityId={review.slug || review.id} />

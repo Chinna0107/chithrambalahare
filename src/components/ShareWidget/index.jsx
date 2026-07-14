@@ -1,12 +1,12 @@
 import { Link as LinkIcon, Share2 } from 'lucide-react';
 import { useState } from 'react';
 
-const ShareWidget = ({ title, url, image }) => {
+const ShareWidget = ({ title, url, image, shareUrl }) => {
   const [copied, setCopied] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(url || window.location.href);
+    navigator.clipboard.writeText(shareUrl || url || window.location.href);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -47,12 +47,11 @@ const ShareWidget = ({ title, url, image }) => {
   return (
     <div className="flex items-center space-x-3 my-8 py-6 border-y border-brand-red/10">
       <div className="flex items-center text-gray-300 font-poppins font-bold mr-4">
-        <Share2 className="w-5 h-5 mr-2 text-brand-red" />
-        Share:
+        <span className="text-brand-red mr-2">Share:</span>
       </div>
       
       <a 
-        href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url || window.location.href)}`} 
+        href={`https://facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl || url || window.location.href)}`} 
         target="_blank" 
         rel="noopener noreferrer"
         className="w-10 h-10 rounded-full bg-[#1877F2]/10 flex items-center justify-center text-[#1877F2] hover:bg-[#1877F2] hover:text-white transition-all hover:scale-110 shadow-sm"
@@ -62,7 +61,7 @@ const ShareWidget = ({ title, url, image }) => {
       </a>
       
       <a 
-        href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url || window.location.href)}`} 
+        href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(shareUrl || url || window.location.href)}`} 
         target="_blank" 
         rel="noopener noreferrer"
         className="w-10 h-10 rounded-full bg-[#1DA1F2]/10 flex items-center justify-center text-[#1DA1F2] hover:bg-[#1DA1F2] hover:text-white transition-all hover:scale-110 shadow-sm"
@@ -72,7 +71,7 @@ const ShareWidget = ({ title, url, image }) => {
       </a>
 
       <a 
-        href={`https://api.whatsapp.com/send?text=${encodeURIComponent(title + " - " + (url || window.location.href))}`} 
+        href={`https://api.whatsapp.com/send?text=${encodeURIComponent(title + " - " + (shareUrl || url || window.location.href))}`} 
         target="_blank" 
         rel="noopener noreferrer"
         className="w-10 h-10 rounded-full bg-[#25D366]/10 flex items-center justify-center text-[#25D366] hover:bg-[#25D366] hover:text-white transition-all hover:scale-110 shadow-sm"

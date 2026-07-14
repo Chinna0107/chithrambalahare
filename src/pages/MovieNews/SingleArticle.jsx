@@ -289,7 +289,12 @@ const SingleArticle = () => {
             </div>
 
             {/* SHARE BAR */}
-            <ShareWidget title={article.title} url={window.location.href} image={heroImage} />
+            <ShareWidget 
+              title={article.title} 
+              url={window.location.href} 
+              shareUrl={`${window.location.origin}/api/share/article/${article.slug}`}
+              image={heroImage} 
+            />
 
             {/* COMMENTS SECTION */}
             <Comments entityType="article" entityId={article.slug || article.id} />
