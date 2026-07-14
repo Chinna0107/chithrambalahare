@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useArticleBySlug, useArticles } from '../../hooks/useArticles';
 import { Helmet } from 'react-helmet-async';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
@@ -9,7 +9,6 @@ import Sidebar from '../../components/Sidebar';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
-import { getArticleBySlug, getArticles } from '../../services/api';
 import Comments from '../../components/Comments';
 import ShareWidget from '../../components/ShareWidget';
 
@@ -165,16 +164,10 @@ const AlsoRead = ({ articles, exclude }) => {
 const SingleArticle = () => {
   const { slug } = useParams();
 
-  const { data: article, isLoading } = useQuery({
-    queryKey: ['article', slug],
-    queryFn: () => getArticleBySlug(slug),
-  });
+  const { data: article, isLoading } = useArticleBySlug(slug);
 
-  const { data: relatedNews } = useQuery({
-    queryKey: ['relatedNews', article?.category],
-    queryFn: () => getArticles({ category: article?.category, limit: 5 }),
-    enabled: !!article,
-  });
+  const { data: relatedData } = useArticles({ category: article?.category, limit: 5 });
+  const relatedNews = relatedData?.data || [];
 
   useEffect(() => {
     window.scrollTo(0, 0);

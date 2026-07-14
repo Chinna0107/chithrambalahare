@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useReviewBySlug, useReviews } from '../../hooks/useReviews';
 import { Helmet } from 'react-helmet-async';
 import { Star, ChevronLeft, ChevronRight, X, Link as LinkIcon, Share2 } from 'lucide-react';
 import Sidebar from '../../components/Sidebar';
 import 'swiper/css';
-import { getReviewBySlug } from '../../services/api';
+// removed
 import Comments from '../../components/Comments';
 import ShareWidget from '../../components/ShareWidget';
 
@@ -22,10 +22,7 @@ const getYouTubeEmbedUrl = (url) => {
 const SingleReview = () => {
   const { slug } = useParams();
 
-  const { data: review, isLoading } = useQuery({
-    queryKey: ['review', slug],
-    queryFn: () => getReviewBySlug(slug),
-  });
+  const { data: review, isLoading } = useReviewBySlug(slug);
 
   useEffect(() => {
     window.scrollTo(0, 0);

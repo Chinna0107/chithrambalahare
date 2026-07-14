@@ -1,5 +1,19 @@
 import axios from 'axios';
 
+axios.interceptors.request.use((config) => {
+  const token = localStorage.getItem('tolly_employee_token');
+  const adminPasscode = localStorage.getItem('tolly_admin_passcode');
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  } else if (adminPasscode) {
+    config.headers['x-admin-passcode'] = adminPasscode;
+  }
+  return config;
+}, (error) => {
+  return Promise.reject(error);
+});
+
 export const getArticles = async ({ page = 1, limit = 10, category = null, search = '' }) => {
   const response = await axios.get('/api/articles', {
     params: { category, search, page, limit }
@@ -60,6 +74,11 @@ export const getGalleryById = async (id) => {
 export const getTeluguNews = async () => {
   const response = await axios.get('/api/telugu-news');
   return response.data || [];
+};
+
+export const getTeluguNewsBySlug = async (slug) => {
+  const response = await axios.get(`/api/telugu-news/${slug}`);
+  return response.data;
 };
 
 // --- New dynamic API endpoints ---

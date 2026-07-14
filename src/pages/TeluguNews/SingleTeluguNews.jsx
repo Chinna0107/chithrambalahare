@@ -1,26 +1,17 @@
 import { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useTeluguNewsBySlug } from '../../hooks/useTeluguNews';
 import { Helmet } from 'react-helmet-async';
-import axios from 'axios';
 import Sidebar from '../../components/Sidebar';
 import Comments from '../../components/Comments';
 import ShareWidget from '../../components/ShareWidget';
 
 const FALLBACK = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1200&q=80';
 
-const fetchSingleTeluguNews = async (slug) => {
-  const res = await axios.get(`/api/telugu-news/${slug}`);
-  return res.data;
-};
-
 const SingleTeluguNews = () => {
   const { slug } = useParams();
 
-  const { data: article, isLoading } = useQuery({
-    queryKey: ['telugu-news', slug],
-    queryFn: () => fetchSingleTeluguNews(slug),
-  });
+  const { data: article, isLoading } = useTeluguNewsBySlug(slug);
 
   useEffect(() => { window.scrollTo(0, 0); }, [slug]);
 

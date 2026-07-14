@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 import { useOutletContext } from 'react-router-dom';
 import { Plus, Trash2, Edit, Check, X, Loader2, Eye, Calendar as CalendarIcon, FileText, Search } from 'lucide-react';
 import ImageUpload from '../../components/ImageUpload';
 import TipTapEditor from '../../components/Editor/TipTapEditor';
 import SEOFields from '../../components/SEO/SEOFields';
+import { useTeluguNews } from '../../hooks/useTeluguNews';
 
 const emptyForm = {
   slug: '', title: '', excerpt: '', content: '', thumbnail: '',
@@ -32,7 +33,7 @@ const deserializeForForm = (item) => sanitize({
 
 const TeluguNews = () => {
   const { triggerNotification } = useOutletContext();
-  const [list, setList] = useState([]);
+  const { data: list = [], refetch: fetchNews } = useTeluguNews();
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({});
   const [showAdd, setShowAdd] = useState(false);
@@ -42,22 +43,6 @@ const TeluguNews = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
-
-  const token = localStorage.getItem('tolly_employee_token');
-  const headers = token
-    ? { Authorization: `Bearer ${token}` }
-    : { 'x-admin-passcode': localStorage.getItem('tolly_admin_passcode') };
-
-  const fetchNews = async () => {
-    try {
-      const res = await axios.get('/api/telugu-news', { headers });
-      setList(res.data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  useEffect(() => { fetchNews(); }, []);
 
   const filteredList = list.filter(item =>
     item.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -81,7 +66,7 @@ const TeluguNews = () => {
     }
     setIsSaving(true);
     try {
-      await axios.post('/api/telugu-news', serializeForApi(addForm), { headers });
+      await axios.post('/api/telugu-news', serializeForApi(addForm));
       await fetchNews();
       triggerNotification('Telugu News added!');
       setShowAdd(false);
@@ -97,7 +82,7 @@ const TeluguNews = () => {
     if (!window.confirm('Are you sure you want to delete this news?')) return;
     setIsSaving(true);
     try {
-      await axios.delete(`/api/telugu-news/${id}`, { headers });
+      await axios.delete(`/api/telugu-news/${id}`);
       await fetchNews();
       triggerNotification('News deleted!');
     } catch {
@@ -118,7 +103,7 @@ const TeluguNews = () => {
     }
     setIsSaving(true);
     try {
-      await axios.put(`/api/telugu-news/${editingId}`, serializeForApi(editForm), { headers });
+      await axios.put(`/api/telugu-news/${editingId}`, serializeForApi(editForm));
       await fetchNews();
       triggerNotification('News updated!');
       setEditingId(null);

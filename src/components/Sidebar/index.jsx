@@ -1,37 +1,31 @@
-import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { useEffect } from 'react';
-import { getArticles, getReviews, getBoxOfficeTop5, getUpcomingSchedules, getTeluguNews } from '../../services/api';
 import { Calendar, Film, Flame, Star, TrendingUp } from 'lucide-react';
+import { useArticles } from '../../hooks/useArticles';
+import { useReviews } from '../../hooks/useReviews';
+import { useBoxOffice } from '../../hooks/useBoxOffice';
+import { useSchedules } from '../../hooks/useSchedules';
+import { useTeluguNews } from '../../hooks/useTeluguNews';
+import { getBoxOfficeTop5 } from '../../services/api'; // Assuming box office top 5 is not extracted, we'll keep it or move it
+import { useQuery } from '@tanstack/react-query';
 
 const Sidebar = () => {
-  const { data: trendingArticles, refetch: refetchTrending } = useQuery({
-    queryKey: ['trending-articles'],
-    queryFn: () => getArticles({ limit: 50 }),
-    select: (data) => data.data.filter(a => a.tags.includes('Trending')).slice(0, 5), // show top 5 for better layout balance
-  });
+  const { data: articlesData, refetch: refetchTrending } = useArticles({ limit: 50 });
+  const trendingArticles = articlesData?.data?.filter(a => a.tags.includes('Trending')).slice(0, 5);
 
-  const { data: latestReviews, refetch: refetchReviews } = useQuery({
-    queryKey: ['latest-reviews'],
-    queryFn: getReviews,
-    select: (data) => data.slice(0, 4),
-  });
+  const { data: reviewsData, refetch: refetchReviews } = useReviews();
+  const latestReviews = reviewsData?.slice(0, 4);
 
   const { data: top5BoxOffice, refetch: refetchTop5 } = useQuery({
     queryKey: ['sidebar-top5'],
     queryFn: getBoxOfficeTop5,
   });
 
-  const { data: upcomingSchedules, refetch: refetchSchedules } = useQuery({
-    queryKey: ['sidebar-schedules'],
-    queryFn: getUpcomingSchedules,
-  });
+  const { data: upcomingSchedulesData, refetch: refetchSchedules } = useSchedules();
+  const upcomingSchedules = upcomingSchedulesData;
 
-  const { data: teluguNews, refetch: refetchTeluguNews } = useQuery({
-    queryKey: ['sidebar-telugu-news'],
-    queryFn: getTeluguNews,
-    select: (data) => data.slice(0, 5),
-  });
+  const { data: teluguNewsData, refetch: refetchTeluguNews } = useTeluguNews();
+  const teluguNews = teluguNewsData?.slice(0, 5);
 
   // Listen to DB changes for real-time refetching
   useEffect(() => {

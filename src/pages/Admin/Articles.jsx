@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 import { useOutletContext } from 'react-router-dom';
 import { Plus, Trash2, Edit, Check, X, Loader2, Eye, Calendar as CalendarIcon, Clock, Link as LinkIcon, FileText, Search } from 'lucide-react';
 import ImageUpload from '../../components/ImageUpload';
 import TipTapEditor from '../../components/Editor/TipTapEditor';
+import { useArticles } from '../../hooks/useArticles';
 import SEOFields from '../../components/SEO/SEOFields';
 
 const emptyForm = { 

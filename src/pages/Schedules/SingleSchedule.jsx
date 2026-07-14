@@ -1,15 +1,14 @@
 import React, { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
+import { useScheduleBySlug } from '../../hooks/useSchedules';
 import { Helmet } from 'react-helmet-async';
 import { ChevronRight, Calendar, Globe, Tag, Users, Video, Info, ChevronLeft } from 'lucide-react';
 import LoadingSkeleton from '../../components/LoadingSkeleton';
+import Sidebar from '../../components/Sidebar';
+import Comments from '../../components/Comments';
+import ShareWidget from '../../components/ShareWidget';
 
-const fetchSingleSchedule = async (slug) => {
-  const { data } = await axios.get(`/api/schedules/${slug}`);
-  return data;
-};
+const FALLBACK_HERO = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1200&q=80';
 
 const extractYouTubeId = (url) => {
   if (!url) return null;
@@ -24,10 +23,7 @@ const SingleSchedule = () => {
     window.scrollTo(0, 0);
   }, [slug]);
 
-  const { data: movie, isLoading, error } = useQuery({
-    queryKey: ['schedule', slug],
-    queryFn: () => fetchSingleSchedule(slug),
-  });
+  const { data: movie, isLoading, error } = useScheduleBySlug(slug);
 
   if (isLoading) return <LoadingSkeleton type="single" />;
   
