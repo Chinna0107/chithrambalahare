@@ -8,16 +8,17 @@ import router from './routes';
 import ErrorBoundary from './components/ErrorBoundary'; // FIXED: #9
 import './index.css';
 
-// Automatically inject admin passcode in requests
-// Only use sessionStorage (clears on tab/browser close) — never localStorage
-// Also nuke any old localStorage token left from previous insecure version
-localStorage.removeItem('tolly_admin_passcode');
-
+// Automatically inject admin passcode or employee token in requests
 axios.interceptors.request.use((config) => {
-  const passcode = sessionStorage.getItem('tolly_admin_passcode');
+  const passcode = localStorage.getItem('tolly_admin_passcode');
+  const token = localStorage.getItem('tolly_employee_token');
+  
   if (passcode) {
-    config.headers['X-Admin-Passcode'] = passcode;
+    config.headers['x-admin-passcode'] = passcode;
+  } else if (token) {
+    config.headers['Authorization'] = `Bearer ${token}`;
   }
+  
   return config;
 }, (error) => {
   return Promise.reject(error);

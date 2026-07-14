@@ -22,17 +22,13 @@ const ImageUpload = ({ value, onChange, multiple = false, placeholder = "Upload 
         const formData = new FormData();
         files.forEach(file => formData.append('images', file));
         
-        const response = await axios.post(url, formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
+        const response = await axios.post(url, formData);
         uploadedUrls = response.data.files.map(f => f.url);
       } else {
         const formData = new FormData();
         formData.append('image', files[0]);
         
-        const response = await axios.post(url, formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
+        const response = await axios.post(url, formData);
         uploadedUrls = [response.data.url];
       }
 

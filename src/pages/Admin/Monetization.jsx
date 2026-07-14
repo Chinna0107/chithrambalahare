@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { DollarSign, Save, Loader2, Image as ImageIcon, Clock, MousePointer2, Settings2 } from 'lucide-react';
 import axios from 'axios';
+import ImageUpload from '../../components/ImageUpload';
 
 const Monetization = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [notification, setNotification] = useState(null);
+  const [fullData, setFullData] = useState({});
 
   const [popupData, setPopupData] = useState({
     active: false,
@@ -29,11 +31,13 @@ const Monetization = () => {
   const fetchPopupData = async () => {
     try {
       const res = await axios.get('/api/popup-ad');
+      setFullData(res.data);
       
       // Format timestamps for datetime-local inputs
       const formatDT = (isoString) => {
-        if (!isoString) return '';
+        if (!isoString || typeof isoString !== 'string') return '';
         const d = new Date(isoString);
+        if (isNaN(d.getTime())) return '';
         return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
       };
 
@@ -61,9 +65,10 @@ const Monetization = () => {
     setIsSaving(true);
     try {
       const payload = {
+        ...fullData,
         ...popupData,
-        scheduleStart: popupData.scheduleStart ? new Date(popupData.scheduleStart).toISOString() : null,
-        scheduleEnd: popupData.scheduleEnd ? new Date(popupData.scheduleEnd).toISOString() : null,
+        scheduleStart: (popupData.scheduleStart && !isNaN(new Date(popupData.scheduleStart).getTime())) ? new Date(popupData.scheduleStart).toISOString() : null,
+        scheduleEnd: (popupData.scheduleEnd && !isNaN(new Date(popupData.scheduleEnd).getTime())) ? new Date(popupData.scheduleEnd).toISOString() : null,
       };
       await axios.post('/api/popup-ad', payload);
       setNotification({ message: 'Popup Ad settings saved successfully!', type: 'success' });
@@ -174,23 +179,19 @@ const Monetization = () => {
             <div className="space-y-5">
               <div>
                 <label className="block text-sm font-bold text-gray-300 mb-2">Desktop Image URL</label>
-                <input 
-                  type="text" 
+                <ImageUpload 
                   value={popupData.imageDesktop}
-                  onChange={(e) => handleChange('imageDesktop', e.target.value)}
-                  placeholder="https://.../desktop-banner.jpg"
-                  className="w-full bg-black border border-gray-800 rounded-xl px-4 py-2.5 text-white focus:border-brand-red focus:ring-1 focus:ring-brand-red outline-none transition-all"
+                  onChange={(url) => handleChange('imageDesktop', url)}
+                  placeholder="Upload desktop banner..."
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-bold text-gray-300 mb-2">Mobile Image URL</label>
-                <input 
-                  type="text" 
+                <ImageUpload 
                   value={popupData.imageMobile}
-                  onChange={(e) => handleChange('imageMobile', e.target.value)}
-                  placeholder="https://.../mobile-banner.jpg"
-                  className="w-full bg-black border border-gray-800 rounded-xl px-4 py-2.5 text-white focus:border-brand-red focus:ring-1 focus:ring-brand-red outline-none transition-all"
+                  onChange={(url) => handleChange('imageMobile', url)}
+                  placeholder="Upload mobile banner..."
                 />
               </div>
             </div>

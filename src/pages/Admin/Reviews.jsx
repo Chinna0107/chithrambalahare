@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useOutletContext } from 'react-router-dom';
-import { Plus, Trash2, Edit, Check, X, Loader2, Eye, Calendar, Link as LinkIcon, Star, Film } from 'lucide-react';
+import { Plus, Trash2, Edit, Check, X, Loader2, Eye, Calendar, Link as LinkIcon, Star, Film, Search } from 'lucide-react';
 import ImageUpload from '../../components/ImageUpload';
 import TipTapEditor from '../../components/Editor/TipTapEditor';
 import SEOFields from '../../components/SEO/SEOFields';
@@ -28,6 +28,21 @@ const Reviews = () => {
   const [addForm, setAddForm] = useState(emptyForm);
   const [isSaving, setIsSaving] = useState(false);
   const [expandedId, setExpandedId] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
+
+  const filteredList = list.filter(item => 
+    item.movieName?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    item.director?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filteredList.length / ITEMS_PER_PAGE);
+  const paginatedList = filteredList.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
 
   const refreshDb = async () => {
     try {
@@ -247,9 +262,21 @@ const Reviews = () => {
           <h2 className="text-2xl font-poppins font-bold text-white mb-1">Movie Reviews</h2>
           <p className="text-gray-500 text-sm">Manage detailed movie reviews and ratings</p>
         </div>
-        <button onClick={() => setShowAdd(v => !v)} className="flex items-center gap-2 bg-brand-red hover:bg-red-600 text-white font-bold px-4 py-2 rounded-xl text-sm transition-all shadow-lg shadow-brand-red/20">
-          <Plus className="w-4 h-4" /> New Review
-        </button>
+        <div className="flex items-center gap-4">
+          <div className="relative">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input 
+              type="text" 
+              placeholder="Search reviews..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 pr-4 py-2 bg-[#18181B] border border-gray-800 rounded-xl text-sm text-white focus:outline-none focus:border-brand-red transition-all w-64"
+            />
+          </div>
+          <button onClick={() => setShowAdd(v => !v)} className="flex items-center gap-2 bg-brand-red hover:bg-red-600 text-white font-bold px-4 py-2 rounded-xl text-sm transition-all shadow-lg shadow-brand-red/20">
+            <Plus className="w-4 h-4" /> New Review
+          </button>
+        </div>
       </div>
 
       {showAdd && (
@@ -271,8 +298,8 @@ const Reviews = () => {
       )}
 
       <div className="space-y-3">
-        {list.length === 0 && <div className="text-center py-16 text-gray-600">No reviews yet.</div>}
-        {list.map(item => (
+        {paginatedList.length === 0 && <div className="text-center py-16 text-gray-600">No reviews yet.</div>}
+        {paginatedList.map(item => (
           <div key={item.id} className="bg-[#18181B] border border-gray-800 rounded-2xl p-5 hover:border-gray-700 transition-colors">
             {editingId === item.id ? (
               <div className="space-y-6">
@@ -346,6 +373,25 @@ const Reviews = () => {
             )}
           </div>
         ))}
+        {totalPages > 1 && (
+          <div className="flex justify-between items-center mt-6 bg-[#18181B] border border-gray-800 rounded-2xl p-4">
+            <button 
+              disabled={currentPage === 1} 
+              onClick={() => setCurrentPage(p => p - 1)}
+              className="px-4 py-2 bg-gray-800 text-white rounded-lg text-sm disabled:opacity-50 hover:bg-gray-700 transition-colors"
+            >
+              Previous
+            </button>
+            <span className="text-gray-400 text-sm font-medium">Page {currentPage} of {totalPages}</span>
+            <button 
+              disabled={currentPage === totalPages} 
+              onClick={() => setCurrentPage(p => p + 1)}
+              className="px-4 py-2 bg-gray-800 text-white rounded-lg text-sm disabled:opacity-50 hover:bg-gray-700 transition-colors"
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

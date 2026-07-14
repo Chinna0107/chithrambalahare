@@ -35,6 +35,8 @@ const AdminMonetization = lazy(() => import('../pages/Admin/Monetization'));
 const AdminComments = lazy(() => import('../pages/Admin/Comments'));
 const AdminSettings = lazy(() => import('../pages/Admin/Settings'));
 const AdminMedia = lazy(() => import('../pages/Admin/Media'));
+const AdminTeluguNews = lazy(() => import('../pages/Admin/TeluguNews'));
+const AdminEmployees = lazy(() => import('../pages/Admin/Employees'));
 const Gallery = lazy(() => import('../pages/Gallery'));
 const NotFound = lazy(() => import('../pages/NotFound'));
 const Advertise = lazy(() => import('../pages/Advertise'));
@@ -170,7 +172,9 @@ const router = createBrowserRouter([
           { path: 'monetization', element: <SuspenseWrapper><AdminMonetization /></SuspenseWrapper> },
           { path: 'comments', element: <SuspenseWrapper><AdminComments /></SuspenseWrapper> },
           { path: 'settings', element: <SuspenseWrapper><AdminSettings /></SuspenseWrapper> },
-          { path: 'media', element: <SuspenseWrapper><AdminMedia /></SuspenseWrapper> }
+          { path: 'media', element: <SuspenseWrapper><AdminMedia /></SuspenseWrapper> },
+          { path: 'telugu-news', element: <SuspenseWrapper><AdminTeluguNews /></SuspenseWrapper> },
+          { path: 'employees', element: <SuspenseWrapper><AdminEmployees /></SuspenseWrapper> }
         ]
       },
       {

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useOutletContext } from 'react-router-dom';
 import { Save, Loader2, Plus, Trash2 } from 'lucide-react';
@@ -17,6 +17,21 @@ const PopupAd = () => {
     carouselItems: dbData.popupAd?.carouselItems ?? []
   });
   const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (dbData.popupAd) {
+      setForm(prev => ({
+        ...prev,
+        active: dbData.popupAd.active ?? false,
+        closeTimer: dbData.popupAd.closeTimer ?? 5,
+        autoClose: dbData.popupAd.autoClose ?? false,
+        imageUrl: dbData.popupAd.imageUrl ?? '',
+        redirectUrl: dbData.popupAd.redirectUrl ?? '',
+        buttonText: dbData.popupAd.buttonText ?? '',
+        carouselItems: dbData.popupAd.carouselItems ?? []
+      }));
+    }
+  }, [dbData.popupAd]);
 
   const handleChange = (field, value) => setForm(f => ({ ...f, [field]: value }));
 
@@ -38,8 +53,9 @@ const PopupAd = () => {
     e.preventDefault();
     setIsSaving(true);
     try {
-      await axios.post('/api/popup-ad', form);
-      setDbData(d => ({ ...d, popupAd: form }));
+      const payload = { ...dbData.popupAd, ...form };
+      await axios.post('/api/popup-ad', payload);
+      setDbData(d => ({ ...d, popupAd: payload }));
       window.dispatchEvent(new Event('tolly_db_change'));
       triggerNotification('Popup ad settings saved!');
     } catch {

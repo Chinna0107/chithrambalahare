@@ -57,6 +57,11 @@ export const getGalleryById = async (id) => {
   return gallery;
 };
 
+export const getTeluguNews = async () => {
+  const response = await axios.get('/api/telugu-news');
+  return response.data || [];
+};
+
 // --- New dynamic API endpoints ---
 
 export const getPopupAd = async () => {

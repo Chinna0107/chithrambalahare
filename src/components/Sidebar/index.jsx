@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { useEffect } from 'react';
-import { getArticles, getReviews, getBoxOfficeTop5, getUpcomingSchedules } from '../../services/api';
+import { getArticles, getReviews, getBoxOfficeTop5, getUpcomingSchedules, getTeluguNews } from '../../services/api';
 import { Calendar, Film, Flame, Star, TrendingUp } from 'lucide-react';
 
 const Sidebar = () => {
@@ -27,6 +27,12 @@ const Sidebar = () => {
     queryFn: getUpcomingSchedules,
   });
 
+  const { data: teluguNews, refetch: refetchTeluguNews } = useQuery({
+    queryKey: ['sidebar-telugu-news'],
+    queryFn: getTeluguNews,
+    select: (data) => data.slice(0, 5),
+  });
+
   // Listen to DB changes for real-time refetching
   useEffect(() => {
     const handleDbChange = () => {
@@ -34,10 +40,11 @@ const Sidebar = () => {
       refetchReviews();
       refetchTop5();
       refetchSchedules();
+      refetchTeluguNews();
     };
     window.addEventListener('tolly_db_change', handleDbChange);
     return () => window.removeEventListener('tolly_db_change', handleDbChange);
-  }, [refetchTrending, refetchReviews, refetchTop5, refetchSchedules]);
+  }, [refetchTrending, refetchReviews, refetchTop5, refetchSchedules, refetchTeluguNews]);
 
   const popularTags = ['Tollywood', 'Box Office', 'Reviews', 'Interviews', 'Gossips', 'OTT'];
 
@@ -70,25 +77,22 @@ const Sidebar = () => {
   return (
     <aside className="w-full space-y-8 pb-4">
       {/* Telugu News */}
-      <div className="sw">
-        <div className="sw-hdr">
-          <div className="sw-title">Telugu News</div>
+      {teluguNews && teluguNews.length > 0 && (
+        <div className="sw">
+          <div className="sw-hdr">
+            <div className="sw-title">Telugu News</div>
+          </div>
+          {teluguNews.map((news, idx) => (
+            <Link to={`/telugu-news/${news.slug || news.id}`} key={news.id} className="pop-item">
+              <div className="pop-num">{idx + 1}</div>
+              <div>
+                <div className="pop-text">{news.title}</div>
+                <div className="pop-meta">{new Date(news.date || new Date()).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+              </div>
+            </Link>
+          ))}
         </div>
-        <Link to="#" className="pop-item">
-          <div className="pop-num">1</div>
-          <div>
-            <div className="pop-text">Chiranjeevi & Venkatesh Rumors: Films Not Postponed</div>
-            <div className="pop-meta">6/18/2026</div>
-          </div>
-        </Link>
-        <Link to="#" className="pop-item">
-          <div className="pop-num">2</div>
-          <div>
-            <div className="pop-text">Dhurandhar Unedited Version Streams on Netflix June 19</div>
-            <div className="pop-meta">6/18/2026</div>
-          </div>
-        </Link>
-      </div>
+      )}
 
       {/* Trending Posts */}
       {trendingArticles && trendingArticles.length > 0 && (

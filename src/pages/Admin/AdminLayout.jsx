@@ -4,14 +4,18 @@ import axios from 'axios';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { 
   Settings, Tv, Globe, Calendar, TrendingUp, RotateCcw, AlertTriangle, Loader2, X, Check, Image as ImageIcon,
-  Tags, LayoutTemplate, DollarSign, MessageSquare
+  Tags, LayoutTemplate, DollarSign, MessageSquare, FileText, Users
 } from 'lucide-react';
 
 const AdminLayout = () => {
   const [dbData, setDbData] = useState(null);
   const [notification, setNotification] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [loginMode, setLoginMode] = useState('admin'); // 'admin' or 'employee'
   const [passcode, setPasscode] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -30,19 +34,30 @@ const AdminLayout = () => {
   // Run auth check ONCE on mount
   useEffect(() => {
     const checkAuth = async () => {
-      const storedCode = sessionStorage.getItem('tolly_admin_passcode');
-      if (!storedCode) {
+      const adminCode = localStorage.getItem('tolly_admin_passcode');
+      const empToken = localStorage.getItem('tolly_employee_token');
+      
+      if (!adminCode && !empToken) {
         setIsAuthenticated(false);
         setIsLoading(false);
         return;
       }
+      
       try {
-        const data = await loadDb();
-        setDbData(data);
+        if (adminCode) {
+          const data = await loadDb();
+          setDbData(data);
+          setIsAdmin(true);
+        } else if (empToken) {
+          const data = await loadDb();
+          setDbData(data);
+          setIsAdmin(false);
+        }
         setIsAuthenticated(true);
       } catch (err) {
         if (err.response?.status === 401) {
-          sessionStorage.removeItem('tolly_admin_passcode');
+          localStorage.removeItem('tolly_admin_passcode');
+          localStorage.removeItem('tolly_employee_token');
         }
         setIsAuthenticated(false);
       } finally {
@@ -51,6 +66,22 @@ const AdminLayout = () => {
     };
     checkAuth();
   }, [loadDb]);
+
+  // Keep dbData fresh across all admin pages
+  useEffect(() => {
+    const handleDbChange = async () => {
+      try {
+        if (isAuthenticated) {
+          const data = await loadDb();
+          setDbData(data);
+        }
+      } catch (e) {
+        console.error('Failed to reload db on change', e);
+      }
+    };
+    window.addEventListener('tolly_db_change', handleDbChange);
+    return () => window.removeEventListener('tolly_db_change', handleDbChange);
+  }, [isAuthenticated, loadDb]);
 
   // Redirect to /admin/overview after authentication
   useEffect(() => {
@@ -61,28 +92,47 @@ const AdminLayout = () => {
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    if (!passcode.trim()) return;
     setIsSubmitting(true);
     setAuthError('');
-    sessionStorage.setItem('tolly_admin_passcode', passcode);
+    
     try {
-      const data = await loadDb();
-      setDbData(data);
+      if (loginMode === 'admin') {
+        if (!passcode.trim()) return;
+        localStorage.setItem('tolly_admin_passcode', passcode);
+        localStorage.removeItem('tolly_employee_token');
+        const data = await loadDb();
+        setDbData(data);
+        setIsAdmin(true);
+      } else {
+        if (!username.trim() || !password.trim()) return;
+        const res = await axios.post('/api/employees/login', { username, password });
+        localStorage.setItem('tolly_employee_token', res.data.token);
+        localStorage.removeItem('tolly_admin_passcode');
+        const data = await loadDb();
+        setDbData(data);
+        setIsAdmin(false);
+      }
+      
       setIsAuthenticated(true);
       navigate('/admin/overview', { replace: true });
     } catch (err) {
-      setAuthError('Invalid passcode. Access Denied.');
-      sessionStorage.removeItem('tolly_admin_passcode');
+      setAuthError(loginMode === 'admin' ? 'Invalid passcode. Access Denied.' : 'Invalid username or password.');
+      localStorage.removeItem('tolly_admin_passcode');
+      localStorage.removeItem('tolly_employee_token');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleLogout = () => {
-    sessionStorage.removeItem('tolly_admin_passcode');
+    localStorage.removeItem('tolly_admin_passcode');
+    localStorage.removeItem('tolly_employee_token');
     setIsAuthenticated(false);
+    setIsAdmin(false);
     setDbData(null);
     setPasscode('');
+    setUsername('');
+    setPassword('');
     navigate('/admin', { replace: true });
   };
 
@@ -124,18 +174,59 @@ const AdminLayout = () => {
             <p className="text-gray-400 text-sm">Enter your passcode to access the database management dashboard.</p>
           </div>
 
+          <div className="flex justify-center mb-6 gap-4 border-b border-gray-800 pb-2">
+            <button
+              onClick={() => setLoginMode('admin')}
+              className={`pb-2 px-2 text-sm font-bold transition-colors ${loginMode === 'admin' ? 'text-brand-red border-b-2 border-brand-red' : 'text-gray-500 hover:text-white'}`}
+            >
+              Admin
+            </button>
+            <button
+              onClick={() => setLoginMode('employee')}
+              className={`pb-2 px-2 text-sm font-bold transition-colors ${loginMode === 'employee' ? 'text-brand-red border-b-2 border-brand-red' : 'text-gray-500 hover:text-white'}`}
+            >
+              Employee
+            </button>
+          </div>
+
           <form onSubmit={handleLoginSubmit} className="space-y-6">
-            <div>
-              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Passcode</label>
-              <input
-                type="password"
-                value={passcode}
-                onChange={(e) => setPasscode(e.target.value)}
-                className="w-full bg-black/50 border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red transition-all"
-                placeholder="••••••••"
-                autoFocus
-              />
-            </div>
+            {loginMode === 'admin' ? (
+              <div>
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Passcode</label>
+                <input
+                  type="password"
+                  value={passcode}
+                  onChange={(e) => setPasscode(e.target.value)}
+                  className="w-full bg-black/50 border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red transition-all"
+                  placeholder="••••••••"
+                  autoFocus
+                />
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Username</label>
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="w-full bg-black/50 border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red transition-all"
+                    placeholder="Username"
+                    autoFocus
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Password</label>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full bg-black/50 border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red transition-all"
+                    placeholder="••••••••"
+                  />
+                </div>
+              </div>
+            )}
             
             {authError && (
               <div className="bg-red-500/10 border border-red-500/50 text-red-500 text-sm p-3 rounded-lg flex items-center gap-2">
@@ -160,26 +251,23 @@ const AdminLayout = () => {
   if (!dbData) return <div className="min-h-screen bg-brand-bg flex items-center justify-center text-white"><Loader2 className="w-8 h-8 animate-spin text-brand-red" /></div>;
 
   const tabs = [
-    { id: 'overview', icon: <TrendingUp className="w-5 h-5" />, label: 'Dashboard Overview' },
-    { id: 'north-america', icon: <Globe className="w-5 h-5" />, label: 'North America' },
-    { id: 'schedules', icon: <Calendar className="w-5 h-5" />, label: 'Schedules' },
-    { id: 'top5', icon: <TrendingUp className="w-5 h-5" />, label: 'Box Office Top 5' },
-    { id: 'box-office', icon: <Globe className="w-5 h-5" />, label: 'Box Office Detail' },
-    { id: 'articles', icon: <Tv className="w-5 h-5" />, label: 'Articles' },
-    { id: 'reviews', icon: <Settings className="w-5 h-5" />, label: 'Reviews' },
-    { id: 'galleries', icon: <ImageIcon className="w-5 h-5" />, label: 'Galleries' },
-    // { id: 'media', icon: <ImageIcon className="w-5 h-5" />, label: 'Media Library' },
-    // { id: 'taxonomy', icon: <Tags className="w-5 h-5" />, label: 'Categories & Tags' },
-    // { id: 'landing-page', icon: <LayoutTemplate className="w-5 h-5" />, label: 'Landing Page' },
-    { id: 'monetization', icon: <DollarSign className="w-5 h-5" />, label: 'Ad & Monetization' },
-    { id: 'popup', icon: <Globe className="w-5 h-5" />, label: 'Popup Ad Settings' },
-    // { id: 'comments', icon: <MessageSquare className="w-5 h-5" />, label: 'Comments' },
-    // { id: 'settings', icon: <Settings className="w-5 h-5" />, label: 'Global Settings' }
-  ];
+    { id: 'overview', icon: <TrendingUp className="w-5 h-5" />, label: 'Dashboard Overview', adminOnly: false },
+    { id: 'north-america', icon: <Globe className="w-5 h-5" />, label: 'North America', adminOnly: false },
+    { id: 'schedules', icon: <Calendar className="w-5 h-5" />, label: 'Schedules', adminOnly: true },
+    { id: 'top5', icon: <TrendingUp className="w-5 h-5" />, label: 'Box Office Top 5', adminOnly: true },
+    { id: 'box-office', icon: <Globe className="w-5 h-5" />, label: 'Box Office Detail', adminOnly: false },
+    { id: 'articles', icon: <Tv className="w-5 h-5" />, label: 'Articles', adminOnly: false },
+    { id: 'reviews', icon: <Settings className="w-5 h-5" />, label: 'Reviews', adminOnly: false },
+    { id: 'galleries', icon: <ImageIcon className="w-5 h-5" />, label: 'Galleries', adminOnly: false },
+    { id: 'telugu-news', icon: <FileText className="w-5 h-5" />, label: 'Telugu News', adminOnly: false },
+    { id: 'employees', icon: <Users className="w-5 h-5" />, label: 'Employees', adminOnly: true },
+    { id: 'monetization', icon: <DollarSign className="w-5 h-5" />, label: 'Ad & Monetization', adminOnly: true },
+    { id: 'popup', icon: <Globe className="w-5 h-5" />, label: 'Popup Ad Settings', adminOnly: true },
+  ].filter(tab => isAdmin || !tab.adminOnly);
 
   return (
     <div className="min-h-screen bg-[#09090b] text-gray-200">
-      <Helmet><title>Admin Dashboard - Tolly</title></Helmet>
+      <Helmet><title>{isAdmin ? 'Admin' : 'Employee'} Dashboard - Tolly</title></Helmet>
 
       {/* Top Navigation Bar */}
       <div className="sticky top-0 z-50 bg-[#09090b]/80 backdrop-blur-md border-b border-gray-800">
@@ -188,7 +276,7 @@ const AdminLayout = () => {
             <div className="w-8 h-8 bg-brand-red rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-brand-red/20">
               T
             </div>
-            <h1 className="text-xl font-poppins font-bold text-white tracking-tight">Admin Dashboard</h1>
+            <h1 className="text-xl font-poppins font-bold text-white tracking-tight">{isAdmin ? 'Admin' : 'Employee'} Dashboard</h1>
             <span className="bg-green-500/10 text-green-500 border border-green-500/20 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ml-2">
               Live
             </span>

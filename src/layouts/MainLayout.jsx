@@ -6,6 +6,7 @@ import Footer from '../components/Footer';
 import ScrollToTop from '../components/ScrollToTop';
 import FlashNews from '../components/FlashNews';
 import PopupAdModal from '../components/PopupAdModal';
+import MonetizationModal from '../components/MonetizationModal';
 
 const MainLayout = () => {
   const location = useLocation();
@@ -28,7 +29,9 @@ const MainLayout = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-brand-light text-gray-100 font-inter">
-      {location.pathname === '/' && <PopupAdModal />}
+      {/* Render both Modals */}
+      <PopupAdModal />
+      <MonetizationModal />
       <FlashNews />
       <ScrollToTop />
       <Header />

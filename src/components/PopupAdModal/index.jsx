@@ -18,9 +18,17 @@ const PopupAdModal = ({ forceShow = false }) => {
   const [timerCount, setTimerCount] = useState(0);
   const [currentImageIdx, setCurrentImageIdx] = useState(0);
 
-  const carouselItems = adData?.carouselItems?.length > 0 
-    ? adData.carouselItems 
-    : [];
+  let carouselItems = [];
+  if (adData?.carouselItems?.length > 0) {
+    carouselItems = adData.carouselItems;
+  } else if (adData?.imageDesktop || adData?.imageMobile) {
+    const isMobile = window.innerWidth <= 768;
+    carouselItems = [{
+      imageUrl: (isMobile && adData.imageMobile) ? adData.imageMobile : (adData.imageDesktop || adData.imageMobile),
+      redirectUrl: adData.redirectUrl,
+      timer: adData.closeTimer || 5
+    }];
+  }
 
   const currentItem = carouselItems[currentImageIdx];
 
@@ -29,10 +37,10 @@ const PopupAdModal = ({ forceShow = false }) => {
     if (!forceShow && adData?.displayRule === 'once_per_user') {
       localStorage.setItem('tolly_ad_dismissed', 'true');
     }
-    if (!forceShow) {
+    if (!forceShow && location.pathname === '/') {
       navigate('/main');
     }
-  }, [forceShow, adData?.displayRule, navigate]);
+  }, [forceShow, adData?.displayRule, navigate, location.pathname]);
 
   const handleSkip = () => {
     if (currentImageIdx < carouselItems.length - 1) {
@@ -97,9 +105,13 @@ const PopupAdModal = ({ forceShow = false }) => {
         return;
       }
     }
+    // We only show the popup automatically on /main or /
+    if (location.pathname !== '/' && location.pathname !== '/main') {
+      return;
+    }
 
-    // Process Delay
-    const delayMs = forceShow ? 0 : (adData.displayDelay || 0) * 1000;
+    // Internal Carousel Popup has no delay.
+    const delayMs = 0;
     
     const delayTimer = setTimeout(() => {
       setIsOpen(true);

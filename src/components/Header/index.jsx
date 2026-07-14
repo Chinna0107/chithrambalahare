@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { FaSearch, FaBars, FaFilm } from 'react-icons/fa';
 import logoImg from '../../assets/cb1.png';
 
 const Header = () => {
@@ -14,8 +15,8 @@ const Header = () => {
           <div>Chitram<span>Bhalare</span></div>
         </Link>
         <div className="h-right">
-          <button className="sbtn" onClick={() => navigate('/search')}>🔍</button>
-          <button className="ham" onClick={() => setIsMenuOpen(!isMenuOpen)}>☰</button>
+          <button className="sbtn" onClick={() => navigate('/search')}><FaSearch /></button>
+          <button className="ham" onClick={() => setIsMenuOpen(!isMenuOpen)}><FaBars /></button>
           <nav id="nav" className={`nav-drawer ${isMenuOpen ? 'open' : ''}`}>
             <NavLink 
               to="/main" 
@@ -74,9 +75,10 @@ const Header = () => {
             <NavLink 
               to="/live-tracking" 
               className="nav-hot-m" 
+              style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
               onClick={() => setIsMenuOpen(false)}
             >
-              🎬 Live Tracking
+              <FaFilm /> Live Tracking
             </NavLink>
           </nav>
         </div>
