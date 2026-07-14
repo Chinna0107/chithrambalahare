@@ -120,7 +120,7 @@ const NorthAmerica = () => {
                           const generatedSlug = val.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
                           if (isNew && (!f.slug || f.slug === (f.movieName ? f.movieName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') : ''))) {
                             newState.slug = generatedSlug;
-                            newState.canonicalUrl = `https://chitrambhalare.com/${generatedSlug}`;
+                            newState.canonicalUrl = `https://chitrambhalare.in/${generatedSlug}`;
                           }
                         }
                         return newState;

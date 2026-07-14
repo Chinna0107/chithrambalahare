@@ -5,8 +5,14 @@ const ShareWidget = ({ title, url, image, shareUrl }) => {
   const [copied, setCopied] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
 
+  // Use the backend share URL (with OG tags) for social platforms
+  // Fall back to article URL, then current page
+  const PROD_SHARE_URL = shareUrl || url || window.location.href;
+  // For copy-to-clipboard, use the article URL directly
+  const ARTICLE_URL = url || window.location.href;
+
   const handleCopy = () => {
-    navigator.clipboard.writeText(shareUrl || url || window.location.href);
+    navigator.clipboard.writeText(ARTICLE_URL);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -15,27 +21,12 @@ const ShareWidget = ({ title, url, image, shareUrl }) => {
     try {
       if (navigator.share) {
         setIsSharing(true);
-        const shareUrl = url || window.location.href;
-        let shareData = {
+        await navigator.share({
           title: title,
-          text: title + '\n' + shareUrl,
-          url: shareUrl
-        };
-
-        if (image) {
-          try {
-            const response = await fetch(image);
-            const blob = await response.blob();
-            const file = new File([blob], 'share-image.jpg', { type: blob.type || 'image/jpeg' });
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-              shareData.files = [file];
-            }
-          } catch (e) {
-            console.error('Failed to attach image to share', e);
-          }
-        }
-
-        await navigator.share(shareData);
+          text: title,
+          // Use the backend share URL so WhatsApp/etc scrapes OG image+title
+          url: PROD_SHARE_URL
+        });
       }
     } catch (err) {
       console.log('Error sharing:', err);
@@ -51,7 +42,7 @@ const ShareWidget = ({ title, url, image, shareUrl }) => {
       </div>
       
       <a 
-        href={`https://facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl || url || window.location.href)}`} 
+        href={`https://facebook.com/sharer/sharer.php?u=${encodeURIComponent(PROD_SHARE_URL)}`} 
         target="_blank" 
         rel="noopener noreferrer"
         className="w-10 h-10 rounded-full bg-[#1877F2]/10 flex items-center justify-center text-[#1877F2] hover:bg-[#1877F2] hover:text-white transition-all hover:scale-110 shadow-sm"
@@ -61,7 +52,7 @@ const ShareWidget = ({ title, url, image, shareUrl }) => {
       </a>
       
       <a 
-        href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(shareUrl || url || window.location.href)}`} 
+        href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(PROD_SHARE_URL)}`} 
         target="_blank" 
         rel="noopener noreferrer"
         className="w-10 h-10 rounded-full bg-[#1DA1F2]/10 flex items-center justify-center text-[#1DA1F2] hover:bg-[#1DA1F2] hover:text-white transition-all hover:scale-110 shadow-sm"
@@ -71,7 +62,7 @@ const ShareWidget = ({ title, url, image, shareUrl }) => {
       </a>
 
       <a 
-        href={`https://api.whatsapp.com/send?text=${encodeURIComponent(title + " - " + (shareUrl || url || window.location.href))}`} 
+        href={`https://api.whatsapp.com/send?text=${encodeURIComponent(title + "\n" + PROD_SHARE_URL)}`} 
         target="_blank" 
         rel="noopener noreferrer"
         className="w-10 h-10 rounded-full bg-[#25D366]/10 flex items-center justify-center text-[#25D366] hover:bg-[#25D366] hover:text-white transition-all hover:scale-110 shadow-sm"

@@ -38,6 +38,8 @@ const AdminMedia = lazy(() => import('../pages/Admin/Media'));
 const AdminTeluguNews = lazy(() => import('../pages/Admin/TeluguNews'));
 const AdminEmployees = lazy(() => import('../pages/Admin/Employees'));
 const Gallery = lazy(() => import('../pages/Gallery'));
+const TeluguNews = lazy(() => import('../pages/TeluguNews'));
+const SingleTeluguNews = lazy(() => import('../pages/TeluguNews/SingleTeluguNews'));
 const NotFound = lazy(() => import('../pages/NotFound'));
 const Advertise = lazy(() => import('../pages/Advertise'));
 const Policy = lazy(() => import('../pages/Policy'));
@@ -139,6 +141,19 @@ const router = createBrowserRouter([
       {
         path: 'search',
         element: <SuspenseWrapper><Search /></SuspenseWrapper>,
+      },
+      {
+        path: 'telugu-news',
+        children: [
+          {
+            index: true,
+            element: <SuspenseWrapper><TeluguNews /></SuspenseWrapper>,
+          },
+          {
+            path: ':slug',
+            element: <SuspenseWrapper><SingleTeluguNews /></SuspenseWrapper>,
+          },
+        ]
       },
       {
         path: 'galleries',

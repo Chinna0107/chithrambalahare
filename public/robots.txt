@@ -4,4 +4,4 @@ Allow: /
 Disallow: /admin
 Disallow: /api/
 
-Sitemap: https://chitrambhalare.com/sitemap.xml
+Sitemap: https://chitrambhalare.in/sitemap.xml

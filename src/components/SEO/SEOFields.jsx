@@ -53,7 +53,7 @@ const SEOFields = ({ values = {}, onChange, showAdvanced = true }) => {
                 {values.seoTitle || values.title || 'Page Title'}
               </p>
               <p className="text-green-600 text-xs truncate">
-                {values.canonicalUrl || values.slug ? `chitrambhalare.com/${values.slug || ''}` : 'chitrambhalare.com'}
+                {values.canonicalUrl || values.slug ? `chitrambhalare.in/${values.slug || ''}` : 'chitrambhalare.in'}
               </p>
               <p className="text-gray-400 text-xs line-clamp-2">
                 {values.metaDescription || 'Add a meta description to improve click-through rates from search results.'}
@@ -114,7 +114,7 @@ const SEOFields = ({ values = {}, onChange, showAdvanced = true }) => {
           <div>
             <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Slug</label>
             <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-600 whitespace-nowrap">chitrambhalare.com/</span>
+              <span className="text-xs text-gray-600 whitespace-nowrap">chitrambhalare.in/</span>
               <input
                 type="text" value={values.slug || ''} onChange={e => update('slug', e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-'))}
                 placeholder="url-friendly-slug"
@@ -128,7 +128,7 @@ const SEOFields = ({ values = {}, onChange, showAdvanced = true }) => {
             <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Canonical URL</label>
             <input
               type="url" value={values.canonicalUrl || ''} onChange={e => update('canonicalUrl', e.target.value)}
-              placeholder="https://chitrambhalare.com/your-page"
+              placeholder="https://chitrambhalare.in/your-page"
               className="w-full bg-black/50 border border-gray-800 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-brand-red transition-colors"
             />
           </div>

@@ -145,6 +145,22 @@ const ImageStrip = ({ images }) => {
   );
 };
 
+// ── Also Read Banner ────────────────────────────────────────────────────────────
+const AlsoRead = ({ articles, exclude }) => {
+  if (!articles || articles.length === 0) return null;
+  const picks = articles.filter(a => a.id !== exclude?.id);
+  if (picks.length === 0) return null;
+  const pick = picks[Math.floor(Math.random() * picks.length)];
+  return (
+    <div className="also-read-banner">
+      <Link to={`/movie-news/${pick.slug}`} className="also-read-link">
+        <span className="also-read-label">Also Read -&nbsp;</span>
+        <span className="also-read-title">{pick.title}</span>
+      </Link>
+    </div>
+  );
+};
+
 // ── Main Component ────────────────────────────────────────────────────────────
 const SingleArticle = () => {
   const { slug } = useParams();
@@ -278,8 +294,55 @@ const SingleArticle = () => {
             )}
 
 
-            {/* BODY CONTENT */}
-            <div className="art-body prose prose-invert max-w-none" id="artBody" dangerouslySetInnerHTML={{ __html: typeof article.content === 'string' ? article.content : '' }} />
+            {/* BODY CONTENT — split after first paragraph to inject Also Read */}
+            {(() => {
+              let html = typeof article.content === 'string' ? article.content : '';
+              
+              // Wrap tables for responsiveness
+              html = html.replace(/<table/g, '<div class="table-responsive" style="width: 100%; overflow-x: auto; margin: 24px 0;"><table style="width: 100%; min-width: 600px; border-collapse: collapse;"')
+                         .replace(/<\/table>/g, '</table></div>');
+                         
+              let splitIdx = -1;
+              let searchIdx = 0;
+              while (true) {
+                const pIdx = html.indexOf('</p>', searchIdx);
+                if (pIdx === -1) {
+                  // No </p> found outside table, just split at the end of the first table if it exists
+                  const tEnd = html.indexOf('</table></div>');
+                  splitIdx = tEnd !== -1 ? tEnd + 14 : -1;
+                  break;
+                }
+                const lastTableStart = html.lastIndexOf('<div class="table-responsive"', pIdx);
+                const lastTableEnd = html.lastIndexOf('</table></div>', pIdx);
+                
+                if (lastTableStart !== -1 && (lastTableEnd === -1 || lastTableEnd < lastTableStart)) {
+                  // We are inside a table, move search to end of this table
+                  const nextTableEnd = html.indexOf('</table></div>', pIdx);
+                  if (nextTableEnd !== -1) {
+                    searchIdx = nextTableEnd + 14;
+                    continue;
+                  }
+                }
+                splitIdx = pIdx + 4;
+                break;
+              }
+
+              if (splitIdx === -1 || !relatedNews?.data?.length) {
+                return <div className="art-body prose prose-invert max-w-none" id="artBody" dangerouslySetInnerHTML={{ __html: html }} />;
+              }
+              const firstPart = html.slice(0, splitIdx);
+              const restPart = html.slice(splitIdx);
+              return (
+                <>
+                  <div className="art-body prose prose-invert max-w-none" id="artBody" dangerouslySetInnerHTML={{ __html: firstPart }} />
+                  <AlsoRead articles={relatedNews?.data} exclude={article} />
+                  <div className="art-body prose prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: restPart }} />
+                </>
+              );
+            })()}
+
+            {/* ALSO READ — bottom banner */}
+            <AlsoRead articles={relatedNews?.data} exclude={article} />
 
             {/* TAGS */}
             <div className="art-tags">
@@ -291,8 +354,8 @@ const SingleArticle = () => {
             {/* SHARE BAR */}
             <ShareWidget 
               title={article.title} 
-              url={window.location.href} 
-              shareUrl={`${window.location.origin}/api/share/article/${article.slug}`}
+              url={`https://chitrambhalare.in/movie-news/${article.slug}`}
+              shareUrl={`https://chitrambhalare.in/api/share/article/${article.slug}`}
               image={heroImage} 
             />
 

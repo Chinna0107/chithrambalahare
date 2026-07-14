@@ -35,6 +35,14 @@ const Header = () => {
               Movie News
             </NavLink>
             <NavLink 
+              to="/telugu-news" 
+              end 
+              className={({ isActive }) => isActive ? 'act' : ''} 
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Telugu News
+            </NavLink>
+            <NavLink 
               to="/box-office" 
               end 
               className={({ isActive }) => isActive ? 'act' : ''} 

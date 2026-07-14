@@ -165,7 +165,7 @@ const Reviews = () => {
                         const generatedSlug = val.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
                         if (isNew && (!f.slug || f.slug === (f.movieName ? f.movieName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') : ''))) {
                           newState.slug = generatedSlug;
-                          newState.canonicalUrl = `https://chitrambhalare.com/${generatedSlug}`;
+                          newState.canonicalUrl = `https://chitrambhalare.in/${generatedSlug}`;
                         }
                       }
                       return newState;
@@ -341,7 +341,7 @@ const Reviews = () => {
                       {item.director && <span className="text-xs text-gray-400 flex items-center gap-1">Dir: {item.director}</span>}
                       {item.date && <span className="text-xs text-gray-400 flex items-center gap-1"><Calendar className="w-3 h-3" />{String(item.date).split('T')[0]}</span>}
                       {item.slug && (
-                        <a href={`https://chitrambhalare.com/${item.slug}`} target="_blank" rel="noreferrer" className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors">
+                        <a href={`https://chitrambhalare.in/${item.slug}`} target="_blank" rel="noreferrer" className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors">
                           <LinkIcon className="w-3 h-3" /> /{item.slug}
                         </a>
                       )}

@@ -82,8 +82,8 @@ const Contact = () => {
                     chitrambhalare1984@gmail.com
                   </a>
                   <br />
-                  {/* <a href="mailto:press@chitrambhalare.com" className="text-gray-400 hover:text-brand-red transition-colors text-sm">
-                    press@chitrambhalare.com
+                  {/* <a href="mailto:press@chitrambhalare.in" className="text-gray-400 hover:text-brand-red transition-colors text-sm">
+                    press@chitrambhalare.in
                   </a> */}
                 </div>
               </div>

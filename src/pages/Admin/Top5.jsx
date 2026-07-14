@@ -34,7 +34,7 @@ const Top5 = () => {
           const generatedSlug = value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
           if (!item.slug || item.slug === (item.movieName ? item.movieName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') : '')) {
             updated.slug = generatedSlug;
-            updated.canonicalUrl = `https://chitrambhalare.com/${generatedSlug}`;
+            updated.canonicalUrl = `https://chitrambhalare.in/${generatedSlug}`;
           }
         }
         return updated;

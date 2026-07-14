@@ -167,7 +167,7 @@ const Articles = () => {
                       // Only auto-fill if the user hasn't typed a slug yet, or if they are creating a new post
                       if (isNew && (!f.slug || f.slug === (f.title ? f.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') : ''))) {
                         newState.slug = generatedSlug;
-                        newState.canonicalUrl = `https://chitrambhalare.com/${generatedSlug}`;
+                        newState.canonicalUrl = `https://chitrambhalare.in/${generatedSlug}`;
                       }
                     }
                     return newState;
@@ -299,7 +299,7 @@ const Articles = () => {
                       {item.author && <span className="text-xs text-gray-400 flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-gray-600" />{item.author}</span>}
                       {item.date && <span className="text-xs text-gray-400 flex items-center gap-1"><CalendarIcon className="w-3 h-3" />{String(item.date).split('T')[0]}</span>}
                       {item.slug && (
-                        <a href={`https://chitrambhalare.com/${item.slug}`} target="_blank" rel="noreferrer" className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors">
+                        <a href={`https://chitrambhalare.in/${item.slug}`} target="_blank" rel="noreferrer" className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors">
                           <LinkIcon className="w-3 h-3" /> /{item.slug}
                         </a>
                       )}
