@@ -7,7 +7,10 @@ import { Link } from '@tiptap/extension-link';
 import { Image } from '@tiptap/extension-image';
 import { TextStyle } from '@tiptap/extension-text-style';
 import { Color } from '@tiptap/extension-color';
-import { Table, TableRow, TableCell, TableHeader } from '@tiptap/extension-table';
+import { Table } from '@tiptap/extension-table';
+import { TableRow } from '@tiptap/extension-table-row';
+import { TableCell } from '@tiptap/extension-table-cell';
+import { TableHeader } from '@tiptap/extension-table-header';
 import { Youtube } from '@tiptap/extension-youtube';
 import { Placeholder } from '@tiptap/extension-placeholder';
 import { TaskList } from '@tiptap/extension-task-list';
@@ -59,6 +62,13 @@ const TipTapEditor = ({ content = '', onChange, placeholder = 'Start writing you
   const [wordCount, setWordCount] = useState({ words: 0, characters: 0 });
   const autoSaveTimer = useRef(null);
   const editorContainerRef = useRef(null);
+
+  const exts = [
+    StarterKit, Underline, TextStyle, Color, Highlight, TextAlign, Link, Image,
+    Table, TableRow, TableCell, TableHeader, Youtube, Placeholder, TaskList, TaskItem,
+    CharacterCount, CodeBlockLowlight
+  ];
+  exts.forEach((ext, i) => { if (!ext) console.error('Extension is undefined at index:', i); });
 
   const editor = useEditor({
     extensions: [

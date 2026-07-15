@@ -300,7 +300,6 @@ const SingleArticle = () => {
               while (true) {
                 const pIdx = html.indexOf('</p>', searchIdx);
                 if (pIdx === -1) {
-                  // No </p> found outside table, just split at the end of the first table if it exists
                   const tEnd = html.indexOf('</table></div>');
                   splitIdx = tEnd !== -1 ? tEnd + 14 : -1;
                   break;
@@ -309,7 +308,6 @@ const SingleArticle = () => {
                 const lastTableEnd = html.lastIndexOf('</table></div>', pIdx);
                 
                 if (lastTableStart !== -1 && (lastTableEnd === -1 || lastTableEnd < lastTableStart)) {
-                  // We are inside a table, move search to end of this table
                   const nextTableEnd = html.indexOf('</table></div>', pIdx);
                   if (nextTableEnd !== -1) {
                     searchIdx = nextTableEnd + 14;
@@ -320,27 +318,35 @@ const SingleArticle = () => {
                 break;
               }
 
-              if (splitIdx === -1 || !relatedNews?.data?.length) {
-                return <div className="art-body prose prose-invert max-w-none" id="artBody" dangerouslySetInnerHTML={{ __html: html }} />;
+              // Fallback to \n\n, \r\n\r\n, or <br><br> if no </p> was found
+              if (splitIdx === -1) {
+                const match = html.match(/(?:\r?\n){2,}|(?:<br\s*\/?>\s*){2,}/i);
+                if (match) {
+                  splitIdx = match.index + match[0].length;
+                }
+              }
+
+              if (splitIdx === -1 || !relatedNews?.length) {
+                return <div className="art-body prose prose-invert max-w-none" id="artBody" dangerouslySetInnerHTML={{ __html: html.replace(/\n/g, '<br />') }} />;
               }
               const firstPart = html.slice(0, splitIdx);
               const restPart = html.slice(splitIdx);
               return (
                 <>
-                  <div className="art-body prose prose-invert max-w-none" id="artBody" dangerouslySetInnerHTML={{ __html: firstPart }} />
-                  <AlsoRead articles={relatedNews?.data} exclude={article} />
-                  <div className="art-body prose prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: restPart }} />
+                  <div className="art-body prose prose-invert max-w-none" id="artBody" dangerouslySetInnerHTML={{ __html: firstPart.replace(/\n/g, '<br />') }} />
+                  <AlsoRead articles={relatedNews} exclude={article} />
+                  <div className="art-body prose prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: restPart.replace(/\n/g, '<br />') }} />
                 </>
               );
             })()}
 
             {/* ALSO READ — bottom banner */}
-            <AlsoRead articles={relatedNews?.data} exclude={article} />
+            <AlsoRead articles={relatedNews} exclude={article} />
 
             {/* TAGS */}
             <div className="art-tags">
               {article.tags?.map((tag) => (
-                <Link to={`/movie-news?search=${tag}`} key={tag} className="atag">{tag}</Link>
+                <Link to={`/search?q=${encodeURIComponent(tag)}`} key={tag} className="atag">{tag}</Link>
               ))}
             </div>
 

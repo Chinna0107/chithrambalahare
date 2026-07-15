@@ -1,11 +1,10 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Helmet } from 'react-helmet-async';
 import axios from 'axios';
 import Sidebar from '../../components/Sidebar';
-
-const FALLBACK = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80';
+import { getStats } from '../../services/api';
 
 const fetchTeluguNews = async ({ page = 1, search = '' } = {}) => {
   const res = await axios.get('/api/telugu-news', {
@@ -15,125 +14,223 @@ const fetchTeluguNews = async ({ page = 1, search = '' } = {}) => {
 };
 
 const TeluguNews = () => {
-  const [page, setPage] = useState(1);
-  const [search, setSearch] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
 
-  const { data: news = [], isLoading } = useQuery({
-    queryKey: ['telugu-news', page, search],
+  const page = parseInt(searchParams.get('page') || '1', 10);
+  const search = searchParams.get('search') || '';
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['telugu-news', { page, search }],
     queryFn: () => fetchTeluguNews({ page, search }),
     keepPreviousData: true,
   });
 
-  const published = news.filter(n => !n.status || n.status === 'published');
+  const { data: stats } = useQuery({
+    queryKey: ['stats', 'telugu-news'],
+    queryFn: () => getStats('telugu-news'),
+  });
+
+  const handlePageChange = (newPage) => {
+    const params = Object.fromEntries(searchParams.entries());
+    setSearchParams({ ...params, page: newPage.toString() });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const allFetchedArticles = Array.isArray(data) ? data.filter(n => !n.status || n.status === 'published') : [];
+  const featuredArticle = page === 1 && allFetchedArticles[0] ? allFetchedArticles[0] : null;
+  const sideArticles = page === 1 ? allFetchedArticles.slice(1, 4) : [];
+  const gridArticles = page === 1 ? allFetchedArticles.slice(4) : allFetchedArticles;
 
   return (
-    <>
+    <div className="wrap">
       <Helmet>
-        <title>Telugu News | Chitrambhalare</title>
+        <title>Telugu News | CHITRAMBHALARE</title>
         <meta name="description" content="Latest Telugu news, regional updates, politics, entertainment and more on Chitrambhalare." />
       </Helmet>
 
-      <div className="wrap">
-        <div className="breadcrumb">
-          <Link to="/main" className="bc-link">Home</Link>
-          <span>/</span>
-          <span style={{ color: 'var(--text)' }}>Telugu News</span>
+      {/* Breadcrumb */}
+      <div style={{ padding: '12px 0 0', fontSize: '11px', color: 'var(--muted)', display: 'flex', alignItems: 'center', gap: '5px' }}>
+        <Link to="/main" style={{ cursor: 'pointer', color: 'var(--gold)', textDecoration: 'none' }}>Home</Link>
+        <span>/</span>
+        <span style={{ color: 'var(--text)' }}>Telugu News</span>
+      </div>
+
+      {/* Category Banner */}
+      <div className="cat-banner">
+        <div>
+          <div className="cat-eyebrow">Browse Category</div>
+          <div className="cat-title">Telugu News</div>
+          <div className="cat-desc">Latest regional news, politics, entertainment & more.</div>
+          <div className="cat-stats">
+            <div><div className="cat-stat-val">{stats ? stats.total.toLocaleString() : '...'}</div><div className="cat-stat-lbl">Articles</div></div>
+            <div><div className="cat-stat-val">Daily</div><div className="cat-stat-lbl">Updates</div></div>
+            <div><div className="cat-stat-val">{stats ? stats.today : '...'}</div><div className="cat-stat-lbl">Today</div></div>
+          </div>
         </div>
+        <div className="cat-icon">TELUGU</div>
+      </div>
 
-        <div className="art-layout">
-          <div>
-            <div className="section-header" style={{ marginBottom: '24px' }}>
-              <h1 className="section-title">Telugu News</h1>
-              <p style={{ color: 'var(--muted)', fontSize: '14px', marginTop: '6px' }}>
-                Latest regional news, politics, entertainment & more
-              </p>
+      <div className="desktop-grid">
+        <div>
+
+          {isLoading ? (
+            <div style={{ color: 'var(--muted)', padding: '40px 0', textAlign: 'center' }}>
+              Loading Telugu News...
             </div>
-
-            {/* Search */}
-            <div style={{ marginBottom: '24px' }}>
-              <input
-                type="text"
-                placeholder="Search Telugu news..."
-                value={search}
-                onChange={e => { setSearch(e.target.value); setPage(1); }}
-                className="w-full"
-                style={{
-                  background: 'var(--card)',
-                  border: '1px solid var(--border)',
-                  borderRadius: '12px',
-                  padding: '10px 16px',
-                  color: 'var(--text)',
-                  fontSize: '14px',
-                  outline: 'none',
-                  width: '100%',
-                }}
-              />
+          ) : allFetchedArticles.length === 0 ? (
+            <div style={{ padding: '60px 0', textAlign: 'center', background: 'var(--card)', borderRadius: '10px', border: '1px solid var(--border)' }}>
+              <p style={{ color: 'var(--muted)' }}>No articles found. Try another category or search term.</p>
             </div>
-
-            {isLoading ? (
-              <div style={{ color: 'var(--muted)', padding: '60px 0', textAlign: 'center' }}>Loading...</div>
-            ) : published.length === 0 ? (
-              <div style={{ color: 'var(--muted)', padding: '60px 0', textAlign: 'center' }}>
-                No news found.
-              </div>
-            ) : (
-              <div className="telugu-news-grid">
-                {published.map(item => (
-                  <Link to={`/telugu-news/${item.slug || item.id}`} key={item.id} className="telugu-news-card">
-                    <div className="telugu-news-thumb">
-                      <img
-                        src={item.thumbnail || item.featuredImage || FALLBACK}
-                        alt={item.title}
-                        onError={e => { e.target.src = FALLBACK; }}
-                      />
-                      {item.category && (
-                        <span className="telugu-news-cat">{item.category}</span>
+          ) : (
+            <>
+              {/* Featured Section */}
+              {featuredArticle && (
+                <>
+                  <div className="section-hdr">
+                    <div className="section-hdr-title">Featured</div>
+                    <span className="see-all">See all →</span>
+                  </div>
+                  <Link to={`/telugu-news/${featuredArticle.slug || featuredArticle.id}`} className="feat-main" style={{ display: 'block', textDecoration: 'none' }}>
+                    <div className="feat-img" style={{ position: 'relative', overflow: 'hidden' }}>
+                      {featuredArticle.featuredImage || featuredArticle.thumbnail ? (
+                        <img
+                          src={featuredArticle.featuredImage || featuredArticle.thumbnail}
+                          alt={featuredArticle.title}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', top: 0, left: 0 }}
+                        />
+                      ) : (
+                        featuredArticle.title.split(' ')[0]
                       )}
+                      <div className="feat-badge" style={{ zIndex: 2 }}>🔥 Top Story</div>
                     </div>
-                    <div className="telugu-news-body">
-                      <h2 className="telugu-news-title">{item.title}</h2>
-                      {item.excerpt && <p className="telugu-news-excerpt">{item.excerpt}</p>}
-                      <div className="telugu-news-meta">
-                        {item.author && <span>{item.author}</span>}
-                        {item.date && <span>{new Date(item.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>}
+                    <div className="feat-body">
+                      <div className="feat-title">{featuredArticle.title}</div>
+                      <div className="feat-excerpt">{featuredArticle.excerpt}</div>
+                      <div className="feat-meta">
+                        <span>By {featuredArticle.author || 'CB'}</span>
+                        <span className="dot">◆</span>
+                        <span>{featuredArticle.date ? new Date(featuredArticle.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : 'Unknown Date'}</span>
+                        <span className="dot">◆</span>
+                        <span>3 min read</span>
                       </div>
                     </div>
                   </Link>
-                ))}
-              </div>
-            )}
+                </>
+              )}
 
-            {/* Pagination */}
-            {published.length >= 12 && (
-              <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginTop: '32px' }}>
-                <button
-                  onClick={() => setPage(p => Math.max(1, p - 1))}
-                  disabled={page === 1}
-                  style={{ padding: '8px 20px', background: 'var(--card)', border: '1px solid var(--border)', color: 'var(--text)', borderRadius: '8px', cursor: 'pointer', opacity: page === 1 ? 0.5 : 1 }}
-                >
-                  Previous
-                </button>
-                <span style={{ color: 'var(--muted)', lineHeight: '36px' }}>Page {page}</span>
-                <button
-                  onClick={() => setPage(p => p + 1)}
-                  style={{ padding: '8px 20px', background: 'var(--card)', border: '1px solid var(--border)', color: 'var(--text)', borderRadius: '8px', cursor: 'pointer' }}
-                >
-                  Next
-                </button>
-              </div>
-            )}
-          </div>
+              {/* Side Scroll Section */}
+              {sideArticles.length > 0 && (
+                <div className="side-scroll">
+                  {sideArticles.map((art) => (
+                    <Link to={`/telugu-news/${art.slug || art.id}`} key={art.id} className="side-card">
+                      <div className="side-cat">{art.category || 'Telugu'}</div>
+                      <div className="side-title">{art.title}</div>
+                      <div className="side-date">
+                        {art.date ? new Date(art.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : ''}
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
 
-          <div className="sidebar-desktop">
-            <Sidebar />
-          </div>
+              {/* Mobile Sidebar (Box Office lists inline on mobile) */}
+              <div className="mobile-sidebar">
+                <div className="sw">
+                  <div className="sw-hdr">
+                    <div className="live-dot"></div>
+                    <div className="sw-title">Live Box Office</div>
+                  </div>
+                  <Link to="/box-office" className="bo-row">
+                    <div className="bo-rank">1</div>
+                    <div className="bo-name">Peddi</div>
+                    <div className="bo-amt">₹320 Cr</div>
+                  </Link>
+                  <Link to="/box-office" className="bo-row">
+                    <div className="bo-rank">2</div>
+                    <div className="bo-name">Drishyam 3</div>
+                    <div className="bo-amt">₹236 Cr</div>
+                  </Link>
+                  <Link to="/box-office" className="bo-row">
+                    <div className="bo-rank">3</div>
+                    <div className="bo-name">Obsession</div>
+                    <div className="bo-amt">₹85 Cr</div>
+                  </Link>
+                  <Link to="/box-office" className="bo-row">
+                    <div className="bo-rank">4</div>
+                    <div className="bo-name">Hai Jawani Toh Ishq</div>
+                    <div className="bo-amt">₹55 Cr</div>
+                  </Link>
+                </div>
+              </div>
+
+              {/* All News Grid */}
+              {gridArticles.length > 0 && (
+                <>
+                  <div className="section-hdr">
+                    <div className="section-hdr-title">All Telugu News</div>
+                    <span className="see-all">See All →</span>
+                  </div>
+                  <div className="news-grid">
+                    {gridArticles.map((art) => (
+                      <Link to={`/telugu-news/${art.slug || art.id}`} key={art.id} className="n-card">
+                        <div className="n-thumb" style={{ background: '#0d1b30', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          {art.thumbnail ? (
+                            <img
+                              src={art.thumbnail}
+                              alt={art.title}
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            />
+                          ) : (
+                            '🎬'
+                          )}
+                        </div>
+                        <div className="n-body">
+                          <div className="n-cat">{art.category || 'Telugu'}</div>
+                          <div className="n-title">{art.title}</div>
+                          <div className="n-meta">
+                            {art.date ? new Date(art.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : ''}
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {/* Pagination */}
+              {allFetchedArticles.length >= 12 && (
+                <div className="pagination">
+                  <button
+                    className="pg-btn"
+                    onClick={() => handlePageChange(page - 1)}
+                    disabled={page === 1}
+                  >
+                    ‹
+                  </button>
+                  <button
+                    className="pg-btn"
+                    onClick={() => handlePageChange(page + 1)}
+                  >
+                    ›
+                  </button>
+                </div>
+              )}
+            </>
+          )}
         </div>
 
-        <div className="mobile-sidebar mt-8 px-4">
+        {/* Desktop Sidebar */}
+        <div className="sidebar-desktop">
           <Sidebar />
         </div>
       </div>
-    </>
+
+      {/* Mobile Sidebar */}
+      <div className="mobile-sidebar">
+        <Sidebar />
+      </div>
+    </div>
   );
 };
 

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useTeluguNewsBySlug } from '../../hooks/useTeluguNews';
+import { useTeluguNewsBySlug, useTeluguNews } from '../../hooks/useTeluguNews';
 import { Helmet } from 'react-helmet-async';
 import Sidebar from '../../components/Sidebar';
 import Comments from '../../components/Comments';
@@ -8,10 +8,27 @@ import ShareWidget from '../../components/ShareWidget';
 
 const FALLBACK = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1200&q=80';
 
+// ── Also Read Banner ────────────────────────────────────────────────────────────
+const AlsoRead = ({ articles, exclude }) => {
+  if (!articles || articles.length === 0) return null;
+  const picks = articles.filter(a => a.id !== exclude?.id);
+  if (picks.length === 0) return null;
+  const pick = picks[Math.floor(Math.random() * picks.length)];
+  return (
+    <div className="also-read-banner">
+      <Link to={`/telugu-news/${pick.slug || pick.id}`} className="also-read-link">
+        <span className="also-read-label">Also Read -&nbsp;</span>
+        <span className="also-read-title">{pick.title}</span>
+      </Link>
+    </div>
+  );
+};
+
 const SingleTeluguNews = () => {
   const { slug } = useParams();
 
   const { data: article, isLoading } = useTeluguNewsBySlug(slug);
+  const { data: allTeluguNews } = useTeluguNews();
 
   useEffect(() => { window.scrollTo(0, 0); }, [slug]);
 
@@ -98,18 +115,64 @@ const SingleTeluguNews = () => {
               let html = typeof article.content === 'string' ? article.content : '';
               html = html.replace(/<table/g, '<div class="table-responsive" style="width: 100%; overflow-x: auto; margin: 24px 0;"><table style="width: 100%; min-width: 600px; border-collapse: collapse;"')
                          .replace(/<\/table>/g, '</table></div>');
+              
+              let splitIdx = -1;
+              let searchIdx = 0;
+              while (true) {
+                const pIdx = html.indexOf('</p>', searchIdx);
+                if (pIdx === -1) {
+                  const tEnd = html.indexOf('</table></div>');
+                  splitIdx = tEnd !== -1 ? tEnd + 14 : -1;
+                  break;
+                }
+                const lastTableStart = html.lastIndexOf('<div class="table-responsive"', pIdx);
+                const lastTableEnd = html.lastIndexOf('</table></div>', pIdx);
+                
+                if (lastTableStart !== -1 && (lastTableEnd === -1 || lastTableEnd < lastTableStart)) {
+                  const nextTableEnd = html.indexOf('</table></div>', pIdx);
+                  if (nextTableEnd !== -1) {
+                    searchIdx = nextTableEnd + 14;
+                    continue;
+                  }
+                }
+                splitIdx = pIdx + 4;
+                break;
+              }
+
+              // Fallback to \n\n, \r\n\r\n, or <br><br> if no </p> was found
+              if (splitIdx === -1) {
+                const match = html.match(/(?:\r?\n){2,}|(?:<br\s*\/?>\s*){2,}/i);
+                if (match) {
+                  splitIdx = match.index + match[0].length;
+                }
+              }
+
+              if (splitIdx === -1 || !allTeluguNews?.length) {
+                return (
+                  <div className="art-body prose prose-invert max-w-none" id="artBody"
+                    dangerouslySetInnerHTML={{ __html: html.replace(/\n/g, '<br />') }}
+                  />
+                );
+              }
+              const firstPart = html.slice(0, splitIdx);
+              const restPart = html.slice(splitIdx);
               return (
-                <div className="art-body prose prose-invert max-w-none" id="artBody"
-                  dangerouslySetInnerHTML={{ __html: html }}
-                />
+                <>
+                  <div className="art-body prose prose-invert max-w-none" id="artBody" dangerouslySetInnerHTML={{ __html: firstPart.replace(/\n/g, '<br />') }} />
+                  <AlsoRead articles={allTeluguNews} exclude={article} />
+                  <div className="art-body prose prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: restPart.replace(/\n/g, '<br />') }} />
+                </>
               );
             })()}
+
+            {/* ALSO READ — bottom banner */}
+            <AlsoRead articles={allTeluguNews} exclude={article} />
 
             {/* Tags */}
             {article.tags && article.tags.length > 0 && (
               <div className="art-tags">
                 {article.tags.map(tag => (
-                  <Link to={`/telugu-news?search=${tag}`} key={tag} className="atag">{tag}</Link>
+                  <Link to={`/search?q=${encodeURIComponent(tag)}`} key={tag} className="atag">{tag}</Link>
                 ))}
               </div>
             )}

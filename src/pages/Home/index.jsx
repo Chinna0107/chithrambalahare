@@ -29,15 +29,15 @@ const Home = () => {
     select: (data) => data.slice(0, 4),
   });
 
-  const { data: boxOfficeData, isLoading: boxOfficeLoading } = useQuery({
-    queryKey: ['boxOffice', { limit: 6 }],
-    queryFn: () => getBoxOffice(),
-    select: (data) => data.slice(0, 6),
+  const { data: boxOfficeDataObj, isLoading: boxOfficeLoading } = useQuery({
+    queryKey: ['articles', { limit: 6, category: 'Box Office' }],
+    queryFn: () => getArticles({ limit: 6, category: 'Box Office' }),
   });
 
   const articles = articlesData?.data || [];
   const latestNews = articles.slice(5, 12); // After 5 slider items, fetch 7 to fill grid
   const ottNews = ottData?.data || [];
+  const boxOfficeData = boxOfficeDataObj?.data || [];
 
   if (articlesLoading) {
     return <LoadingSkeleton type="page" />;
@@ -114,7 +114,7 @@ const Home = () => {
               boxOfficeData && boxOfficeData.length > 0 && (
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {boxOfficeData.map(bo => (
-                    <BoxOfficeCard key={bo.id} boxOffice={bo} compact={true} />
+                    <NewsCard key={bo.id} article={bo} compact={true} />
                   ))}
                 </div>
               )

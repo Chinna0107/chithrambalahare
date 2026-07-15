@@ -3,7 +3,7 @@ import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Helmet } from 'react-helmet-async';
 import Sidebar from '../../components/Sidebar';
-import { getArticles } from '../../services/api';
+import { getArticles, getStats } from '../../services/api';
 
 const BoxOffice = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -20,6 +20,12 @@ const BoxOffice = () => {
       category: 'Box Office',
       search
     }),
+  });
+
+  const { data: stats } = useQuery({
+    queryKey: ['stats', 'box-office'],
+    queryFn: () => getStats('box-office'),
+    staleTime: 1000 * 60 * 5,
   });
 
   const handlePageChange = (newPage) => {
@@ -54,9 +60,9 @@ const BoxOffice = () => {
           <div className="cat-title">Box Office News</div>
           <div className="cat-desc">Latest collections, box office records, and trade updates from Indian Cinema.</div>
           <div className="cat-stats">
-            <div><div className="cat-stat-val">1,200+</div><div className="cat-stat-lbl">Articles</div></div>
+            <div><div className="cat-stat-val">{stats ? stats.total.toLocaleString() : '...'}</div><div className="cat-stat-lbl">Articles</div></div>
             <div><div className="cat-stat-val">Daily</div><div className="cat-stat-lbl">Updates</div></div>
-            <div><div className="cat-stat-val">8</div><div className="cat-stat-lbl">Today</div></div>
+            <div><div className="cat-stat-val">{stats ? stats.today : '...'}</div><div className="cat-stat-lbl">Today</div></div>
           </div>
         </div>
         <div className="cat-icon">📈</div>

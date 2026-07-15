@@ -16,7 +16,7 @@ const CATEGORIES = [
   'Stills'
 ];
 
-const emptyForm = { title: '', category: 'Stills', coverImage: '', images: [], date: '', slug: '', seoTitle: '', metaDescription: '', canonicalUrl: '', ogImage: '' };
+const emptyForm = { title: '', category: 'Stills', coverImage: '', images: [], date: '', slug: '', seoTitle: '', metaDescription: '', metaKeywords: '', canonicalUrl: '', ogImage: '' };
 const sanitize = (obj) => Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, v === null || v === undefined ? '' : v]));
 
 const SortableImageItem = ({ image, onUpdate, onRemove, onSetFeatured, isFeatured }) => {
