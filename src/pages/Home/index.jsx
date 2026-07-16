@@ -10,7 +10,7 @@ import Sidebar from '../../components/Sidebar';
 import LoadingSkeleton from '../../components/LoadingSkeleton';
 import GalleryGrid from '../../components/GalleryGrid';
 import NorthAmericaCollections from '../../components/NorthAmericaCollections';
-import { getArticles, getReviews, getBoxOffice } from '../../services/api';
+import { getArticles, getReviews, getBoxOffice, getActiveLiveUpdate } from '../../services/api';
 
 const Home = () => {
   const { data: articlesData, isLoading: articlesLoading } = useQuery({
@@ -34,6 +34,14 @@ const Home = () => {
     queryFn: () => getArticles({ limit: 6, category: 'Box Office' }),
   });
 
+  const { data: activeLiveUpdate } = useQuery({
+    queryKey: ['activeLiveUpdate'],
+    queryFn: () => getActiveLiveUpdate(),
+    staleTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true
+  });
+
   const articles = articlesData?.data || [];
   const latestNews = articles.slice(5, 12); // After 5 slider items, fetch 7 to fill grid
   const ottNews = ottData?.data || [];
@@ -54,6 +62,25 @@ const Home = () => {
         {/* Main Content Area */}
         <div className="space-y-12 min-w-0">
           
+          {/* Live Now Banner */}
+          {activeLiveUpdate && (
+            <Link to={`/live-tracking/${activeLiveUpdate.slug}`} className="block relative group overflow-hidden rounded-xl bg-gradient-to-r from-red-600 via-brand-red to-red-900 border border-brand-red/30 shadow-[0_0_20px_rgba(229,9,20,0.2)]">
+              <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-300"></div>
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-white/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform -translate-x-full group-hover:translate-x-full"></div>
+              <div className="flex items-center justify-between p-4 relative z-10">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-3 w-3 relative">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
+                  </span>
+                  <span className="text-white font-bold tracking-wider uppercase text-sm whitespace-nowrap">Live Now:</span>
+                  <span className="text-white font-semibold text-sm md:text-base truncate max-w-[200px] md:max-w-md lg:max-w-lg">{activeLiveUpdate.title}</span>
+                </div>
+                <ChevronRight className="w-5 h-5 text-white transform group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
+          )}
+
           {/* Hero Section */}
           <HeroSlider articles={articles} />
           

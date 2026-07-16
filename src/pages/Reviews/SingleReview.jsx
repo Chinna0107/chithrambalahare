@@ -23,6 +23,9 @@ const SingleReview = () => {
   const { slug } = useParams();
 
   const { data: review, isLoading } = useReviewBySlug(slug);
+  const { data: allReviews } = useReviews();
+
+  const relatedReviews = allReviews ? allReviews.filter(r => r.slug !== slug).slice(0, 3) : [];
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -232,6 +235,28 @@ const SingleReview = () => {
                   </h2>
                   <div dangerouslySetInnerHTML={{ __html: review.technicalAspects }} />
                 </section>
+              )}
+
+              {/* ALSO READ */}
+              {relatedReviews.length > 0 && (
+                <div style={{ marginTop: '3rem', padding: '1.5rem', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                  <h3 style={{ fontSize: '20px', fontFamily: 'Bebas Neue', color: 'var(--text)', marginBottom: '16px', display: 'flex', alignItems: 'center' }}>
+                    <span style={{ width: '4px', height: '20px', background: 'var(--brand-red)', marginRight: '10px', borderRadius: '4px' }}></span>
+                    Also Read
+                  </h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {relatedReviews.map(r => (
+                      <Link to={`/reviews/${r.slug}`} key={r.slug} style={{ display: 'flex', alignItems: 'center', gap: '16px', textDecoration: 'none', color: 'var(--text)', padding: '12px', borderRadius: '8px', transition: 'background 0.2s', border: '1px solid rgba(255,255,255,0.05)' }} className="hover:bg-white/10 hover:border-white/20">
+                        <img src={r.poster || FALLBACK} alt={r.movieName} style={{ width: '80px', height: '60px', objectFit: 'cover', borderRadius: '6px' }} />
+                        <div style={{ flex: 1 }}>
+                          <h4 style={{ margin: 0, fontSize: '16px', fontWeight: 'bold' }}>{r.movieName} Review</h4>
+                          <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: 'var(--muted)', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{r.snippet || r.verdict}</p>
+                        </div>
+                        <ChevronRight className="w-5 h-5 hidden sm:block" style={{ color: 'var(--brand-red)' }} />
+                      </Link>
+                    ))}
+                  </div>
+                </div>
               )}
 
               {/* VERDICT BOX */}

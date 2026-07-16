@@ -38,6 +38,16 @@ export const getArticlesByLetter = async (letter) => {
   return posts.filter(a => a.title.toLowerCase().startsWith(letter.toLowerCase()));
 };
 
+export const getActiveLiveUpdate = async () => {
+  const response = await axios.get('/api/live-updates/active/banner');
+  return response.data;
+};
+
+export const getLiveUpdateBySlug = async (slug) => {
+  const response = await axios.get(`/api/live-updates/${slug}`);
+  return response.data;
+};
+
 export const getReviews = async () => {
   const response = await axios.get('/api/reviews');
   return response.data || [];

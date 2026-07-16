@@ -257,6 +257,7 @@ const AdminLayout = () => {
     { id: 'top5', icon: <TrendingUp className="w-5 h-5" />, label: 'Box Office Top 5', adminOnly: true },
     { id: 'box-office', icon: <Globe className="w-5 h-5" />, label: 'Box Office Detail', adminOnly: false },
     { id: 'articles', icon: <Tv className="w-5 h-5" />, label: 'Articles', adminOnly: false },
+    { id: 'live-updates', icon: <Tv className="w-5 h-5" />, label: 'Live Updates', adminOnly: false },
     { id: 'reviews', icon: <Settings className="w-5 h-5" />, label: 'Reviews', adminOnly: false },
     { id: 'galleries', icon: <ImageIcon className="w-5 h-5" />, label: 'Galleries', adminOnly: false },
     { id: 'telugu-news', icon: <FileText className="w-5 h-5" />, label: 'Telugu News', adminOnly: false },

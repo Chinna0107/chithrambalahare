@@ -27,6 +27,7 @@ const AdminSchedules = lazy(() => import('../pages/Admin/Schedules'));
 const AdminTop5 = lazy(() => import('../pages/Admin/Top5'));
 const AdminGalleries = lazy(() => import('../pages/Admin/Galleries'));
 const AdminArticles = lazy(() => import('../pages/Admin/Articles'));
+const AdminLiveUpdates = lazy(() => import('../pages/Admin/LiveUpdates'));
 const AdminReviews = lazy(() => import('../pages/Admin/Reviews'));
 const AdminBoxOffice = lazy(() => import('../pages/Admin/BoxOffice'));
 const AdminTaxonomy = lazy(() => import('../pages/Admin/Taxonomy'));
@@ -118,7 +119,16 @@ const router = createBrowserRouter([
       },
       {
         path: 'live-tracking',
-        element: <SuspenseWrapper><LiveTracking /></SuspenseWrapper>,
+        children: [
+          {
+            index: true,
+            element: <SuspenseWrapper><LiveTracking /></SuspenseWrapper>,
+          },
+          {
+            path: ':slug',
+            element: <SuspenseWrapper><LiveTracking /></SuspenseWrapper>,
+          }
+        ]
       },
       {
         path: 'north-america',
@@ -180,6 +190,7 @@ const router = createBrowserRouter([
           { path: 'top5', element: <SuspenseWrapper><AdminTop5 /></SuspenseWrapper> },
           { path: 'galleries', element: <SuspenseWrapper><AdminGalleries /></SuspenseWrapper> },
           { path: 'articles', element: <SuspenseWrapper><AdminArticles /></SuspenseWrapper> },
+          { path: 'live-updates', element: <SuspenseWrapper><AdminLiveUpdates /></SuspenseWrapper> },
           { path: 'reviews', element: <SuspenseWrapper><AdminReviews /></SuspenseWrapper> },
           { path: 'box-office', element: <SuspenseWrapper><AdminBoxOffice /></SuspenseWrapper> },
           { path: 'taxonomy', element: <SuspenseWrapper><AdminTaxonomy /></SuspenseWrapper> },
