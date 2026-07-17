@@ -78,6 +78,7 @@ const Galleries = () => {
   const [addForm, setAddForm] = useState(emptyForm);
   const [isSaving, setIsSaving] = useState(false);
   const [previewGallery, setPreviewGallery] = useState(null);
+  const [selectedIds, setSelectedIds] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
@@ -155,6 +156,32 @@ const Galleries = () => {
   };
 
   const handleDelete = (id) => save(list.filter(item => item.id !== id));
+
+  const handleSelect = (id) => {
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
+
+  const handleSelectAll = () => {
+    if (selectedIds.length === paginatedList.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(paginatedList.map(i => i.id));
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} galleries?`)) return;
+    setIsSaving(true);
+    try {
+      const newList = list.filter(item => !selectedIds.includes(item.id));
+      await save(newList);
+      setSelectedIds([]);
+    } catch {
+      triggerNotification('Failed to delete some galleries.', 'error');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const handleEditSave = async () => {
     if (!editForm.title.trim() || !editForm.slug?.trim()) {
@@ -340,6 +367,19 @@ const Galleries = () => {
       )}
 
       <div className="grid grid-cols-1 gap-6">
+        {selectedIds.length > 0 && (
+          <div className="bg-[#18181B] border border-brand-red/30 rounded-xl p-4 flex items-center justify-between shadow-lg shadow-brand-red/10 animate-in fade-in slide-in-from-top-2 mb-2">
+            <div className="flex items-center gap-4">
+              <span className="text-white font-bold">{selectedIds.length} selected</span>
+              <button onClick={handleSelectAll} className="text-sm font-semibold text-brand-red hover:text-red-400 transition-colors">
+                {selectedIds.length === paginatedList.length ? 'Deselect All' : 'Select All'}
+              </button>
+            </div>
+            <button onClick={handleBulkDelete} disabled={isSaving} className="flex items-center gap-2 bg-red-500/20 text-red-500 hover:bg-red-500 hover:text-white px-4 py-2 rounded-lg text-sm font-bold transition-all">
+              {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />} Delete Selected
+            </button>
+          </div>
+        )}
         {paginatedList.length === 0 && <div className="text-center py-16 text-gray-600">No galleries yet.</div>}
         {paginatedList.map(item => (
           <div key={item.id} className="bg-[#18181B] border border-gray-800 rounded-2xl overflow-hidden hover:border-gray-700 transition-colors">
@@ -364,13 +404,21 @@ const Galleries = () => {
             ) : (
               <div className="flex flex-col md:flex-row">
                 <div className="md:w-64 h-48 flex-shrink-0 relative">
+                  <div className="absolute top-2 left-2 z-10">
+                    <input 
+                      type="checkbox" 
+                      checked={selectedIds.includes(item.id)} 
+                      onChange={() => handleSelect(item.id)} 
+                      className="w-5 h-5 rounded border-gray-700 bg-black/50 text-brand-red focus:ring-brand-red focus:ring-offset-gray-900 cursor-pointer transition-colors" 
+                    />
+                  </div>
                   {item.coverImage ? (
                     <img src={item.coverImage} alt={item.title} className="w-full h-full object-cover bg-gray-800" />
                   ) : (
                     <div className="w-full h-full bg-gray-800 flex items-center justify-center text-gray-600">No Cover</div>
                   )}
                   {item.category && (
-                    <span className="absolute top-2 left-2 bg-brand-red text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">
+                    <span className="absolute top-2 right-2 bg-brand-red text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">
                       {item.category}
                     </span>
                   )}

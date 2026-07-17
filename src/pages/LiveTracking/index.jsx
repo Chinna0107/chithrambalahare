@@ -154,7 +154,7 @@ const AlsoRead = ({ articles, exclude }) => {
   const pick = picks[Math.floor(Math.random() * picks.length)];
   return (
     <div className="also-read-banner">
-      <Link to={`/live-tracking/${pick.slug}`} className="also-read-link">
+      <Link to={`/live-updates/${pick.slug}`} className="also-read-link">
         <span className="also-read-label">Also Read -&nbsp;</span>
         <span className="also-read-title">{pick.title}</span>
       </Link>
@@ -178,17 +178,17 @@ const LiveTopicsList = () => {
       <div className="breadcrumb mb-8">
         <Link to="/main" className="bc-link">Home</Link>
         <span>/</span>
-        <span style={{ color: 'var(--text)' }}>Live Tracking</span>
+        <span style={{ color: 'var(--text)' }}>Live Updates</span>
       </div>
       
       <div className="flex items-center gap-3 mb-12">
-        <h1 className="text-4xl font-bold text-white" style={{ fontFamily: 'Impact, sans-serif' }}>LIVE TRACKING</h1>
+        <h1 className="text-4xl font-bold text-white" style={{ fontFamily: 'Impact, sans-serif' }}>LIVE UPDATES</h1>
         <div className="h-px bg-gray-800 flex-1 ml-4 mt-2" />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {topics.map(topic => (
-          <Link key={topic.id} to={`/live-tracking/${topic.slug}`} className="group block">
+          <Link key={topic.id} to={`/live-updates/${topic.slug}`} className="group block">
             <div className="relative aspect-video rounded-2xl overflow-hidden mb-4 border border-gray-800">
               <img src={topic.thumbnail || topic.featuredImage || FALLBACK} alt={topic.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
@@ -238,7 +238,7 @@ const SingleLiveUpdate = () => {
     return (
       <div style={{ color: 'var(--text)', padding: '100px 0', textAlign: 'center' }}>
         <h2 style={{ fontFamily: 'Bebas Neue', fontSize: '32px' }}>Article Not Found</h2>
-        <Link to="/live-tracking" style={{ color: 'var(--gold)', marginTop: '10px', display: 'inline-block' }}>Back to Live Tracking</Link>
+        <Link to="/live-updates" style={{ color: 'var(--gold)', marginTop: '10px', display: 'inline-block' }}>Back to Live Updates</Link>
       </div>
     );
   }
@@ -288,7 +288,7 @@ const SingleLiveUpdate = () => {
         <div className="breadcrumb">
           <Link to="/main" className="bc-link">Home</Link>
           <span>/</span>
-          <Link to="/live-tracking" className="bc-link">Live Tracking</Link>
+          <Link to="/live-updates" className="bc-link">Live Updates</Link>
           <span>/</span>
           <span style={{ color: 'var(--text)' }}>
             {(article.title || '').length > 30 ? `${article.title.slice(0, 27)}...` : article.title}
@@ -409,7 +409,7 @@ const SingleLiveUpdate = () => {
             {/* SHARE BAR */}
             <ShareWidget 
               title={article.title} 
-              url={`https://chitrambhalare.in/live-tracking/${article.slug}`}
+              url={`https://chitrambhalare.in/live-updates/${article.slug}`}
               shareUrl={`https://chitrambhalare.in/api/share/article/${article.slug}`}
               image={heroImage} 
             />
@@ -421,7 +421,7 @@ const SingleLiveUpdate = () => {
             <div className="related-title">Related Articles</div>
             <div className="related-grid">
               {relatedNews?.data?.filter(n => n.id !== article.id).slice(0, 4).map((rel) => (
-                <Link to={`/live-tracking/${rel.slug}`} key={rel.id} className="rel-card">
+                <Link to={`/live-updates/${rel.slug}`} key={rel.id} className="rel-card">
                   <div className="rel-thumb" style={{ background: '#0d1b30', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     {rel.thumbnail ? (
                       <img

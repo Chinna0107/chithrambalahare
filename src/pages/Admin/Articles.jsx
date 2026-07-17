@@ -26,6 +26,7 @@ const Articles = () => {
   const [addForm, setAddForm] = useState(emptyForm);
   const [isSaving, setIsSaving] = useState(false);
   const [expandedId, setExpandedId] = useState(null);
+  const [selectedIds, setSelectedIds] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
@@ -94,8 +95,37 @@ const Articles = () => {
       await refreshDb();
       window.dispatchEvent(new Event('tolly_db_change'));
       triggerNotification('Article deleted!');
+      setSelectedIds(prev => prev.filter(selectedId => selectedId !== id));
     } catch {
       triggerNotification('Failed to delete article.', 'error');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSelect = (id) => {
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
+
+  const handleSelectAll = () => {
+    if (selectedIds.length === paginatedList.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(paginatedList.map(i => i.id));
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} articles?`)) return;
+    setIsSaving(true);
+    try {
+      await Promise.all(selectedIds.map(id => axios.delete(`/api/articles/${id}`)));
+      await refreshDb();
+      window.dispatchEvent(new Event('tolly_db_change'));
+      triggerNotification(`${selectedIds.length} articles deleted!`);
+      setSelectedIds([]);
+    } catch {
+      triggerNotification('Failed to delete some articles.', 'error');
     } finally {
       setIsSaving(false);
     }
@@ -257,6 +287,19 @@ const Articles = () => {
       )}
 
       <div className="space-y-3">
+        {selectedIds.length > 0 && (
+          <div className="bg-[#18181B] border border-brand-red/30 rounded-xl p-4 flex items-center justify-between shadow-lg shadow-brand-red/10 animate-in fade-in slide-in-from-top-2 mb-4">
+            <div className="flex items-center gap-4">
+              <span className="text-white font-bold">{selectedIds.length} selected</span>
+              <button onClick={handleSelectAll} className="text-sm font-semibold text-brand-red hover:text-red-400 transition-colors">
+                {selectedIds.length === paginatedList.length ? 'Deselect All' : 'Select All'}
+              </button>
+            </div>
+            <button onClick={handleBulkDelete} disabled={isSaving} className="flex items-center gap-2 bg-red-500/20 text-red-500 hover:bg-red-500 hover:text-white px-4 py-2 rounded-lg text-sm font-bold transition-all">
+              {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />} Delete Selected
+            </button>
+          </div>
+        )}
         {paginatedList.length === 0 && <div className="text-center py-16 text-gray-600">No articles yet.</div>}
         {paginatedList.map(item => (
           <div key={item.id} className="bg-[#18181B] border border-gray-800 rounded-2xl p-5 hover:border-gray-700 transition-colors">
@@ -281,6 +324,14 @@ const Articles = () => {
             ) : (
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-start gap-4 flex-1 min-w-0">
+                  <div className="pt-2 flex-shrink-0">
+                    <input 
+                      type="checkbox" 
+                      checked={selectedIds.includes(item.id)} 
+                      onChange={() => handleSelect(item.id)} 
+                      className="w-5 h-5 rounded border-gray-700 bg-black/50 text-brand-red focus:ring-brand-red focus:ring-offset-gray-900 cursor-pointer transition-colors" 
+                    />
+                  </div>
                   {item.thumbnail ? (
                     <img src={item.thumbnail} alt={item.title} className="w-20 h-20 object-cover rounded-xl flex-shrink-0 bg-gray-800" />
                   ) : (
