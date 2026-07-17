@@ -164,45 +164,23 @@ const AlsoRead = ({ articles, exclude }) => {
 
 // ── Live Topics List ──────────────────────────────────────────────────────────
 const LiveTopicsList = () => {
-  const { data, isLoading } = useQuery({
-    queryKey: ['liveUpdates', { page: 1, limit: 20 }],
-    queryFn: () => getLiveUpdates({ page: 1, limit: 20 })
-  });
-
-  if (isLoading) return <div style={{ color: 'var(--muted)', padding: '100px 0', textAlign: 'center' }}>Loading Live Updates...</div>;
-
-  const topics = data?.data || [];
-
   return (
-    <div className="wrap py-10">
-      <div className="breadcrumb mb-8">
-        <Link to="/main" className="bc-link">Home</Link>
-        <span>/</span>
-        <span style={{ color: 'var(--text)' }}>Live Updates</span>
-      </div>
-      
-      <div className="flex items-center gap-3 mb-12">
-        <h1 className="text-4xl font-bold text-white" style={{ fontFamily: 'Impact, sans-serif' }}>LIVE UPDATES</h1>
-        <div className="h-px bg-gray-800 flex-1 ml-4 mt-2" />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {topics.map(topic => (
-          <Link key={topic.id} to={`/live-updates/${topic.slug}`} className="group block">
-            <div className="relative aspect-video rounded-2xl overflow-hidden mb-4 border border-gray-800">
-              <img src={topic.thumbnail || topic.featuredImage || FALLBACK} alt={topic.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-              <div className="absolute top-3 left-3 bg-brand-red text-white text-xs font-bold px-2 py-1 rounded flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-white animate-pulse" /> LIVE
-              </div>
-            </div>
-            <h2 className="text-xl font-bold text-white group-hover:text-brand-red transition-colors line-clamp-2">{topic.title}</h2>
-            <div className="text-gray-400 text-sm mt-2 flex items-center gap-2">
-              <span>{new Date(topic.date).toLocaleDateString()}</span>
-            </div>
+    <div className="flex items-center justify-center min-h-[60vh] px-4">
+      <div className="text-center space-y-6 animate-in fade-in zoom-in duration-500">
+        <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-brand-red/10 text-brand-red mb-4 shadow-[0_0_30px_rgba(212,43,43,0.3)]">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        </div>
+        <h1 className="text-5xl md:text-6xl font-black text-white" style={{ fontFamily: 'Impact, sans-serif', letterSpacing: '2px' }}>
+          COMING SOON
+        </h1>
+        <p className="text-xl text-gray-400 max-w-lg mx-auto font-medium">
+          We are currently working on our live tracking feature to bring you real-time updates. Stay tuned!
+        </p>
+        <div className="pt-8">
+          <Link to="/" className="inline-flex items-center gap-2 bg-brand-red hover:bg-red-600 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg shadow-brand-red/20 hover:scale-105 active:scale-95">
+            Back to Home
           </Link>
-        ))}
-        {topics.length === 0 && <div className="text-gray-500 col-span-full">No live updates currently available.</div>}
+        </div>
       </div>
     </div>
   );
