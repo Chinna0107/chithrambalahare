@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { getLiveUpdateBySlug, getArticles } from '../../services/api';
+import { getLiveUpdateBySlug, getArticles, getLiveUpdates } from '../../services/api';
+import LiveFeed from './LiveFeed';
 import { Helmet } from 'react-helmet-async';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
@@ -161,10 +162,56 @@ const AlsoRead = ({ articles, exclude }) => {
   );
 };
 
+// ── Live Topics List ──────────────────────────────────────────────────────────
+const LiveTopicsList = () => {
+  const { data, isLoading } = useQuery({
+    queryKey: ['liveUpdates', { page: 1, limit: 20 }],
+    queryFn: () => getLiveUpdates({ page: 1, limit: 20 })
+  });
+
+  if (isLoading) return <div style={{ color: 'var(--muted)', padding: '100px 0', textAlign: 'center' }}>Loading Live Updates...</div>;
+
+  const topics = data?.data || [];
+
+  return (
+    <div className="wrap py-10">
+      <div className="breadcrumb mb-8">
+        <Link to="/main" className="bc-link">Home</Link>
+        <span>/</span>
+        <span style={{ color: 'var(--text)' }}>Live Tracking</span>
+      </div>
+      
+      <div className="flex items-center gap-3 mb-12">
+        <h1 className="text-4xl font-bold text-white" style={{ fontFamily: 'Impact, sans-serif' }}>LIVE TRACKING</h1>
+        <div className="h-px bg-gray-800 flex-1 ml-4 mt-2" />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {topics.map(topic => (
+          <Link key={topic.id} to={`/live-tracking/${topic.slug}`} className="group block">
+            <div className="relative aspect-video rounded-2xl overflow-hidden mb-4 border border-gray-800">
+              <img src={topic.thumbnail || topic.featuredImage || FALLBACK} alt={topic.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+              <div className="absolute top-3 left-3 bg-brand-red text-white text-xs font-bold px-2 py-1 rounded flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-white animate-pulse" /> LIVE
+              </div>
+            </div>
+            <h2 className="text-xl font-bold text-white group-hover:text-brand-red transition-colors line-clamp-2">{topic.title}</h2>
+            <div className="text-gray-400 text-sm mt-2 flex items-center gap-2">
+              <span>{new Date(topic.date).toLocaleDateString()}</span>
+            </div>
+          </Link>
+        ))}
+        {topics.length === 0 && <div className="text-gray-500 col-span-full">No live updates currently available.</div>}
+      </div>
+    </div>
+  );
+};
+
 // ── Main Component ────────────────────────────────────────────────────────────
 const SingleLiveUpdate = () => {
   const { slug } = useParams();
-  const { data: article, isLoading, isError } = useQuery({ queryKey: ['liveUpdate', slug], queryFn: () => getLiveUpdateBySlug(slug) });
+  const { data: article, isLoading, isError } = useQuery({ queryKey: ['liveUpdate', slug], queryFn: () => getLiveUpdateBySlug(slug), enabled: !!slug });
 
   
 
@@ -174,6 +221,10 @@ const SingleLiveUpdate = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [slug]);
+
+  if (!slug) {
+    return <LiveTopicsList />;
+  }
 
   if (isLoading) {
     return (
@@ -211,7 +262,7 @@ const SingleLiveUpdate = () => {
   return (
     <>
       <Helmet>
-        <title>{article.seoTitle || article.title} | CHITRAMBHALARE</title>
+        <title>{`${article.seoTitle || article.title || 'Live Update'} | CHITRAMBHALARE`}</title>
         <meta name="description" content={article.metaDescription || article.excerpt} />
         {article.metaKeywords && <meta name="keywords" content={article.metaKeywords} />}
         {article.canonicalUrl && <link rel="canonical" href={article.canonicalUrl} />}
@@ -240,7 +291,7 @@ const SingleLiveUpdate = () => {
           <Link to="/live-tracking" className="bc-link">Live Tracking</Link>
           <span>/</span>
           <span style={{ color: 'var(--text)' }}>
-            {article.title.length > 30 ? `${article.title.slice(0, 27)}...` : article.title}
+            {(article.title || '').length > 30 ? `${article.title.slice(0, 27)}...` : article.title}
           </span>
         </div>
 
@@ -281,7 +332,7 @@ const SingleLiveUpdate = () => {
                     style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 1 }}
                   />
                   <div className="art-hero-text" style={{ position: 'relative', zIndex: 2 }}>
-                    {isPeddiArticle ? 'PEDDI' : article.category.toUpperCase()}
+                    {isPeddiArticle ? 'PEDDI' : (article.category || 'Live Update').toUpperCase()}
                   </div>
                 </div>
                 <div className="img-caption">{article.title}</div>
@@ -344,6 +395,9 @@ const SingleLiveUpdate = () => {
 
             {/* ALSO READ — bottom banner */}
             <AlsoRead articles={relatedNews} exclude={article} />
+
+            {/* LIVE FEED (TIMELINE EVENTS) */}
+            <LiveFeed topic={article} />
 
             {/* TAGS */}
             <div className="art-tags">

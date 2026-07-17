@@ -280,7 +280,8 @@ const GalleryListView = () => {
     <>
       <Helmet>
         <title>Exclusive Galleries | CHITRAMBHALARE</title>
-        <meta name="description" content="Browse exclusive Tollywood photo galleries — behind the scenes, set stills, events and more." />
+        <meta name="description" content="Browse exclusive photo galleries of Tollywood celebrities, movie posters, Actress hot photos, New movie opning stills, event stills and behind-the-scenes pictures." />
+        <meta name="keywords" content="tollywood photos, telugu actress hot photos, actress sexy photo shoot, tollywood movie stills, telugu celebrity gallery, tollywood event photos, HD images, " />
       </Helmet>
 
       <div className="wrap py-6">

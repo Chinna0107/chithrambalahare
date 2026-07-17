@@ -42,7 +42,8 @@ const OTT = () => {
     <div className="wrap">
       <Helmet>
         <title>OTT News | CHITRAMBHALARE</title>
-        <meta name="description" content="Latest OTT releases, digital streaming dates, and news for Tollywood." />
+        <meta name="description" content="Find out when your favorite Telugu movies are streaming — OTT release dates, platform details and digital rights news for Tollywood films." />
+        <meta name="keywords" content="telugu movies OTT release date, tollywood OTT news, telugu movie streaming platform, telugu new movies OTT, tollywood digital rights news" />
       </Helmet>
 
       {/* Breadcrumb */}

@@ -41,7 +41,8 @@ const MovieNews = () => {
     <div className="wrap">
       <Helmet>
         <title>Movie News | CHITRAMBHALARE</title>
-        <meta name="description" content="Browse the latest updates, casting news, release dates, and production rumors from Tollywood." />
+        <meta name="description" content="Stay updated with breaking Tollywood movie news — new film announcements, shooting updates, cast & crew news, release dates and more." />
+        <meta name="keywords" content="tollywood movie news, telugu movie updates, tollywood latest news, telugu film announcements, tollywood shooting updates, telugu movie release date news" />
       </Helmet>
 
       {/* Breadcrumb */}

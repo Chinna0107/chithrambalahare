@@ -54,8 +54,9 @@ const Home = () => {
   return (
     <div className="wrap pt-28 pb-12">
       <Helmet>
-        <title>CHITRAMBHALARE | Latest Movie News & Reviews</title>
-        <meta name="description" content="Get the latest Tollywood movie news, unbiased reviews, box office collections, and exclusive celebrity interviews on CHITRAMBHALARE." />
+        <title>ChitramBhalare – Latest Tollywood Movie News, Box Office & OTT Updates, BMS Ticket Sales, BMS Live Tracking, District Ticket Sales</title>
+        <meta name="description" content="Get the latest Tollywood movie news, Telugu cinema updates, box office collections, OTT releases, reviews & photo galleries — all at ChitramBhalare." />
+        <meta name="keywords" content="Today News, tollywood news, telugu movie news, telugu cinema news today, tollywood box office collection, latest telugu movies news, tollywood updates, telugu film industry news, BMS Ticket Sales, Live Tracking" />
       </Helmet>
 
       <div className="desktop-grid">

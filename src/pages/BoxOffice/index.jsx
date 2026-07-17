@@ -43,7 +43,8 @@ const BoxOffice = () => {
     <div className="wrap">
       <Helmet>
         <title>Box Office News | CHITRAMBHALARE</title>
-        <meta name="description" content="Latest box office collections, records, and trade reports from Tollywood and Indian Cinema." />
+        <meta name="description" content="Track daily, weekend and lifetime box office collections of Telugu movies with accurate BMS ticket sales data and box office reports." />
+        <meta name="keywords" content="tollywood box office collection, telugu movies box office report, BMS ticket sales telugu movies, telugu movie box office today, tollywood worldwide collection, telugu movie day 1 collection, telugu movie advance booking, BMS ticket tracking, Daily BMS Ticket Sales" />
       </Helmet>
 
       {/* Breadcrumb */}

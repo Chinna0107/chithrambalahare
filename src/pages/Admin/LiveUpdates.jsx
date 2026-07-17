@@ -8,9 +8,10 @@ import SEOFields from '../../components/SEO/SEOFields';
 
 const emptyForm = { 
   slug: '', title: '', excerpt: '', content: '', thumbnail: '', 
-  date: '', category: 'Casting', author: '', tags: '', status: 'published',
+  date: '', category: 'Update', author: '', tags: '', status: 'published',
   seoTitle: '', metaDescription: '', focusKeyword: '', metaKeywords: '',
-  canonicalUrl: '', ogTitle: '', ogDescription: '', ogImage: '', twitterCard: 'summary_large_image', robots: 'index,follow'
+  canonicalUrl: '', ogTitle: '', ogDescription: '', ogImage: '', twitterCard: 'summary_large_image', robots: 'index,follow',
+  timelineEvents: []
 };
 
 const sanitize = (obj) => Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, v === null || v === undefined ? '' : v]));
@@ -27,6 +28,7 @@ const LiveUpdates = () => {
   const [expandedId, setExpandedId] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedIds, setSelectedIds] = useState(new Set());
   const ITEMS_PER_PAGE = 10;
 
   const filteredList = list.filter(item => 
@@ -100,6 +102,23 @@ const LiveUpdates = () => {
     }
   };
 
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) return;
+    if (!window.confirm(`Are you sure you want to delete ${selectedIds.size} selected items?`)) return;
+    setIsSaving(true);
+    try {
+      await Promise.all(Array.from(selectedIds).map(id => axios.delete(`/api/live-updates/${id}`)));
+      await refreshDb();
+      window.dispatchEvent(new Event('tolly_db_change'));
+      triggerNotification(`${selectedIds.size} Live Updates deleted!`);
+      setSelectedIds(new Set());
+    } catch {
+      triggerNotification('Failed to delete some items.', 'error');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const handleEditSave = async () => {
     if (!editForm.title.trim() || !editForm.slug.trim()) {
       triggerNotification('Title and Slug are required', 'error');
@@ -133,6 +152,27 @@ const LiveUpdates = () => {
     { field: 'showAboveBanner', label: 'Show Above Banner', type: 'checkbox', colSpan: 1 },
     { field: 'thumbnail', label: 'Thumbnail URL', placeholder: 'https://...', colSpan: 1 },
   ];
+
+  const handleAddEvent = (formState, setFormState) => {
+    const newEvent = { id: Date.now().toString(), category: 'Update', date: new Date().toISOString().slice(0, 16), title: '', content: '' };
+    setFormState(f => ({ ...f, timelineEvents: [newEvent, ...(f.timelineEvents || [])] }));
+  };
+
+  const handleUpdateEvent = (index, field, value, setFormState) => {
+    setFormState(f => {
+      const newEvents = [...(f.timelineEvents || [])];
+      newEvents[index] = { ...newEvents[index], [field]: value };
+      return { ...f, timelineEvents: newEvents };
+    });
+  };
+
+  const handleRemoveEvent = (index, setFormState) => {
+    setFormState(f => {
+      const newEvents = [...(f.timelineEvents || [])];
+      newEvents.splice(index, 1);
+      return { ...f, timelineEvents: newEvents };
+    });
+  };
 
   const renderFormFields = (formState, setFormState, isNew) => (
     <div className="space-y-6">
@@ -221,29 +261,100 @@ const LiveUpdates = () => {
         onChange={(newValues) => setFormState(newValues)}
         showAdvanced={true}
       />
+
+      {/* Timeline Events */}
+      <div className="bg-[#1a1a1d] p-4 rounded-xl border border-gray-800">
+        <div className="flex items-center justify-between mb-4">
+          <h4 className="text-white font-bold text-md">Timeline Events</h4>
+          <button onClick={() => handleAddEvent(formState, setFormState)} className="flex items-center gap-1 bg-gray-800 hover:bg-gray-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">
+            <Plus className="w-3 h-3" /> Add Event
+          </button>
+        </div>
+        
+        <div className="space-y-4">
+          {(formState.timelineEvents || []).map((event, index) => (
+            <div key={event.id || index} className="p-4 bg-black/40 rounded-lg border border-gray-800 relative">
+              <button onClick={() => handleRemoveEvent(index, setFormState)} className="absolute top-3 right-3 text-gray-500 hover:text-brand-red transition-colors">
+                <Trash2 className="w-4 h-4" />
+              </button>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-3">
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Category</label>
+                  <select
+                    value={event.category}
+                    onChange={e => handleUpdateEvent(index, 'category', e.target.value, setFormState)}
+                    className="w-full bg-black/50 border border-gray-800 rounded-lg px-2 py-1.5 text-white text-xs focus:outline-none focus:border-brand-red"
+                  >
+                    {['Update', 'Verdict', 'Audience', 'Box Office', 'News'].map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Date/Time</label>
+                  <input
+                    type="datetime-local"
+                    value={event.date || ''}
+                    onChange={e => handleUpdateEvent(index, 'date', e.target.value, setFormState)}
+                    className="w-full bg-black/50 border border-gray-800 rounded-lg px-2 py-1.5 text-white text-xs focus:outline-none focus:border-brand-red"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Title</label>
+                  <input
+                    type="text"
+                    value={event.title}
+                    onChange={e => handleUpdateEvent(index, 'title', e.target.value, setFormState)}
+                    placeholder="Event title..."
+                    className="w-full bg-black/50 border border-gray-800 rounded-lg px-2 py-1.5 text-white text-xs focus:outline-none focus:border-brand-red"
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Content</label>
+                <textarea
+                  value={event.content}
+                  onChange={e => handleUpdateEvent(index, 'content', e.target.value, setFormState)}
+                  rows={3}
+                  placeholder="Write the event content here..."
+                  className="w-full bg-black/50 border border-gray-800 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-brand-red resize-y"
+                />
+              </div>
+            </div>
+          ))}
+          {(formState.timelineEvents || []).length === 0 && (
+            <div className="text-center py-6 text-gray-500 text-sm">No timeline events added yet. Click 'Add Event' to start.</div>
+          )}
+        </div>
+      </div>
     </div>
   );
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
           <h2 className="text-2xl font-poppins font-bold text-white mb-1">LiveUpdates</h2>
           <p className="text-gray-500 text-sm">Manage news and editorial content</p>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input 
-              type="text" 
-              placeholder="Search liveUpdates..." 
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="relative w-full sm:w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+            <input
+              type="text"
+              placeholder="Search liveUpdates..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 pr-4 py-2 bg-[#18181B] border border-gray-800 rounded-xl text-sm text-white focus:outline-none focus:border-brand-red transition-all w-64"
+              onChange={e => setSearchQuery(e.target.value)}
+              className="w-full bg-black/50 border border-gray-800 rounded-xl pl-10 pr-4 py-2.5 text-white text-sm focus:outline-none focus:border-brand-red transition-colors"
             />
           </div>
-          <button onClick={() => setShowAdd(v => !v)} className="flex items-center gap-2 bg-brand-red hover:bg-red-600 text-white font-bold px-4 py-2 rounded-xl text-sm transition-all shadow-lg shadow-brand-red/20">
-            <Plus className="w-4 h-4" /> New Live Update
+          {selectedIds.size > 0 && (
+            <button onClick={handleBulkDelete} disabled={isSaving} className="flex items-center gap-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 font-bold px-4 py-2.5 rounded-xl text-sm transition-all border border-red-500/20 whitespace-nowrap">
+              <Trash2 className="w-4 h-4" /> Delete ({selectedIds.size})
+            </button>
+          )}
+          <button onClick={() => setShowAdd(!showAdd)} className="flex items-center justify-center gap-2 bg-brand-red text-white font-bold px-4 py-2.5 rounded-xl text-sm hover:bg-red-600 transition-colors whitespace-nowrap">
+            <Plus className="w-4 h-4" /> New Update
           </button>
         </div>
       </div>
@@ -291,6 +402,19 @@ const LiveUpdates = () => {
             ) : (
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-start gap-4 flex-1 min-w-0">
+                  <div className="pt-2">
+                    <input 
+                      type="checkbox" 
+                      className="w-5 h-5 rounded border-gray-800 bg-black/50 text-brand-red focus:ring-brand-red focus:ring-offset-gray-900 cursor-pointer"
+                      checked={selectedIds.has(item.id)}
+                      onChange={e => {
+                        const newSet = new Set(selectedIds);
+                        if (e.target.checked) newSet.add(item.id);
+                        else newSet.delete(item.id);
+                        setSelectedIds(newSet);
+                      }}
+                    />
+                  </div>
                   {item.thumbnail ? (
                     <img src={item.thumbnail} alt={item.title} className="w-20 h-20 object-cover rounded-xl flex-shrink-0 bg-gray-800" />
                   ) : (

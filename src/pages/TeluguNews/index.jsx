@@ -46,7 +46,8 @@ const TeluguNews = () => {
     <div className="wrap">
       <Helmet>
         <title>Telugu News | CHITRAMBHALARE</title>
-        <meta name="description" content="Latest Telugu news, regional updates, politics, entertainment and more on Chitrambhalare." />
+        <meta name="description" content="Read the latest Telugu entertainment news covering actors, actresses, events, and happenings from the Telugu film industry." />
+        <meta name="keywords" content="telugu news today, telugu entertainment news, telugu cinema updates, telugu actor news, telugu actress news, tollywood celebrity news" />
       </Helmet>
 
       {/* Breadcrumb */}

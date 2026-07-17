@@ -43,6 +43,19 @@ export const getActiveLiveUpdate = async () => {
   return response.data;
 };
 
+export const getLiveUpdates = async ({ page = 1, limit = 50, search = '' }) => {
+  const response = await axios.get('/api/live-updates', {
+    params: { search, page, limit }
+  });
+  
+  return {
+    data: response.data.data || [],
+    total: response.data.total || 0,
+    page: response.data.page || 1,
+    totalPages: response.data.totalPages || 1,
+  };
+};
+
 export const getLiveUpdateBySlug = async (slug) => {
   const response = await axios.get(`/api/live-updates/${slug}`);
   return response.data;

@@ -38,7 +38,8 @@ const Reviews = () => {
     <div className="wrap">
       <Helmet>
         <title>Movie Reviews | CHITRAMBHALARE</title>
-        <meta name="description" content="Read unbiased and detailed movie reviews." />
+        <meta name="description" content="Read honest Telugu movie reviews and ratings — story, performance and verdict for the latest Tollywood releases." />
+        <meta name="keywords" content="telugu movie review, tollywood movie rating, movie reviews in telugu, latest telugu movie review, tollywood movie verdict" />
       </Helmet>
 
       {/* Breadcrumb */}
