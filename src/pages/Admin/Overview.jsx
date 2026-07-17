@@ -79,13 +79,7 @@ const Overview = () => {
     return items.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 8);
   }, [dbData]);
 
-  const recentActivity = analytics.recentActivity || [
-    { user: 'Admin', action: 'updated North America collections', time: '10 mins ago', color: 'bg-green-500/20', type: 'north-america' },
-    { user: 'Editor', action: 'published a new article', time: '2 hours ago', color: 'bg-blue-500/20', type: 'article' },
-    { user: 'System', action: 'cleared cache', time: '5 hours ago', color: 'bg-yellow-500/20', type: 'settings' },
-    { user: 'Admin', action: 'uploaded 12 gallery images', time: '1 day ago', color: 'bg-purple-500/20', type: 'gallery' },
-    { user: 'Admin', action: 'updated box office data', time: '1 day ago', color: 'bg-red-500/20', type: 'box-office' },
-  ];
+  const recentActivity = analytics.recentActivity || [];
 
   return (
     <div className="space-y-8">

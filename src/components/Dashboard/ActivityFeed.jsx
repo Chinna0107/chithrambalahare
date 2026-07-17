@@ -18,6 +18,25 @@ const colorMap = {
   default: 'bg-gray-500',
 };
 
+const timeAgo = (dateStr) => {
+  if (!dateStr) return 'Just now';
+  if (dateStr.includes(' ago')) return dateStr;
+
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return dateStr;
+
+  const seconds = Math.floor((new Date() - date) / 1000);
+  if (seconds < 60) return 'Just now';
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes} mins ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} hours ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 30) return `${days} days ago`;
+  const months = Math.floor(days / 30);
+  return `${months} months ago`;
+};
+
 const ActivityFeed = ({ activities = [] }) => {
   return (
     <div className="bg-[#18181B] rounded-2xl border border-gray-800 p-6">
@@ -45,7 +64,7 @@ const ActivityFeed = ({ activities = [] }) => {
                     <span className="font-bold text-white">{activity.user || 'Admin'}</span>{' '}
                     {activity.action || 'performed an action'}
                   </p>
-                  <p className="text-[10px] text-gray-500 mt-0.5">{activity.time || 'Just now'}</p>
+                  <p className="text-[10px] text-gray-500 mt-0.5">{timeAgo(activity.time)}</p>
                 </div>
               </div>
             );
