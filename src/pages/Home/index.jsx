@@ -43,7 +43,7 @@ const Home = () => {
   });
 
   const articles = articlesData?.data || [];
-  const latestNews = articles.slice(5, 12); // After 5 slider items, fetch 7 to fill grid
+  const latestNews = articles.slice(0, 7); // Show latest 7 articles in the grid
   const ottNews = ottData?.data || [];
   const boxOfficeData = boxOfficeDataObj?.data || [];
 

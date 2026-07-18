@@ -155,7 +155,7 @@ const Articles = () => {
   };
 
   const fields = [
-    { field: 'category', label: 'Category', type: 'select', options: ['Casting', 'Release Dates', 'OTT Dates', 'Re-Release', 'Production', 'Box Office'], colSpan: 1 },
+    { field: 'category', label: 'Category', type: 'select', options: ['Production', 'Box Office'], colSpan: 1 },
     { field: 'title', label: 'Title', placeholder: 'Article title', colSpan: 2 },
     { field: 'author', label: 'Author', placeholder: 'Author name', colSpan: 1 },
     { field: 'date', label: 'Date', placeholder: '', type: 'date', colSpan: 1 },
