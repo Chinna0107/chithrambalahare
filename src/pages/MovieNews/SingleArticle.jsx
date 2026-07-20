@@ -364,7 +364,7 @@ const SingleArticle = () => {
             {/* RELATED ARTICLES */}
             <div className="related-title">Related Articles</div>
             <div className="related-grid">
-              {relatedNews?.data?.filter(n => n.id !== article.id).slice(0, 4).map((rel) => (
+              {relatedNews?.filter(n => n.id !== article.id).slice(0, 4).map((rel) => (
                 <Link to={`/movie-news/${rel.slug}`} key={rel.id} className="rel-card">
                   <div className="rel-thumb" style={{ background: '#0d1b30', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     {rel.thumbnail ? (

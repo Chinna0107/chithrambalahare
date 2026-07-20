@@ -92,9 +92,9 @@ const BoxOffice = () => {
                   </div>
                   <Link to={`/movie-news/${featuredArticle.slug}`} className="feat-main" style={{ display: 'block', textDecoration: 'none' }}>
                     <div className="feat-img" style={{ position: 'relative', overflow: 'hidden' }}>
-                      {featuredArticle.featuredImage ? (
+                      {featuredArticle.featuredImage || featuredArticle.thumbnail ? (
                         <img
-                          src={featuredArticle.featuredImage}
+                          src={featuredArticle.featuredImage || featuredArticle.thumbnail}
                           alt={featuredArticle.title}
                           style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', top: 0, left: 0 }}
                         />

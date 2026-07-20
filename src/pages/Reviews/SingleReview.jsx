@@ -13,9 +13,8 @@ const FALLBACK = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?a
 
 const getYouTubeEmbedUrl = (url) => {
   if (!url) return '';
-  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-  const match = url.match(regExp);
-  const videoId = (match && match[2].length === 11) ? match[2] : null;
+  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|shorts\/|live\/|.*[?&]v=))([^"&?\/\s]{11})/);
+  const videoId = match ? match[1] : null;
   return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
 };
 

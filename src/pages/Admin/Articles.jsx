@@ -7,9 +7,9 @@ import TipTapEditor from '../../components/Editor/TipTapEditor';
 import { useArticles } from '../../hooks/useArticles';
 import SEOFields from '../../components/SEO/SEOFields';
 
-const emptyForm = { 
-  slug: '', title: '', excerpt: '', content: '', thumbnail: '', 
-  date: '', category: 'Casting', author: '', tags: '', status: 'published',
+const emptyForm = {
+  slug: '', title: '', excerpt: '', content: '', thumbnail: '',
+  date: '', category: 'Production', author: '', tags: '', status: 'published',
   seoTitle: '', metaDescription: '', focusKeyword: '', metaKeywords: '',
   canonicalUrl: '', ogTitle: '', ogDescription: '', ogImage: '', twitterCard: 'summary_large_image', robots: 'index,follow'
 };
@@ -31,8 +31,8 @@ const Articles = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
 
-  const filteredList = list.filter(item => 
-    item.title?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+  const filteredList = list.filter(item =>
+    item.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     item.category?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -155,7 +155,7 @@ const Articles = () => {
   };
 
   const fields = [
-    { field: 'category', label: 'Category', type: 'select', options: ['Production', 'Box Office'], colSpan: 1 },
+    { field: 'category', label: 'Category', type: 'select', options: ['Production', 'ott', 'Box Office'], colSpan: 1 },
     { field: 'title', label: 'Title', placeholder: 'Article title', colSpan: 2 },
     { field: 'author', label: 'Author', placeholder: 'Author name', colSpan: 1 },
     { field: 'date', label: 'Date', placeholder: '', type: 'date', colSpan: 1 },
@@ -172,10 +172,10 @@ const Articles = () => {
           <div key={field} className={colSpan === 2 ? 'sm:col-span-2' : ''}>
             <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">{label}</label>
             {field === 'thumbnail' ? (
-              <ImageUpload 
-                value={formState[field] ?? ''} 
-                onChange={url => setFormState(f => ({ ...f, [field]: url }))} 
-                placeholder={`Upload ${label.replace(' URL', '').toLowerCase()}...`} 
+              <ImageUpload
+                value={formState[field] ?? ''}
+                onChange={url => setFormState(f => ({ ...f, [field]: url }))}
+                placeholder={`Upload ${label.replace(' URL', '').toLowerCase()}...`}
               />
             ) : type === 'select' ? (
               <select
@@ -236,7 +236,7 @@ const Articles = () => {
       </div>
 
 
-      <SEOFields 
+      <SEOFields
         values={formState}
         onChange={(newValues) => setFormState(newValues)}
         showAdvanced={true}
@@ -254,9 +254,9 @@ const Articles = () => {
         <div className="flex items-center gap-4">
           <div className="relative">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input 
-              type="text" 
-              placeholder="Search articles..." 
+            <input
+              type="text"
+              placeholder="Search articles..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9 pr-4 py-2 bg-[#18181B] border border-gray-800 rounded-xl text-sm text-white focus:outline-none focus:border-brand-red transition-all w-64"
@@ -325,11 +325,11 @@ const Articles = () => {
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-start gap-4 flex-1 min-w-0">
                   <div className="pt-2 flex-shrink-0">
-                    <input 
-                      type="checkbox" 
-                      checked={selectedIds.includes(item.id)} 
-                      onChange={() => handleSelect(item.id)} 
-                      className="w-5 h-5 rounded border-gray-700 bg-black/50 text-brand-red focus:ring-brand-red focus:ring-offset-gray-900 cursor-pointer transition-colors" 
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.includes(item.id)}
+                      onChange={() => handleSelect(item.id)}
+                      className="w-5 h-5 rounded border-gray-700 bg-black/50 text-brand-red focus:ring-brand-red focus:ring-offset-gray-900 cursor-pointer transition-colors"
                     />
                   </div>
                   {item.thumbnail ? (
@@ -345,7 +345,7 @@ const Articles = () => {
                       {item.status === 'draft' && <span className="bg-yellow-500/10 text-yellow-500 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Draft</span>}
                       {item.status === 'scheduled' && <span className="bg-blue-500/10 text-blue-500 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Scheduled</span>}
                     </div>
-                    
+
                     <div className="flex flex-wrap items-center gap-3 mt-2">
                       {item.category && <span className="text-xs font-bold bg-gray-800 px-2 py-1 rounded-md text-gray-300">{item.category}</span>}
                       {item.author && <span className="text-xs text-gray-400 flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-gray-600" />{item.author}</span>}
@@ -357,7 +357,7 @@ const Articles = () => {
                       )}
                     </div>
                     {item.excerpt && <p className="text-sm text-gray-500 mt-2 line-clamp-2">{item.excerpt}</p>}
-                    
+
                     {expandedId === item.id && (
                       <div className="mt-4 p-4 bg-black/40 rounded-xl text-sm text-gray-300 prose prose-invert max-w-none border border-gray-800">
                         <div dangerouslySetInnerHTML={{ __html: typeof item.content === 'string' ? item.content : JSON.stringify(item.content) }} />
@@ -382,16 +382,16 @@ const Articles = () => {
         ))}
         {totalPages > 1 && (
           <div className="flex justify-between items-center mt-6 bg-[#18181B] border border-gray-800 rounded-2xl p-4">
-            <button 
-              disabled={currentPage === 1} 
+            <button
+              disabled={currentPage === 1}
               onClick={() => setCurrentPage(p => p - 1)}
               className="px-4 py-2 bg-gray-800 text-white rounded-lg text-sm disabled:opacity-50 hover:bg-gray-700 transition-colors"
             >
               Previous
             </button>
             <span className="text-gray-400 text-sm font-medium">Page {currentPage} of {totalPages}</span>
-            <button 
-              disabled={currentPage === totalPages} 
+            <button
+              disabled={currentPage === totalPages}
               onClick={() => setCurrentPage(p => p + 1)}
               className="px-4 py-2 bg-gray-800 text-white rounded-lg text-sm disabled:opacity-50 hover:bg-gray-700 transition-colors"
             >
