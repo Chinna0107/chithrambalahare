@@ -7,12 +7,15 @@ import TipTapEditor from '../../components/Editor/TipTapEditor';
 import { useArticles } from '../../hooks/useArticles';
 import SEOFields from '../../components/SEO/SEOFields';
 
+
 const emptyForm = {
   slug: '', title: '', excerpt: '', content: '', thumbnail: '',
   date: '', category: 'movie-news', author: '', tags: '', status: 'published',
   seoTitle: '', metaDescription: '', focusKeyword: '', metaKeywords: '',
   canonicalUrl: '', ogTitle: '', ogDescription: '', ogImage: '', twitterCard: 'summary_large_image', robots: 'index,follow'
 };
+
+
 
 const sanitize = (obj) => Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, v === null || v === undefined ? '' : v]));
 
