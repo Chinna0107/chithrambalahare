@@ -150,10 +150,11 @@ const SingleSchedule = () => {
               <div className="relative pt-[56.25%] rounded-xl overflow-hidden bg-black border border-gray-800">
                 <iframe
                   className="absolute inset-0 w-full h-full"
-                  src={`https://www.youtube.com/embed/${trailerId}`}
+                  src={`https://www.youtube.com/embed/${trailerId}?origin=${encodeURIComponent(typeof window !== 'undefined' ? window.location.origin : 'https://chitrambhalare.in')}&enablejsapi=1&rel=0`}
                   title={`${movie.movieName} Trailer`}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
+                  referrerPolicy="strict-origin-when-cross-origin"
                 ></iframe>
               </div>
             </div>

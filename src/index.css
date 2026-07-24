@@ -1040,6 +1040,33 @@ footer {
   color: rgba(240, 237, 232, 0.9);
 }
 
+/* ── YouTube / Video Embeds ──────────────────────────────────── */
+.art-body iframe[src*="youtube"],
+.art-body iframe[src*="youtu.be"] {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  height: auto;
+  border-radius: 12px;
+  border: none;
+  margin: 24px 0;
+  display: block;
+}
+
+.art-body div[data-youtube-video] {
+  position: relative;
+  width: 100%;
+  margin: 24px 0;
+}
+
+.art-body div[data-youtube-video] iframe {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  height: auto;
+  border-radius: 12px;
+  border: none;
+  display: block;
+}
+
 .art-body p {
   margin-bottom: 16px;
 }

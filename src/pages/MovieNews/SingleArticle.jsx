@@ -232,15 +232,23 @@ const SingleArticle = () => {
 
       <div className="wrap">
         {/* BREADCRUMB */}
-        <div className="breadcrumb">
-          <Link to="/main" className="bc-link">Home</Link>
-          <span>/</span>
-          <Link to="/movie-news" className="bc-link">Movie News</Link>
-          <span>/</span>
-          <span style={{ color: 'var(--text)' }}>
-            {article.title.length > 30 ? `${article.title.slice(0, 27)}...` : article.title}
-          </span>
-        </div>
+        {(() => {
+          const cat = (article.category || '').toLowerCase();
+          const isBoxOffice = cat.includes('box office');
+          const breadcrumbLabel = isBoxOffice ? 'Box Office' : 'Movie News';
+          const breadcrumbPath = isBoxOffice ? '/box-office' : '/movie-news';
+          return (
+            <div className="breadcrumb">
+              <Link to="/main" className="bc-link">Home</Link>
+              <span>/</span>
+              <Link to={breadcrumbPath} className="bc-link">{breadcrumbLabel}</Link>
+              <span>/</span>
+              <span style={{ color: 'var(--text)' }}>
+                {article.title.length > 30 ? `${article.title.slice(0, 27)}...` : article.title}
+              </span>
+            </div>
+          );
+        })()}
 
         <div className="art-layout">
           {/* ARTICLE */}

@@ -46,7 +46,7 @@ const ReviewCard = ({ review }) => {
           </p>
           <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-200">
             <span className="text-gray-100 font-bold text-sm flex items-center bg-brand-red/90 w-max px-4 py-2 rounded-full shadow-[0_0_15px_rgba(255,0,0,0.4)]">
-              Read Review <span className="ml-2 text-lg">â†’</span>
+                  Read Review <span className="ml-2 text-lg"></span>
             </span>
           </div>
         </div>

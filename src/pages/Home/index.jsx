@@ -14,8 +14,8 @@ import { getArticles, getReviews, getBoxOffice, getActiveLiveUpdate } from '../.
 
 const Home = () => {
   const { data: articlesData, isLoading: articlesLoading } = useQuery({
-    queryKey: ['articles', { limit: 15 }],
-    queryFn: () => getArticles({ limit: 15 }),
+    queryKey: ['articles', { limit: 15, category: 'movie-news,production' }],
+    queryFn: () => getArticles({ limit: 15, category: 'movie-news,production' }),
   });
 
   const { data: ottData } = useQuery({
@@ -62,7 +62,7 @@ const Home = () => {
       <div className="desktop-grid">
         {/* Main Content Area */}
         <div className="space-y-12 min-w-0">
-          
+
           {/* Live Now Banner */}
           {activeLiveUpdate && (
             <Link to={`/live-tracking/${activeLiveUpdate.slug}`} className="block relative group overflow-hidden rounded-xl bg-gradient-to-r from-red-600 via-brand-red to-red-900 border border-brand-red/30 shadow-[0_0_20px_rgba(229,9,20,0.2)]">
@@ -84,7 +84,7 @@ const Home = () => {
 
           {/* Hero Section */}
           <HeroSlider articles={articles} />
-          
+
           {/* Latest Movie News Grid */}
           {latestNews.length > 0 && (
             <section>
@@ -96,7 +96,7 @@ const Home = () => {
                   View All <ChevronRight className="w-4 h-4 ml-1" />
                 </Link>
               </div>
-              
+
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
                 {latestNews.map((article, idx) => (
                   <NewsCard key={article.id} article={article} isFeatured={idx === 0} compact={idx !== 0} />
@@ -108,7 +108,7 @@ const Home = () => {
           {/* OTT Updates */}
           {ottNews.length > 0 && (
             <section>
-            <div className="flex justify-between items-center mb-6 border-b-2 border-brand-red/10 pb-2">
+              <div className="flex justify-between items-center mb-6 border-b-2 border-brand-red/10 pb-2">
                 <h2 className="text-2xl font-poppins font-bold text-gray-100 border-b-2 border-brand-red -mb-[10px] pb-2">
                   OTT Updates
                 </h2>
@@ -116,7 +116,7 @@ const Home = () => {
                   View All <ChevronRight className="w-4 h-4 ml-1" />
                 </Link>
               </div>
-              
+
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
                 {ottNews.map((article, idx) => (
                   <NewsCard key={article.id} article={article} isFeatured={idx === 0} compact={idx !== 0} />
@@ -154,7 +154,7 @@ const Home = () => {
 
           {/* Latest Reviews */}
           {reviewsLoading ? (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4"><LoadingSkeleton type="card"/><LoadingSkeleton type="card"/></div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4"><LoadingSkeleton type="card" /><LoadingSkeleton type="card" /></div>
           ) : (
             reviewsData && reviewsData.length > 0 && (
               <section>
@@ -166,7 +166,7 @@ const Home = () => {
                     View All <ChevronRight className="w-4 h-4 ml-1" />
                   </Link>
                 </div>
-                
+
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                   {reviewsData.map(review => (
                     <ReviewCard key={review.id} review={review} />
@@ -183,7 +183,7 @@ const Home = () => {
           <Sidebar />
         </div>
       </div>
-      
+
       {/* Mobile Sidebar (Shows below content on mobile) */}
       <div className="mobile-sidebar mt-12">
         <Sidebar />

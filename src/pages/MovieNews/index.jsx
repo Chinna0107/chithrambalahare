@@ -13,11 +13,12 @@ const MovieNews = () => {
   const search = searchParams.get('search') || '';
 
   const { data, isLoading } = useQuery({
-    queryKey: ['articles', { page, search }],
+    queryKey: ['articles', { page, search, category: 'movie-news,production' }],
     queryFn: () => getArticles({
       page,
       limit: 12,
-      search
+      search,
+      category: 'movie-news,production'
     }),
   });
 
@@ -85,7 +86,7 @@ const MovieNews = () => {
                 <>
                   <div className="section-hdr">
                     <div className="section-hdr-title">Featured</div>
-                    <span className="see-all">See all →</span>
+                    {/* <span className="see-all">See all →</span> */}
                   </div>
                   <Link to={`/movie-news/${featuredArticle.slug}`} className="feat-main" style={{ display: 'block', textDecoration: 'none' }}>
                     <div className="feat-img" style={{ position: 'relative', overflow: 'hidden' }}>
@@ -165,7 +166,7 @@ const MovieNews = () => {
                 <>
                   <div className="section-hdr">
                     <div className="section-hdr-title">All Movie News</div>
-                    <span className="see-all">2,400+ →</span>
+                    {/* <span className="see-all">2,400+ →</span> */}
                   </div>
                   <div className="news-grid">
                     {gridArticles.map((art) => (

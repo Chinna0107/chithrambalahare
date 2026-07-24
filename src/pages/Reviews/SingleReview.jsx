@@ -15,7 +15,9 @@ const getYouTubeEmbedUrl = (url) => {
   if (!url) return '';
   const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|shorts\/|live\/|.*[?&]v=))([^"&?\/\s]{11})/);
   const videoId = match ? match[1] : null;
-  return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
+  if (!videoId) return url;
+  const origin = typeof window !== 'undefined' ? window.location.origin : 'https://chitrambhalare.in';
+  return `https://www.youtube.com/embed/${videoId}?origin=${encodeURIComponent(origin)}&enablejsapi=1&rel=0`;
 };
 
 const SingleReview = () => {
@@ -201,6 +203,7 @@ const SingleReview = () => {
                       frameBorder="0" 
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                       allowFullScreen
+                      referrerPolicy="strict-origin-when-cross-origin"
                     ></iframe>
                   </div>
                 </div>

@@ -87,7 +87,7 @@ const TipTapEditor = ({ content = '', onChange, placeholder = 'Start writing you
       TableRow,
       TableCell,
       TableHeader,
-      Youtube.configure({ width: 640, height: 360, HTMLAttributes: { class: 'rounded-lg overflow-hidden my-4' } }),
+      Youtube.configure({ width: 640, height: 360, HTMLAttributes: { class: 'rounded-lg overflow-hidden my-4', referrerpolicy: 'strict-origin-when-cross-origin' } }),
       Placeholder.configure({ placeholder }),
       TaskList,
       TaskItem.configure({ nested: true }),

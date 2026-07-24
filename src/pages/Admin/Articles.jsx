@@ -9,7 +9,7 @@ import SEOFields from '../../components/SEO/SEOFields';
 
 const emptyForm = {
   slug: '', title: '', excerpt: '', content: '', thumbnail: '',
-  date: '', category: 'Production', author: '', tags: '', status: 'published',
+  date: '', category: 'movie-news', author: '', tags: '', status: 'published',
   seoTitle: '', metaDescription: '', focusKeyword: '', metaKeywords: '',
   canonicalUrl: '', ogTitle: '', ogDescription: '', ogImage: '', twitterCard: 'summary_large_image', robots: 'index,follow'
 };
@@ -155,7 +155,7 @@ const Articles = () => {
   };
 
   const fields = [
-    { field: 'category', label: 'Category', type: 'select', options: ['Production', 'ott', 'Box Office'], colSpan: 1 },
+    { field: 'category', label: 'Category', type: 'select', options: ['movie-news', 'Production', 'ott', 'Box Office'], colSpan: 1 },
     { field: 'title', label: 'Title', placeholder: 'Article title', colSpan: 2 },
     { field: 'author', label: 'Author', placeholder: 'Author name', colSpan: 1 },
     { field: 'date', label: 'Date', placeholder: '', type: 'date', colSpan: 1 },
